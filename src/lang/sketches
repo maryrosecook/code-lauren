@@ -1,0 +1,68 @@
+move each robot in robots
+feed robots through move
+robots > each > add_hat > move
+
+
+"hi" > uppercase : hi_uppercase
+
+"hi" " " "alan" > concat "!" > print : hi_alan_in_uppercase
+
+? > describe_person
+
+(robot (10 20)) > move
+run move robot
+
+say_hi(alan, mary)
+
+create_procedure ?number
+  number 1 > add
+: add_1
+
+1 2 3 > each (?x x 1 > add)
+
+name
+  first_name : "mary rose"
+  last_name : "cook"
+  height : 160
+  full_name : first_name last_name > join " "
+    full_name height > join " " > print
+
+choose
+  name "mary" > eq : "hi mary" > print
+  name "rose" > eq : "hi rose" > print
+
+name
+  describe_person : ()
+
+print(add(1, 2))
+
+1 2 > add > say_hi
+
+"b" > uppercase : b_uppercased
+  "a" b_uppercased > concat
+
+1 2 > add (3 2 > multiply) > print
+
+
+
+create_procedure ?name ?height (
+  !name !height > join " " > print
+): describe_person
+
+'a' 'b' 'c' : items
+  items > each > uppercase > print
+
+"mary" 160 > describe_person
+
+items -> ("a" "b" "c")
+items each do item_count times
+  (
+.
+
+if ("a" "a") same
+  "they are the same" print
+.
+
+
+item <= first(items)
+for each item in items
