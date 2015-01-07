@@ -24,24 +24,32 @@ name
   first_name : "mary rose"
   last_name : "cook"
   height : 160
+  likes :
+    food : "bananas" "apples"
+    games : "squash" "go"
+  cities : "berlin" "new york" "london"
   full_name : first_name last_name > join " "
+  .
     full_name height > join " " > print
 
 choose
-  name "mary" > eq : "hi mary" > print
-  name "rose" > eq : "hi rose" > print
+  first_name "mary" > eq - "hi mary" > print
+  first_name "rose" > eq - "hi rose" > print
 
 name
-  describe_person : ()
+  describe_person : [?name ?height > join " " > return]
+  names : "mary" "rose" "cook"
+  .
+    names > map describe_person > join " " > print
 
-print(add(1, 2))
 
-1 2 > add > say_hi
+
+1 2 > add ? > say_hi ?
 
 "b" > uppercase : b_uppercased
   "a" b_uppercased > concat
 
-1 2 > add (3 2 > multiply) > print
+3 2 > multiply > concat 1 2 > add > print
 
 
 

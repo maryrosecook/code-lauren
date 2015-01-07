@@ -1,0 +1,32 @@
+data:
+  cars:
+    * x: 10 y: 20 vx: 5 vy: 5 color: blue
+    * x: 20 y: 30 vx: 5 vy: 5 color: 'green
+  difficulty_level: hard
+  difficulty_levels:
+    hard:
+      speed: 3
+    medium:
+      speed: 2
+    easy:
+      speed: 1
+
+main: fun (?data
+  render(data)
+
+  speed: 'data/difficulty_levels/[data/difficulty_level]/speed
+
+  data:
+    cars:
+      'move_cars(. 'speed)
+)
+
+move_cars: fun (?cars ?speed
+  cars: each(. move_car)
+)
+
+move_car: fun (?car ?speed
+  car:
+    x: add(. speed)
+    y: add(. speed)
+)
