@@ -1,0 +1,18 @@
+people: [
+  mary: [
+    name: "Mary" height: 160
+    hobbies: ["programming" "going to the Met" "going to the cinema"]
+  ]
+]
+
+describePerson: f { ?person
+  concat(person/name " " person/height
+         join(hobbies " "))
+}
+
+print(all(people describePerson))
+
+print(choose {
+  eq(mary/name "Mary"): "hi Mary"
+  else: "hi stranger"
+})
