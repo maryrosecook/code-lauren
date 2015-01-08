@@ -1,0 +1,23 @@
+mary: [
+  name: "Mary" height: 160
+  hobbies: ["programming" "going to the Met" "going to the cinema"]
+]
+
+if eq(1 2) {
+
+} else if eq(2 2) {
+
+}
+
+describePerson: fun { ?person
+  return concat(person.name " " person.height " "
+                join(person.hobbies, " "))
+}
+
+each hobby in hobbies {
+  print(hobby)
+}
+
+loop hobby: next(hobbies) {
+  loop hobby: next(hobbies)
+}
