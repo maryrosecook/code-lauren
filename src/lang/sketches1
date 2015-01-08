@@ -49,7 +49,7 @@ name
 "b" > uppercase : b_uppercased
   "a" b_uppercased > concat
 
-3 2 > multiply > concat 1 2 > add > print
+3 2 > multiply > concat ? 1 2 > add > print
 
 
 
