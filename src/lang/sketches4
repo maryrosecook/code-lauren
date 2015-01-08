@@ -1,0 +1,10 @@
+(name people
+      (mary: (name: "Mary" height: 160
+              hobbies: ("programming" "going to the Met" "going to the cinema"))))
+
+(name describe-person
+      (fun (person)
+           (concat (get "name" person) " " (get "height" person)
+                   (join (get "hobbies" person) " "))))
+
+(print (all people describe-person))
