@@ -8,3 +8,6 @@
                    (join (get "hobbies" person) " "))))
 
 (print (all people describe-person))
+
++ simple syntax
+- hard to read

@@ -21,3 +21,7 @@ each hobby in hobbies {
 loop hobby: next(hobbies) {
   loop hobby: next(hobbies)
 }
+
++ same brackets for lists and maps
++ ?param ysntax
+- lots of punctuation

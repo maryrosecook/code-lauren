@@ -30,3 +30,8 @@ move_car: fun (?car ?speed
     x: add(. speed)
     y: add(. speed)
 )
+
+- overly complex data def
+- quoting thing is hard to keep track of (see speed:...)
+- the . to get previous val is kind of cool, but since different dots map to different vars, it's confusing
+- the copy+mutate+return syntax makes things a bit clearer on why values are not modified in place, but there is a logical flaw because could still seem like `speed: 1; speed: 2` is mutatey

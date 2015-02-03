@@ -20,17 +20,15 @@ create_procedure ?number
 
 1 2 3 > each (?x x 1 > add)
 
-name
-  first_name : "mary rose"
-  last_name : "cook"
-  height : 160
-  likes :
-    food : "bananas" "apples"
-    games : "squash" "go"
-  cities : "berlin" "new york" "london"
-  full_name : first_name last_name > join " "
-  .
-    full_name height > join " " > print
+first_name : "mary rose"
+last_name : "cook"
+height : 160
+likes :
+  food : "bananas" "apples"
+  games : "squash" "go"
+cities : "berlin" "new york" "london"
+full_name : first_name last_name > join " "
+full_name height > join " " > print
 
 choose
   first_name "mary" > eq - "hi mary" > print
@@ -45,13 +43,6 @@ name
 
 
 1 2 > add ? > say_hi ?
-
-"b" > uppercase : b_uppercased
-  "a" b_uppercased > concat
-
-3 2 > multiply > concat ? 1 2 > add > print
-
-
 
 create_procedure ?name ?height (
   !name !height > join " " > print
@@ -74,3 +65,40 @@ if ("a" "a") same
 
 item <= first(items)
 for each item in items
+
+
+
+to_dos: "Haircut"
+
+print_to_dos < [?to_dos
+  all todos print
+]
+
+new_to_do: [?to_dos
+  raw_input "What else do you need to do? " > concat to_dos ?
+]
+
+[
+  print "Oops still a work in progress!"
+]: complete_to_do
+
+handle_action: [?to_dos
+  raw_input "New item, completed item or print list? ": action
+
+  New: [new_to_do todos]
+  Completed: [to_dos] > get action ? > ? : new_to_dos
+
+  ["New" "Print" > contains action] > if ? [print_to_dos new_todos]
+
+  new_to_dos
+]
+
+handle_action > forever ?
+
++ pipeline syntax very easy to read
++ the ? interpolation seems ok to solve the thread-first/thread-last problem
++ no brackets required around lists
++ read top to bottom left to right
+- forever and other control flows feel like black boxes
+- invocation of > ? > is really weird
+- conditionals feels forced
