@@ -1,0 +1,47 @@
+people:
+  mary:
+    name: "Mary"
+    height: 160
+    hobbies:
+      "programming"
+      "going to the Met"
+      "going to the cinema"
+
+banana:
+  tastiness: "high"
+potato:
+  colour: "high"
+if
+  equal
+   banana/tastiness
+   potato/tastiness
+  print "wow they are the same tastiness"
+
+describe-person:
+  action
+    person
+    concat
+      get
+        "name"
+        person
+      " "
+      get
+        "height"
+        person
+      join
+        get
+          "hobbies"
+          person
+        " "
+
+print
+  all
+    people
+    describe-person
+
++ the colons to name things go nicely w the code
+Lisp w/o the parens
+- lots of lines
+"do I need to indent?" - solved with highlight showing current associativity?
++ minimal punctuation
+- expressions w more than two parts aren't great - hard to scan them for their parts
