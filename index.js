@@ -8914,7 +8914,7 @@ var peg = require("pegjs");
 
 
 var pegParse = peg.buildParser(
-  "start\n  = additive\n\nadditive\n  = left:multiplicative \"+\" right:additive { return left + right; }\n  / multiplicative\n\nmultiplicative\n  = left:primary \"*\" right:multiplicative { return left * right; }\n  / primary\n\nprimary\n  = integer\n  / \"(\" additive:additive \")\" { return additive; }\n\ninteger \"integer\"\n  = digits:[0-9]+ { return parseInt(digits.join(\"\"), 10); }\n"
+  "{\n  function par() {\n\n  };\n\n  function atom(tag, content, line, column, syntax, raw) {\n    var node = { t: tag, c: content, l: line(), i: column() };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    if (raw !== undefined) {\n      node.raw = raw;\n    }\n\n    return node;\n  };\n\n  // WHAT IS THE \"integer\"?\n}\n\nstart\n  = s_expression\n\ns_expression\n  = all:atom { return atom(\"variable\", all, line, column); }\n\natom\n  = number\n  / variable\n\nnumber \"number\"\n  = all:[0-9]+[.]*[0-9]* { return parseInt(all.join(\"\"), 10); }\n\nvariable\n  = all:[a-zA-Z-]+ { return all.join(\"\"); }\n"
 ).parse;
 
 function parse(str) {
@@ -8931,7 +8931,7 @@ function run(str) {
 
 run.parse = parse;
 run.interpret = interpret;
-exports.module = run;
+module.exports = run;
 
 },{"immutable":"/Users/maryrosecook/code/lauren/node_modules/immutable/dist/immutable.js","pegjs":"/Users/maryrosecook/code/lauren/node_modules/pegjs/lib/peg.js"}],"/Users/maryrosecook/code/lauren/src":[function(require,module,exports){
 var lang = require("./lang/lis");
