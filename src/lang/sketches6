@@ -45,3 +45,13 @@ Lisp w/o the parens
 "do I need to indent?" - solved with highlight showing current associativity?
 + minimal punctuation
 - expressions w more than two parts aren't great - hard to scan them for their parts
+
+["describe-person" ["action" ["person"] [["concat" { person.name } { " " } { person.height }]]]]
+
+describe-person:
+  action
+    person
+    concat
+      person.name
+      " "
+      person.height
