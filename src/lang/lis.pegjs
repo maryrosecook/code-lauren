@@ -1,17 +1,36 @@
+{
+  function par() {
+
+  };
+
+  function atom(tag, content, line, column, syntax, raw) {
+    var node = { t: tag, c: content, l: line(), i: column() };
+    if(syntax !== undefined) {
+      node.syntax = syntax;
+    }
+
+    if (raw !== undefined) {
+      node.raw = raw;
+    }
+
+    return node;
+  };
+
+  // WHAT IS THE "integer"?
+}
+
 start
-  = additive
+  = s_expression
 
-additive
-  = left:multiplicative "+" right:additive { return left + right; }
-  / multiplicative
+s_expression
+  = all: atom
 
-multiplicative
-  = left:primary "*" right:multiplicative { return left * right; }
-  / primary
+atom
+  = all: num { return atom("num", all, line, column); }
+  / all: var { return atom("var", all, line, column); }
 
-primary
-  = integer
-  / "(" additive:additive ")" { return additive; }
+num "num"
+  = all: [0-9]+[.]*[0-9]* { return parseInt(all.join(""), 10); }
 
-integer "integer"
-  = digits:[0-9]+ { return parseInt(digits.join(""), 10); }
+var
+  = all: [a-zA-Z-]+ { return all.join(""); }
