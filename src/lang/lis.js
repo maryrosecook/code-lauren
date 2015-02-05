@@ -20,4 +20,4 @@ function run(str) {
 
 run.parse = parse;
 run.interpret = interpret;
-exports.module = run;
+module.exports = run;
