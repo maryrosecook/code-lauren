@@ -8914,7 +8914,7 @@ var peg = require("pegjs");
 
 
 var pegParse = peg.buildParser(
-  "{\n  function par() {\n\n  };\n\n  function atom(tag, content, line, column, syntax, raw) {\n    var node = { t: tag, c: content, l: line(), i: column() };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    if (raw !== undefined) {\n      node.raw = raw;\n    }\n\n    return node;\n  };\n\n  // WHAT IS THE \"integer\"?\n}\n\nstart\n  = s_expression\n\ns_expression\n  = all:atom { return atom(\"variable\", all, line, column); }\n\natom\n  = number\n  / variable\n\nnumber \"number\"\n  = all:[0-9]+[.]*[0-9]* { return parseInt(all.join(\"\"), 10); }\n\nvariable\n  = all:[a-zA-Z-]+ { return all.join(\"\"); }\n"
+  "{\n  function par() {\n\n  };\n\n  function atom(tag, content, line, column, syntax, raw) {\n    var node = { t: tag, c: content, l: line(), i: column() };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    if (raw !== undefined) {\n      node.raw = raw;\n    }\n\n    return node;\n  };\n}\n\nstart\n  = s_expression\n\ns_expression\n  = all: atom\n\natom\n  = all: num { return atom(\"num\", all, line, column); }\n  / all: var { return atom(\"var\", all, line, column); }\n\nnum\n  = all: [0-9]+[.]*[0-9]* { return parseInt(all.join(\"\"), 10); }\n\nvar\n  = all: [a-zA-Z-]+ { return all.join(\"\"); }\n"
 ).parse;
 
 function parse(str) {

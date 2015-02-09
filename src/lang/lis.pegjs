@@ -15,8 +15,6 @@
 
     return node;
   };
-
-  // WHAT IS THE "integer"?
 }
 
 start
@@ -29,7 +27,7 @@ atom
   = all: num { return atom("num", all, line, column); }
   / all: var { return atom("var", all, line, column); }
 
-num "num"
+num
   = all: [0-9]+[.]*[0-9]* { return parseInt(all.join(""), 10); }
 
 var
