@@ -1,9 +1,5 @@
 {
-  function par() {
-
-  };
-
-  function atom(tag, content, line, column, syntax, raw) {
+  function node(tag, content, line, column, syntax, raw) {
     var node = { t: tag, c: content, l: line(), i: column() };
     if(syntax !== undefined) {
       node.syntax = syntax;
@@ -18,17 +14,25 @@
 }
 
 start
-  = s_expression
+  = exp
 
-s_expression
-  = all: atom
+exp
+  = assignment
+  / atom
+
+assignment
+  = ident:ident ':' nl '  ' value:exp
+    { return node("assignment", [ident, value], line, column); }
 
 atom
-  = all: num { return atom("num", all, line, column); }
-  / all: var { return atom("var", all, line, column); }
+  = all: num
+  / all: ident
+
+nl
+  = all:[\n]+ { return node('nl', all, line, column); }
 
 num
-  = all: [0-9]+[.]*[0-9]* { return parseInt(all.join(""), 10); }
+  = all: [0-9]+[.]*[0-9]* { return node("num", parseInt(all.join(""), 10), line, column); }
 
-var
-  = all: [a-zA-Z-]+ { return all.join(""); }
+ident
+  = all: [a-zA-Z-_]+ { return node("ident", all.join(""), line, column); }
