@@ -21,18 +21,18 @@ exp
   / atom
 
 assignment
-  = ident:ident ':' nl '  ' value:exp
-    { return node("assignment", [ident, value], line, column); }
+  = label:label ':' nl '  ' value:exp
+    { return node("assignment", [label, value], line, column); }
 
 atom
-  = all: num
-  / all: ident
+  = all: number
+  / all: label
 
 nl
   = all:[\n]+ { return node('nl', all, line, column); }
 
-num
-  = all: [0-9]+[.]*[0-9]* { return node("num", parseInt(all.join(""), 10), line, column); }
+number
+  = all: [0-9]+[.]*[0-9]* { return node("number", parseInt(all.join(""), 10), line, column); }
 
-ident
-  = all: [a-zA-Z-_]+ { return node("ident", all.join(""), line, column); }
+label
+  = all: [a-zA-Z-_]+ { return node("label", all.join(""), line, column); }

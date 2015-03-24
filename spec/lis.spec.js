@@ -13,20 +13,20 @@ function strip(obj) {
 describe("parser", function() {
   it("should parse a var", function() {
     var ast = l.parse("height");
-    expect(strip(ast)).toEqual({ t: "ident", c: "height" });
+    expect(strip(ast)).toEqual({ t: "label", c: "height" });
   });
 
   it("should parse an integer", function() {
     var ast = l.parse("1");
-    expect(strip(ast)).toEqual({ t: "num", c: 1 });
+    expect(strip(ast)).toEqual({ t: "number", c: 1 });
   });
 
   it("should parse a variable assignmest", function() {
     var ast = l.parse("height:\n  160");
     expect(strip(ast)).toEqual({
       t: "assignment", c: [
-        { t: "ident", c: "height" },
-        { t: "num", c: 160 }
+        { t: "label", c: "height" },
+        { t: "number", c: 160 }
       ]
     });
   });
