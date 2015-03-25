@@ -1,0 +1,11 @@
+(set world "draw" {
+  ?world
+  (rectangle (get world "box"))
+})
+
+(set world "update" { ?world
+  (set world "box" "x" (add (get world "box" "x") (random -1 1)))
+  (set world "box" "y" (add (get world "box" "y") (random -1 1)))
+})
+
+(set world "box" [x:10 y:20 w:20 h:20])
