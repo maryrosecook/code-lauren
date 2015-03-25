@@ -32,7 +32,7 @@ map
   = '[' mappings:mapping+ ']'
 
 lambda
-  = '{' parameters:parameter* body:expression_item* '}'
+  = '{' _* parameters:parameter* _* body:expression_item* '}'
     { return node("lambda", { parameters: parameters, body: body }, line, column); }
 
 parameter
