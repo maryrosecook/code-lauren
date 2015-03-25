@@ -55,7 +55,7 @@ nl
     { return node('nl', all, line, column); }
 
 _
-  = [ \\t\\r\n]+
+  = [ \t\r\n]+
 
 number
   = all: [0-9]+[.]*[0-9]*
