@@ -1,5 +1,4 @@
-(set world "draw" {
-  ?world
+(set world "draw" { ?world
   (rectangle (get world "box"))
 })
 
