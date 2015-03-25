@@ -8,14 +8,28 @@ people:
       "going to the cinema"
 
 banana:
-  tastiness: "high"
+  tastiness:
+    "high"
 potato:
-  colour: "high"
-if
-  equal
-   banana/tastiness
-   potato/tastiness
-  print "wow they are the same tastiness"
+  colour:
+    "high"
+choose
+  if
+    equal
+      get
+        banana
+        "tastiness"
+      get
+        potato
+        "tastiness"
+  do
+    print "wow they are the same tastiness"
+  if
+    anything
+  do
+    print "they are not the same tastiness"
+
+
 
 describe-person:
   action
