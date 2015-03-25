@@ -28,26 +28,6 @@ describe("parser", function() {
     });
   });
 
-  describe("lists", function() {
-    it("should parse an empty list", function() {
-      var ast = l.parse("[]");
-      expect(strip(ast)).toEqual({ t: "list", c: [] });
-    });
-
-    it("should parse a list with two items", function() {
-      var ast = l.parse("[1 2]");
-      expect(strip(ast)).toEqual({ t: "list", c: [{ t: "number", c: 1 },
-                                                  { t: "number", c: 2 }] });
-    });
-
-    it("should parse a with a nested list", function() {
-      var ast = l.parse("[1 [2 3]]");
-      expect(strip(ast)).toEqual({ t: "list", c: [{ t: "number", c: 1 },
-                                                  { t: "list", c: [{ t: "number", c: 2 },
-                                                                   { t: "number", c: 3 }]}]});
-    });
-  });
-
   describe("invocation", function() {
     it("should parse an empty invocation", function() {
       var ast = l.parse("()");

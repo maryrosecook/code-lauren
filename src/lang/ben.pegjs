@@ -22,16 +22,14 @@ s_expression
 
 expression
   = invocation
-  / list
   / lambda
 
 invocation
   = '(' elements:expression_item* ')'
     { return node("invocation", elements, line, column); }
 
-list
-  = '[' elements:expression_item* ']'
-    { return node("list", elements, line, column); }
+map
+  = '[' mappings:mapping+ ']'
 
 lambda
   = '{' parameters:parameter* body:expression_item* '}'
@@ -45,17 +43,13 @@ expression_item
   = s_expression:s_expression _*
     { return s_expression; }
 
+mapping
+  = label ':'
+
 atom
   = number
   / string
   / label
-
-nl
-  = all:[\n]+
-    { return node('nl', all, line, column); }
-
-_
-  = [ \t\r\n]+
 
 number
   = all: [0-9]+[.]*[0-9]*
@@ -68,3 +62,10 @@ string
 label
   = all: [a-zA-Z-_]+
     { return node("label", all.join(""), line, column); }
+
+nl
+  = all:[\n]+
+    { return node('nl', all, line, column); }
+
+_
+  = [ \t\r\n]+

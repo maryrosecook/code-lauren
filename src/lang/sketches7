@@ -8,4 +8,4 @@
   (set world "box" "y" (add (get world "box" "y") (random -1 1)))
 })
 
-(set world "box" [x:10 y:20 w:20 h:20])
+(set world "box" (new-dictionary x 10 y 20 w 20 h 20))
