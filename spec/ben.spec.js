@@ -89,6 +89,31 @@ describe("parser", function() {
                                         body: [] }});
     });
 
+    it("should parse an uninvoked lambda with two params and two body exprs", function() {
+      var ast = l.parse("{?a ?b (add a b) (subtract a b)}");
+      expect(strip(ast)).toEqual({ t: "lambda",
+                                   c: { parameters: [{ t: "parameter", c: "a" },
+                                                     { t: "parameter", c: "b" }],
+                                        body: [{ t: "invocation",
+                                                 c: [{ t: "label", c: "add" },
+                                                     { t: "label", c: "a" },
+                                                     { t: "label", c: "b" }]},
+                                               { t: "invocation",
+                                                 c: [{ t: "label", c: "subtract" },
+                                                     { t: "label", c: "a" },
+                                                     { t: "label", c: "b" }]}]}});
+    });
 
+    it("should parse an invoked lambda with param and body", function() {
+      var ast = l.parse("({?a (add a 1)} 2)");
+      expect(strip(ast)).toEqual({ t: "invocation",
+                                   c: [{ t: "lambda",
+                                         c: { parameters: [{ t: "parameter", c: "a" }],
+                                              body: [{ t: "invocation",
+                                                       c: [{ t: "label", c: "add" },
+                                                           { t: "label", c: "a" },
+                                                           { t: "number", c: 1 }]}]}},
+                                       { t: "number", c: 2 }]});
+    });
   });
 });
