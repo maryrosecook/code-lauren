@@ -14,29 +14,33 @@
 }
 
 start
-  = s_expression
+  = top
+
+top
+  = all:s_expression_list_item*
+    { return node("top", all, line, column); }
 
 s_expression
-  = expression
+  = parenthetical
   / atom
 
-expression
+parenthetical
   = invocation
   / lambda
 
 invocation
-  = '(' elements:expression_item* ')'
+  = '(' elements:s_expression_list_item* ')'
     { return node("invocation", elements, line, column); }
 
 lambda
-  = '{' _* parameters:parameter* _* body:expression_item* '}'
+  = '{' _* parameters:parameter* _* body:s_expression_list_item* '}'
     { return node("lambda", { parameters: parameters, body: body }, line, column); }
 
 parameter
   = '?' label:label _*
     { return node("parameter", label.c, line, column); }
 
-expression_item
+s_expression_list_item
   = s_expression:s_expression _*
     { return s_expression; }
 
