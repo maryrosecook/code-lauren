@@ -28,9 +28,6 @@ invocation
   = '(' elements:expression_item* ')'
     { return node("invocation", elements, line, column); }
 
-map
-  = '[' mappings:mapping+ ']'
-
 lambda
   = '{' _* parameters:parameter* _* body:expression_item* '}'
     { return node("lambda", { parameters: parameters, body: body }, line, column); }
