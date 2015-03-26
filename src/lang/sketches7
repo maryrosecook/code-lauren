@@ -1,10 +1,38 @@
-(set world "draw" { ?world
+(set actions "draw" { ?world
   (rectangle (get world "box"))
 })
 
-(set world "update" { ?world
+(set actions "update" { ?world
   (set world "box" "x" (add (get world "box" "x") (random -1 1)))
   (set world "box" "y" (add (get world "box" "y") (random -1 1)))
 })
 
-(set world "box" (new-dictionary x 10 y 20 w 20 h 20))
+(set actions "start" {
+  (new-dictionary "box" (new-dictionary "x" 250 "y" 250 "w" 20 "h" 20))
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;;;;;;;;
+  (choose
+    ("test" (or (< (get world "box" "x") 0)
+                (> (get world "box" "x") 500)
+                (< (get world "box" "y") 0)
+                (< (get world "box" "y") 500))
+     "action" {
+       (set world "box" "x" 250)
+       (set world "box" "y" 250)
+     }))
