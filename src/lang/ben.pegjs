@@ -14,11 +14,7 @@
 }
 
 start
-  = top
-
-top
-  = all:s_expression_list_item*
-    { return node("top", all, line, column); }
+  = invocation
 
 s_expression
   = parenthetical
@@ -33,16 +29,20 @@ invocation
     { return node("invocation", elements, line, column); }
 
 lambda
-  = '{' _* parameters:parameter* _* body:s_expression_list_item* '}'
-    { return node("lambda", { parameters: parameters, body: body }, line, column); }
+  = '{' _* parameters:parameter* _* body:s_expression_list '}'
+    { return node("lambda", [parameters, body], line, column); }
 
-parameter
-  = '?' label:label _*
-    { return node("parameter", label.c, line, column); }
+s_expression_list
+  = all: s_expression_list_item*
+    { return node("expression_list", all, line, column); }
 
 s_expression_list_item
   = s_expression:s_expression _*
     { return s_expression; }
+
+parameter
+  = '?' label:label _*
+    { return node("parameter", label.c, line, column); }
 
 mapping
   = label ':'
