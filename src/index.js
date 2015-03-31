@@ -1,8 +1,12 @@
 var lang = require("./lang/lis");
-console.log("hi")
-// var createIde = require("./ide.js")
+var ace = require('brace');
+require('brace/mode/javascript');
+require('brace/theme/monokai');
 
-exports.lauren = lauren;
-function lauren(codeElement, canvasElement) {
-  var ide = createIde(codeElement, canvasElement);
-};
+console.log("loaded")
+
+window.addEventListener("load", function() {
+  var editor = ace.edit('editor');
+  editor.getSession().setMode('ace/mode/javascript');
+  editor.setTheme('ace/theme/monokai');
+});
