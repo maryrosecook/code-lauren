@@ -19,6 +19,7 @@ function setupEditor() {
   var editor = ace.edit('editor');
   editor.setValue('(write-text "Hello, world" 12 30 "black")');
   editor.clearSelection(); // for some reason, setting the initial text selects everything
+  editor.focus();
   editor.setTheme('ace/theme/monokai');
   editor.renderer.setShowGutter(false);
   editor.getSession().setTabSize(2);
