@@ -26,6 +26,16 @@ var canvasLibrary = module.exports = function(screen) {
       screen.closePath();
       screen.fillStyle = color;
       screen.fill();
+    },
+
+    "draw-unfilled-rectangle": function(x, y, width, height, color) {
+      screen.strokeStyle = color;
+      screen.strokeRect(x, y, width, height);
+    },
+
+    "draw-filled-rectangle": function(x, y, width, height, color) {
+      screen.fillStyle = color;
+      screen.fillRect(x, y, width, height);
     }
   };
 };
