@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "node_modules/jasmine-node/bin/jasmine-node spec/",
-    "build": "browserify src/ | uglifyjs > index.js",
+    "build": "browserify src/ -t brfs | uglifyjs > index.js",
     "watch": "watchify src/ -o index.js -t brfs --verbose --debug"
   },
   "dependencies": {
