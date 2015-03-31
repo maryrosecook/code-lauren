@@ -12,12 +12,20 @@ var canvasLibrary = module.exports = function(screen) {
       screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
     },
 
-    "draw-circle": function(x, y, radius, color) {
+    "draw-unfilled-circle": function(x, y, radius, color) {
       screen.beginPath();
       screen.arc(x, y, radius, 0, Math.PI * 2, true);
       screen.closePath();
       screen.strokeStyle = color;
       screen.stroke();
+    },
+
+    "draw-filled-circle": function(x, y, radius, color) {
+      screen.beginPath();
+      screen.arc(x, y, radius, 0, Math.PI * 2, true);
+      screen.closePath();
+      screen.fillStyle = color;
+      screen.fill();
     }
   };
 };
