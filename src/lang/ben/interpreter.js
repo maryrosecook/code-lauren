@@ -3,6 +3,7 @@ var peg = require("pegjs");
 var fs = require("fs");
 var _ = require('underscore');
 
+var standardLibrary = require("./standard-library");
 
 var pegParse = peg.buildParser(
   fs.readFileSync(__dirname + "/grammar.pegjs", "utf8")
@@ -56,7 +57,9 @@ function interpretLiteral(ast, env) {
 };
 
 function interpret(ast, env) {
-  if (ast.t === "invocation") {
+  if (env === undefined) {
+    return interpret(ast, createScope(standardLibrary));
+  } else if (ast.t === "invocation") {
     return interpretSExpression(ast, env);
   } else if (ast.t === "lambda") {
     return interpretLambdaDef(ast, env);

@@ -17,5 +17,10 @@ var standardLibrary = module.exports = {
 
   get: function(dict, key) {
     return dict[key];
+  },
+
+  print: function(thingToPrint) {
+    console.log(thingToPrint);
+    return (thingToPrint !== undefined ? thingToPrint.toString() : "") + "\n";
   }
 };

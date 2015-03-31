@@ -1,4 +1,4 @@
-var lib = require("../../src/lang/ben/library.js");
+var lib = require("../../src/lang/ben/standard-library.js");
 
 function pp(str) {
   console.log(JSON.stringify(str, null, 2));
