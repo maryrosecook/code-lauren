@@ -3,19 +3,25 @@
   margin: 0;
 }
 
+body {
+  margin: 10px 0 0 10px;
+}
+
 #container {
-  width: 1002px;
+  width: 1012px;
 }
 
 #editor {
   float: left;
-  width: 500px;
-  height: 502px;
+  width: 480px;
+  height: 482px;
+
+  border: 10px solid #272822;
 }
 
 #screen {
   float: right;
-  border: 1px solid black;
+  border: 1px solid #272822;
   width: 500px;
   height: 500px;
 }

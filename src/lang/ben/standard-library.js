@@ -1,11 +1,6 @@
 var _ = require("underscore");
 
-var library = module.exports = {
-  print: function(thingToPrint) {
-    console.log(thingToPrint);
-    return (thingToPrint !== undefined ? thingToPrint.toString() : "") + "\n";
-  },
-
+var standardLibrary = module.exports = {
   add: function() {
     return _.reduce(arguments, function(a, n) { return a + n; });
   },
