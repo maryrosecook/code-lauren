@@ -3,8 +3,11 @@ var peg = require("pegjs");
 var fs = require("fs");
 var _ = require('underscore');
 
+var library = require("./library");
+
+
 var pegParse = peg.buildParser(
-  fs.readFileSync(__dirname + "/ben.pegjs", "utf8")
+  fs.readFileSync(__dirname + "/grammar.pegjs", "utf8")
 ).parse;
 
 function parse(str) {
@@ -27,7 +30,8 @@ function Scope(scope, parent) {
 function interpretLambdaDef(ast, env) {
   return function() {
     var lambdaArguments = arguments;
-    var lambdaScope = ast.c[0].reduce(function(s, parameter, i) {
+    var lambdaParameters = _.pluck(ast.c[0], "c");
+    var lambdaScope = lambdaParameters.reduce(function(s, parameter, i) {
       s[parameter] = lambdaArguments[i];
       return s;
     }, {});
@@ -51,13 +55,15 @@ function interpretLiteral(ast, env) {
 
 function interpret(ast, env) {
   if (env === undefined) {
-    return interpret(ast, new Scope({}));
+    return interpret(ast, new Scope(library));
   } else if (ast.t === "invocation") {
     return interpretSExpression(ast, env);
   } else if (ast.t === "lambda") {
     return interpretLambdaDef(ast, env);
   } else if (ast.t === "expression_list") {
     return interpretSExpressionList(ast, env);
+  } else if (ast.t === "label") {
+    return env.get(ast.c);
   } else { // literal
     return interpretLiteral(ast, env);
   }
