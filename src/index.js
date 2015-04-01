@@ -1,4 +1,4 @@
-var ben = require("./lang/ben/interpreter");
+var interpret = require("./lang/ben/interpreter");
 var createEditor = require("./editor");
 var createEnv = require("./env");
 
@@ -16,7 +16,7 @@ window.addEventListener("load", function() {
 
 function runCode(editor, env) {
   try {
-    return ben(editor.getValue(), env);
+    return interpret(editor.getValue(), env);
   } catch(e) {
     // no error messages, yet, so treat all errors as invalid syntax
     // that will soon be corrected
