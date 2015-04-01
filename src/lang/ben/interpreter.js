@@ -9,8 +9,8 @@ var pegParse = peg.buildParser(
   fs.readFileSync(__dirname + "/grammar.pegjs", "utf8")
 ).parse;
 
-function parse(str) {
-  return pegParse("({" + str + "})"); // wrap in invoked lambda
+function parse(codeStr) {
+  return pegParse("({" + codeStr + "})"); // wrap in invoked lambda
 };
 
 function Scope(scope, parent) {
