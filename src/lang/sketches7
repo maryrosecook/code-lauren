@@ -1,21 +1,20 @@
-(set actions "draw" { ?world
-  (rectangle (get world "box"))
-})
+(name
+  x: 250
+  y: 250
 
-(set actions "update" { ?world
-  (set world "box" "x" (add (get world "box" "x") (random -1 1)))
-  (set world "box" "y" (add (get world "box" "y") (random -1 1)))
-})
+  move: { ?x
+    (add 1 x)
+  }
 
-(set actions "start" {
-  (new-dictionary "box" (new-dictionary "x" 250 "y" 250 "w" 20 "h" 20))
-})
+  animate: { ?x ?y
+   (name
+     x: (move x)
 
+     (draw-filled-circle x y 50 "red")
+     (animate x y))
+  }
 
-
-
-
-
+  (animate x y))
 
 
 
