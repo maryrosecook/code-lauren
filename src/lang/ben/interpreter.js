@@ -45,13 +45,12 @@ function interpretLet(ast, env) {
   var labels = _.filter(_.pluck(labelValuePairs, "c"), function(_, i) { return i % 2 === 0; });
   var values = _.filter(labelValuePairs, function(_, i) { return i % 2 === 1; });
 
-  var letEnv = _.reduce(labels, function(s, l, i) {
-    var bindings = {};
-    bindings[l] = interpret(values[i], s);
-    return createScope(bindings, s);
-  }, env);
+  var letScope = _.reduce(labels, function(s, l, i) {
+    s.setBinding(l, interpret(values[i], s));
+    return s;
+  }, createScope({}, env));
 
-  return interpret(ast.c[1], letEnv);
+  return interpret(ast.c[1], letScope);
 };
 
 function interpretSExpression(ast, env) {

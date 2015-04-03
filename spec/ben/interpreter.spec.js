@@ -66,4 +66,12 @@ describe("interpreter", function() {
       expect(run("(let [f { ?a (add a 1) }] (f 1))")).toEqual(2);
     });
   });
+
+  describe("recursion", function() {
+    it("should allow function to recurse", function() {
+      expect(function() {
+        run('(let [b { (b) }] (b))')
+      }).toThrow("Maximum call stack size exceeded");
+    });
+  });
 });
