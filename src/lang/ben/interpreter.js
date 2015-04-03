@@ -21,6 +21,10 @@ function Scope(scope, parent) {
       return parent.get(identifier);
     }
   };
+
+  this.setBinding = function(k, v) {
+    scope[k] = v;
+  };
 };
 
 function createScope(scope, parent) {
