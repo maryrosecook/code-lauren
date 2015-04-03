@@ -5,7 +5,7 @@ var createEnv = require("./env");
 window.addEventListener("load", function() {
   var editor = createEditor();
   var screen = document.getElementById("screen").getContext("2d");
-  var env = ben.createScope(createEnv(screen)); // will get mutated for now
+  var env = interpret.createScope(createEnv(screen)); // will get mutated for now
 
   editor.on("change", function() {
     runCode(editor, env);
