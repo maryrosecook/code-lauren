@@ -14,14 +14,11 @@ function parse(codeStr) {
 };
 
 function Scope(scope, parent) {
-  this.scope = scope;
-  this.parent = parent;
-
   this.get = function(identifier) {
-    if (identifier in this.scope) {
-      return this.scope[identifier];
-    } else if (this.parent !== undefined) {
-      return this.parent.get(identifier);
+    if (identifier in scope) {
+      return scope[identifier];
+    } else if (parent !== undefined) {
+      return parent.get(identifier);
     }
   };
 };
