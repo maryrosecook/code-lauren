@@ -55,7 +55,7 @@ function interpretLet(ast, env) {
 
 function interpretSExpression(ast, env) {
   var exprs = ast.c.map(function(x) { return interpret(x, env); });
-  return exprs[0].apply(undefined, exprs.slice(1));
+  return exprs[0].apply(null, exprs.slice(1));
 };
 
 function interpretSExpressionList(ast, env) {
