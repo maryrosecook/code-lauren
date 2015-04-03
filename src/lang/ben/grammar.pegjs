@@ -21,8 +21,21 @@ s_expression
   / atom
 
 parenthetical
-  = invocation
+  = let
+  / invocation
   / lambda
+
+let
+  = '(' _* 'let' _* binding_list:binding_list _* body:s_expression_list ')'
+    { return node("let", [binding_list, body], line, column); }
+
+binding_list
+  = '[' bindings:binding* ']'
+    { return node("bindings", bindings, line, column); }
+
+binding
+  = _* label:label _+ s_expression:s_expression _*
+    { return node("binding", [label, s_expression], line, column); }
 
 invocation
   = '(' elements:s_expression_list_item* ')'

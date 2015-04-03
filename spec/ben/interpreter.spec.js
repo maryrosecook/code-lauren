@@ -48,4 +48,22 @@ describe("interpreter", function() {
       expect(run("1\n2\n3")).toEqual(3);
     });
   });
+
+  describe("let blocks", function() {
+    it("should return last expression in a let block", function() {
+      expect(run("(let [] 1\n2\n3)")).toEqual(3);
+    });
+
+    it("should allow usage of a binding in the body", function() {
+      expect(run("(let [a 1] 2\na)")).toEqual(1);
+    });
+
+    it("should allow letrec behaviour of bindings", function() {
+      expect(run("(let [a 1\nb (add a 1)\nc (add b 1)] c)")).toEqual(3);
+    });
+
+    it("should allow let lambda to be run in body", function() {
+      expect(run("(let [f { ?a (add a 1) }] (f 1))")).toEqual(2);
+    });
+  });
 });

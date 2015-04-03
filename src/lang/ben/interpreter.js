@@ -34,13 +34,23 @@ function interpretLambdaDef(ast, env) {
   return function() {
     var lambdaArguments = arguments;
     var lambdaParameters = _.pluck(ast.c[0], "c");
-    var lambdaScope = lambdaParameters.reduce(function(s, parameter, i) {
-      s[parameter] = lambdaArguments[i];
-      return s;
-    }, {});
-
-    return interpret(ast.c[1], createScope(lambdaScope, env));
+    return interpret(ast.c[1],
+                     createScope(_.object(lambdaParameters, lambdaArguments), env));
   };
+};
+
+function interpretLet(ast, env) {
+  var labelValuePairs = _.flatten(_.pluck(ast.c[0].c, "c"));
+  var labels = _.filter(_.pluck(labelValuePairs, "c"), function(_, i) { return i % 2 === 0; });
+  var values = _.filter(labelValuePairs, function(_, i) { return i % 2 === 1; });
+
+  var letEnv = _.reduce(labels, function(s, l, i) {
+    var bindings = {};
+    bindings[l] = interpret(values[i], s);
+    return createScope(bindings, s);
+  }, env);
+
+  return interpret(ast.c[1], letEnv);
 };
 
 function interpretSExpression(ast, env) {
@@ -63,6 +73,8 @@ function interpret(ast, env) {
     return interpretSExpression(ast, env);
   } else if (ast.t === "lambda") {
     return interpretLambdaDef(ast, env);
+  } else if (ast.t === "let") {
+    return interpretLet(ast, env);
   } else if (ast.t === "expression_list") {
     return interpretSExpressionList(ast, env);
   } else if (ast.t === "label") {

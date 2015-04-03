@@ -140,4 +140,71 @@ describe("parser", function() {
                        { t: "number", c: 2 }]});
     });
   });
+
+  describe("let", function() {
+    it("should parse a let with no bindings or body", function() {
+      var ast = parse("(let [])");
+      expect(strip(getNodeAt(ast, ["invocation", 0, "lambda", 1, "expression_list", 0])))
+        .toEqual({ t: "let", c: [{ t: "bindings", c: [] }, { t: "expression_list", c: []}]});
+    });
+
+    it("should parse a let with no bindings and several body expressions", function() {
+      var ast = parse("(let [] 1 2)");
+      expect(strip(getNodeAt(ast, ["invocation", 0, "lambda", 1, "expression_list", 0])))
+        .toEqual({ t: "let", c: [{ t: "bindings", c: [] },
+                                 { t: "expression_list", c: [{ t: "number", c: 1 },
+                                                             { t: "number", c: 2 }]}]});
+    });
+
+    it("should parse a let with several bindings and several body expressions", function() {
+      var ast = parse("(let [a 1 b 2] 3 4)");
+      expect(strip(getNodeAt(ast, ["invocation", 0, "lambda", 1, "expression_list", 0])))
+        .toEqual({ t: "let", c: [{ t: "bindings", c: [{ t: "binding",
+                                                        c: [{ t: "label", c: "a" },
+                                                            { t: "number", c: 1 }]},
+                                                      { t: "binding",
+                                                        c: [{ t: "label", c: "b" },
+                                                            { t: "number", c: 2 }]}]},
+                                 { t: "expression_list", c: [{ t: "number", c: 3 },
+                                                             { t: "number", c: 4 }]}]});
+    });
+
+    it("should parse a let with several parentheticals in the body", function() {
+      var ast = parse("(let [] (add a) (subtract b))");
+      expect(strip(getNodeAt(ast, ["invocation", 0, "lambda", 1, "expression_list", 0])))
+        .toEqual({ t: "let", c: [{ t: "bindings", c: []},
+                                 { t: "expression_list",
+                                   c: [{ t: "invocation",
+                                         c: [{ t: "label", c: "add" },
+                                             { t: "label", c: "a" }]},
+                                       { t: "invocation",
+                                         c: [{ t: "label", c: "subtract" },
+                                             { t: "label", c: "b" }]}]}]});
+    });
+
+    it("should parse a let var bound to a lambda", function() {
+      var ast = parse("(let [a { ?b 2 }])");
+      expect(strip(getNodeAt(ast, ["invocation", 0, "lambda", 1, "expression_list", 0])))
+        .toEqual({ t: "let", c: [{ t: "bindings",
+                                   c: [{ t: "binding",
+                                         c: [{ t: "label", c: "a" },
+                                             { t: "lambda",
+                                               c: [[{ t: "parameter", c: "b" }],
+                                                   { t: "expression_list",
+                                                     c: [{ t: "number", c: 2 }]}]}]}]},
+                                 { t: "expression_list", c: []}]});
+    });
+
+    it("should parse a let var bound to a lambda", function() {
+      var ast = parse("(let [a (add b)])");
+      expect(strip(getNodeAt(ast, ["invocation", 0, "lambda", 1, "expression_list", 0])))
+        .toEqual({ t: "let", c: [{ t: "bindings",
+                                   c: [{ t: "binding",
+                                         c: [{ t: "label", c: "a" },
+                                             { t: "invocation",
+                                               c: [{ t: "label", c: "add" },
+                                                   { t: "label", c: "b" }]}]}]},
+                                 { t: "expression_list", c: []}]});
+    });
+  });
 });
