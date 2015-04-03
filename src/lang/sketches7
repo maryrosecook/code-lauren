@@ -1,18 +1,18 @@
-(name
-  x: 250
-  y: 250
+(let
+  [x 250
+   y 250
 
-  move: { ?x
-    (add 1 x)
-  }
+   move { ?x
+     (add 1 x)
+   }
 
-  animate: { ?x ?y
-   (name
-     x: (move x)
+   animate { ?x ?y
+    (let
+      [x (move x)]
 
-     (draw-filled-circle x y 50 "red")
-     (animate x y))
-  }
+      (draw-filled-circle x y 50 "red")
+      (animate x y))
+   }]
 
   (animate x y))
 
