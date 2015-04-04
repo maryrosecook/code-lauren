@@ -1,9 +1,5 @@
 var lib = require("../../src/lang/ben/standard-library.js");
 
-function pp(str) {
-  console.log(JSON.stringify(str, null, 2));
-}
-
 describe("library", function() {
   describe("new-dictionary", function() {
     it("should be able to make new empty dict", function() {

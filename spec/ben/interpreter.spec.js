@@ -1,9 +1,5 @@
 var run = require("../../src/lang/ben/interpreter.js");
 
-function pp(str) {
-  console.log(JSON.stringify(str, null, 2));
-}
-
 describe("interpreter", function() {
   describe("env", function() {
     it("should be able to interpret if no env passed in", function() {
