@@ -65,7 +65,8 @@ function interpretIf(ast, env) {
     interpret(parts[2], env);
 };
 
-function interpretSExpressionList(ast, env) {
+function interpretSExpressionList(ast_, env) {
+  var ast = cloneAst(ast_);
   for (var i = 0; i < ast.c.length; i++) {
     if (ast.c[i].t !== undefined) {
       ast.c[i] = interpret(ast.c[i], env);
@@ -84,7 +85,7 @@ function interpretInvocation(ast, env) {
   var next = interpretSExpressionList(ast, env);
   return next instanceof Function ?
     next :
-    ast.c[0].apply(null, ast.c.slice(1));
+    next.c[0].apply(null, next.c.slice(1));
 };
 
 function interpretDo(ast, env) {
@@ -112,13 +113,35 @@ function interpret(ast, env) {
   } else if (ast.t === "let") {
     return interpretLet(ast, env);
   } else if (ast.t === "if") {
-    return interpretIf(ast, env);
+    var r = interpretIf(ast, env);
+    return r;
   } else if (ast.t === "do") {
     return interpretDo(ast, env);
   } else if (ast.t === "label") {
     return env.get(ast.c);
   } else { // literal
     return interpretLiteral(ast, env);
+  }
+};
+
+function cloneAst(ast) {
+  if (_.isArray(ast)) {
+    return ast.map(cloneAst);
+  } else if (_.isObject(ast)) {
+    var c = {};
+    for (var i in ast) {
+      if (ast.hasOwnProperty(i)) {
+        c[i] = cloneAst(ast[i]);
+      }
+    }
+
+    return c;
+  } else if (_.isString(ast) ||
+             _.isBoolean(ast) ||
+             _.isFunction(ast) ||
+             _.isNumber(ast) ||
+             ast === null) {
+    return ast;
   }
 };
 
