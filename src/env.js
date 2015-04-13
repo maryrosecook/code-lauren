@@ -11,6 +11,6 @@ var createEnv = module.exports = function(screen) {
     return library;
   };
 
-  return mergeLibrary(require("./lang/ben/standard-library"),
+  return mergeLibrary(require("./lang/ben/standard-library")(),
                       require("./lang/ben/canvas-library")(screen));
 };
