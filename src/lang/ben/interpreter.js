@@ -111,7 +111,7 @@ function interpret(ast, env) {
     return interpretLet(ast, env);
   } else if (ast.t === "if") {
     return interpretIf(ast, env);
-  } else if (ast.t === "expression_list") {
+  } else if (ast.t === "do") {
     return interpretDo(ast, env);
   } else if (ast.t === "label") {
     return env.get(ast.c);

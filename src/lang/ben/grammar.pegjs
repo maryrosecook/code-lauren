@@ -27,7 +27,7 @@ parenthetical
   / lambda
 
 let
-  = '(' _* 'let' _* binding_list:binding_list _* body:s_expression_list ')'
+  = '(' _* 'let' _* binding_list:binding_list _* body:do ')'
     { return node("let", [binding_list, body], line, column); }
 
 if
@@ -43,18 +43,18 @@ binding
     { return node("binding", [label, s_expression], line, column); }
 
 invocation
-  = '(' elements:s_expression_list_item* ')'
+  = '(' elements:do_item* ')'
     { return node("invocation", elements, line, column); }
 
 lambda
-  = '{' _* parameters:parameter* _* body:s_expression_list '}'
+  = '{' _* parameters:parameter* _* body:do '}'
     { return node("lambda", [parameters, body], line, column); }
 
-s_expression_list
-  = all: s_expression_list_item*
-    { return node("expression_list", all, line, column); }
+do
+  = all: do_item*
+    { return node("do", all, line, column); }
 
-s_expression_list_item
+do_item
   = s_expression:s_expression _*
     { return s_expression; }
 
