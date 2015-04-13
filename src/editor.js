@@ -2,9 +2,9 @@ var ace = require('brace');
 require('brace/mode/scheme');
 require('brace/theme/monokai');
 
-var createEditor = module.exports = function() {
+var createEditor = module.exports = function(initialText) {
   var editor = ace.edit('editor');
-  editor.setValue('(print "one") (print "two")');
+  editor.setValue(initialText);
   editor.clearSelection(); // for some reason, setting the initial text selects everything
   editor.focus();
   editor.setTheme('ace/theme/monokai');
