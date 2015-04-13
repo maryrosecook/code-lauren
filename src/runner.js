@@ -41,21 +41,23 @@ function complete(runnable) {
 };
 
 function ParseError(e) {
-  copy(e, this);
+  copyException(e, this);
 };
+ParseError.prototype = new Error();
 
 function RuntimeError(e) {
-  copy(e, this);
+  copyException(e, this);
 };
+RuntimeError.prototype = new Error();
 
 function DoneError(e) {
-  copy(e, this);
+  copyException(e, this);
 };
+DoneError.prototype = new Error();
 
-function copy(from, to) {
-  for (var i in from) {
-    to[i] = from[i];
-  }
+function copyException(from, to) {
+  to.stack = from.stack;
+  to.message = from.message;
 }
 
 
