@@ -113,8 +113,7 @@ function interpret(ast, env) {
   } else if (ast.t === "let") {
     return interpretLet(ast, env);
   } else if (ast.t === "if") {
-    var r = interpretIf(ast, env);
-    return r;
+    return interpretIf(ast, env);
   } else if (ast.t === "do") {
     return interpretDo(ast, env);
   } else if (ast.t === "label") {
