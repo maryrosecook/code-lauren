@@ -1,7 +1,7 @@
 var _ = require("underscore");
 
 var createStandardLibrary = module.exports = function () {
-  return {
+  var lib = {
     add: function() {
       return _.reduce(arguments, function(a, n) { return a + n; });
     },
@@ -19,6 +19,17 @@ var createStandardLibrary = module.exports = function () {
       return a > b;
     },
 
+    equals: function() {
+      var args = _.toArray(arguments);
+      if (args.length < 2 || args[0] !== args[1]) {
+        return false;
+      } else if (args.length === 2) {
+        return true;
+      } else {
+        return lib.equals.apply(null, args.slice(1));
+      }
+    },
+
     set: function(dict, key, value) {
       dict[key] = value;
       return dict;
@@ -34,4 +45,6 @@ var createStandardLibrary = module.exports = function () {
       return output + "\n";
     }
   };
+
+  return lib;
 };
