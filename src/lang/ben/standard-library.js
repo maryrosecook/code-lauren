@@ -20,9 +20,10 @@ var createStandardLibrary = module.exports = function () {
       return dict[key];
     },
 
-    print: function(thingToPrint) {
-      console.log(thingToPrint);
-      return (thingToPrint !== undefined ? thingToPrint.toString() : "") + "\n";
+    print: function() {
+      var output = _.map(arguments, function(x) { return x.toString(); }).join(" ");
+      console.log(output);
+      return output + "\n";
     }
   };
 };
