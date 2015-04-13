@@ -83,6 +83,14 @@ describe("interpreter", function() {
       expect(r.complete(r("(if false 1 2)"))).toEqual(2);
     });
 
+    it("should return undefined if false and no second branch", function() {
+      expect(r.complete(r("(if false 1)"))).toBeUndefined();
+    });
+
+    it("should return first branch if true and no second branch", function() {
+      expect(r.complete(r("(if true 1)"))).toEqual(1);
+    });
+
     it("should allow s-expression in first branch", function() {
       expect(r.complete(r('(if true (print "hi") 2)'))).toEqual("hi\n");
     });

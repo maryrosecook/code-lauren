@@ -31,8 +31,11 @@ let
     { return node("let", [binding_list, body], line, column); }
 
 if
-  = '(' _* 'if' _+ test:s_expression _+ then_branch:s_expression _+ else_branch:s_expression ')'
-    { return node("if", [test, then_branch, else_branch], line, column); }
+  = '(' _* 'if' _+ test:s_expression _* then_branch:s_expression _* else_branch:s_expression? ')'
+    { return node("if",
+                  [test, then_branch, else_branch === null ? undefined : else_branch],
+                  line,
+                  column); }
 
 binding_list
   = '[' bindings:binding* ']'

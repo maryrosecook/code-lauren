@@ -99,7 +99,9 @@ function interpretLiteral(ast, env) {
 };
 
 function interpret(ast, env) {
-  if (ast instanceof Function) {
+  if (ast === undefined) {
+    return;
+  } else if (ast instanceof Function) {
     return ast();
   } else if (env === undefined) {
     return interpret(ast, createScope(standardLibrary()));
