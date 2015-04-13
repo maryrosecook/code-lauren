@@ -11,6 +11,14 @@ var createStandardLibrary = module.exports = function () {
                       _.filter(arguments, function(_, i) { return i % 2 === 1; }));
     },
 
+    "less-than": function(a, b) {
+      return a < b;
+    },
+
+    "greater-than": function(a, b) {
+      return a > b;
+    },
+
     set: function(dict, key, value) {
       dict[key] = value;
       return dict;
