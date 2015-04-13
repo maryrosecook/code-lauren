@@ -87,7 +87,6 @@ describe("library", function() {
     });
   });
 
-
   describe("equals", function() {
     it("should return false for no args", function() {
       expect(standardLibrary()["equals"]()).toEqual(false);
