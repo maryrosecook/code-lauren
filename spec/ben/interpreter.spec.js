@@ -1,6 +1,6 @@
 var r = require("../../src/runner");
-
-var standardEnv = require("../../src/lang/ben/standard-library");
+var i = require("../../src/lang/ben/interpreter");
+var standardLibrary = require("../../src/lang/ben/standard-library");
 
 describe("interpreter", function() {
   describe("env", function() {
@@ -100,11 +100,18 @@ describe("interpreter", function() {
     });
   });
 
-  // describe("recursion", function() {
-  //   it("should allow function to recurse", function() {
-  //     expect(function() {
-  //       run('(let [b { (b) }] (b))')
-  //     }).toThrow("Maximum call stack size exceeded");
-  //   });
-  // });
+  describe("recursion", function() {
+    it("should allow function to recurse a few times", function() {
+      var lib = standardLibrary();
+      var callCount = 0;
+      lib.called = function() {
+        callCount += 1;
+      };
+
+      var env = i.createScope(lib);
+
+      r.complete(r('(let [b { ?x (called) (if (less-than x 5) (b (add x 1))) }] (b 0))', env));
+      expect(callCount).toEqual(6);
+    });
+  });
 });
