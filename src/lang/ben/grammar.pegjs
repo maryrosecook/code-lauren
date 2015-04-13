@@ -22,12 +22,17 @@ s_expression
 
 parenthetical
   = let
+  / if
   / invocation
   / lambda
 
 let
   = '(' _* 'let' _* binding_list:binding_list _* body:s_expression_list ')'
     { return node("let", [binding_list, body], line, column); }
+
+if
+  = '(' _* 'if' _+ test:s_expression _+ then_branch:s_expression _+ else_branch:s_expression ')'
+    { return node("if", [test, then_branch, else_branch], line, column); }
 
 binding_list
   = '[' bindings:binding* ']'
@@ -63,6 +68,7 @@ mapping
 atom
   = number
   / string
+  / boolean
   / label
 
 number
@@ -72,6 +78,10 @@ number
 string
   = '"' all:[A-Za-z0-9., ]* '"'
     { return node('string', all.join(""), line, column); }
+
+boolean
+  = 'true'  { return node("boolean", true, line, column); }
+  / 'false' { return node("boolean", false, line, column); }
 
 label
   = all: [a-zA-Z-_]+

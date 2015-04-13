@@ -4,7 +4,7 @@ require('brace/theme/monokai');
 
 var createEditor = module.exports = function() {
   var editor = ace.edit('editor');
-  editor.setValue('(write-text "Hello, world" 12 30 "black")');
+  editor.setValue('(print "one") (print "two")');
   editor.clearSelection(); // for some reason, setting the initial text selects everything
   editor.focus();
   editor.setTheme('ace/theme/monokai');

@@ -14,17 +14,22 @@ function parse(codeStr) {
 };
 
 function Scope(scope, parent) {
-  this.get = function(identifier) {
-    if (identifier in scope) {
-      return scope[identifier];
-    } else if (parent !== undefined) {
-      return parent.get(identifier);
-    }
-  };
+  this.scope = scope;
+  this.parent = parent;
+};
 
-  this.setBinding = function(k, v) {
-    scope[k] = v;
-  };
+Scope.prototype = {
+  get: function(identifier) {
+    if (identifier in this.scope) {
+      return this.scope[identifier];
+    } else if (this.parent !== undefined) {
+      return this.parent.get(identifier);
+    }
+  },
+
+  setBinding: function(k, v) {
+    this.scope[k] = v;
+  }
 };
 
 function createScope(scope, parent) {
@@ -53,13 +58,40 @@ function interpretLet(ast, env) {
   return interpret(ast.c[1], letScope);
 };
 
-function interpretSExpression(ast, env) {
-  var exprs = ast.c.map(function(x) { return interpret(x, env); });
-  return exprs[0].apply(null, exprs.slice(1));
+function interpretIf(ast, env) {
+  var parts = ast.c;
+  return interpret(parts[0], env) ?
+    interpret(parts[1], env) :
+    interpret(parts[2], env);
 };
 
 function interpretSExpressionList(ast, env) {
-  return _.last(ast.c.map(function(x) { return interpret(x, env); }));
+  for (var i = 0; i < ast.c.length; i++) {
+    if (ast.c[i].t !== undefined) {
+      ast.c[i] = interpret(ast.c[i], env);
+      if (i > 0 && ast.c[i] instanceof Function) {
+        return function() {
+          return interpret(ast, env);
+        };
+      }
+    }
+  }
+
+  return ast;
+};
+
+function interpretInvocation(ast, env) {
+  var next = interpretSExpressionList(ast, env);
+  return next instanceof Function ?
+    next :
+    ast.c[0].apply(null, ast.c.slice(1));
+};
+
+function interpretDo(ast, env) {
+  var next = interpretSExpressionList(ast, env);
+  return next instanceof Function ?
+    next :
+    _.last(next.c);
 };
 
 function interpretLiteral(ast, env) {
@@ -67,16 +99,20 @@ function interpretLiteral(ast, env) {
 };
 
 function interpret(ast, env) {
-  if (env === undefined) {
-    return interpret(ast, createScope(standardLibrary));
+  if (ast instanceof Function) {
+    return ast();
+  } else if (env === undefined) {
+    return interpret(ast, createScope(standardLibrary()));
   } else if (ast.t === "invocation") {
-    return interpretSExpression(ast, env);
+    return interpretInvocation(ast, env);
   } else if (ast.t === "lambda") {
     return interpretLambdaDef(ast, env);
   } else if (ast.t === "let") {
     return interpretLet(ast, env);
+  } else if (ast.t === "if") {
+    return interpretIf(ast, env);
   } else if (ast.t === "expression_list") {
-    return interpretSExpressionList(ast, env);
+    return interpretDo(ast, env);
   } else if (ast.t === "label") {
     return env.get(ast.c);
   } else { // literal
