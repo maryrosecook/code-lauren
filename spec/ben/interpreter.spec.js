@@ -113,5 +113,11 @@ describe("interpreter", function() {
       r.complete(r('(let [b { ?x (called) (if (less-than x 5) (b (add x 1))) }] (b 0))', env));
       expect(callCount).toEqual(6);
     });
+
+    it("should throw that stack has blown if recurse infinitely", function() {
+      expect(function() {
+        r.complete(r('(let [b { (b) }] (b))'));
+      }).toThrow("Maximum call stack size exceeded");
+    });
   });
 });
