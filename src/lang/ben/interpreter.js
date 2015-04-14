@@ -32,6 +32,10 @@ Scope.prototype = {
   }
 };
 
+function Continuation(fn) {
+  this.fn = fn;
+};
+
 function createScope(scope, parent) {
   return new Scope(scope, parent);
 };
@@ -65,34 +69,16 @@ function interpretIf(ast, env) {
     interpret(parts[2], env);
 };
 
-function interpretSExpressionList(ast_, env) {
-  var ast = cloneAst(ast_);
-  for (var i = 0; i < ast.c.length; i++) {
-    if (ast.c[i].t !== undefined) {
-      ast.c[i] = interpret(ast.c[i], env);
-      if (i > 0 && ast.c[i] instanceof Function) {
-        return function() {
-          return interpret(ast, env);
-        };
-      }
-    }
-  }
-
-  return ast;
-};
-
 function interpretInvocation(ast, env) {
-  var next = interpretSExpressionList(ast, env);
-  return next instanceof Function ?
-    next :
-    next.c[0].apply(null, next.c.slice(1));
+  var exprs = ast.c.map(function(x) { return interpret(x, env); });
+  return exprs[0].apply(null, exprs.slice(1));
 };
 
 function interpretDo(ast, env) {
-  var next = interpretSExpressionList(ast, env);
-  return next instanceof Function ?
-    next :
-    _.last(next.c);
+  return new Continuation(function() {
+    var exprs = ast.c.map(function(x) { return interpret(x, env); });
+    return _.last(exprs);
+  });
 };
 
 function interpretLiteral(ast, env) {
@@ -102,10 +88,10 @@ function interpretLiteral(ast, env) {
 function interpret(ast, env) {
   if (ast === undefined) {
     return;
-  } else if (ast instanceof Function) {
-    return ast();
   } else if (env === undefined) {
     return interpret(ast, createScope(standardLibrary()));
+  } else if (ast instanceof Continuation) {
+    return ast.fn();
   } else if (ast.t === "invocation") {
     return interpretInvocation(ast, env);
   } else if (ast.t === "lambda") {
@@ -118,29 +104,8 @@ function interpret(ast, env) {
     return interpretDo(ast, env);
   } else if (ast.t === "label") {
     return env.get(ast.c);
-  } else { // literal
+  } else if (ast.t === "number" || ast.t === "string" || ast.t === "boolean" ) {
     return interpretLiteral(ast, env);
-  }
-};
-
-function cloneAst(ast) {
-  if (_.isArray(ast)) {
-    return ast.map(cloneAst);
-  } else if (_.isObject(ast)) {
-    var c = {};
-    for (var i in ast) {
-      if (ast.hasOwnProperty(i)) {
-        c[i] = cloneAst(ast[i]);
-      }
-    }
-
-    return c;
-  } else if (_.isString(ast) ||
-             _.isBoolean(ast) ||
-             _.isFunction(ast) ||
-             _.isNumber(ast) ||
-             ast === null) {
-    return ast;
   }
 };
 
@@ -151,4 +116,5 @@ function run(str, env) {
 run.parse = parse;
 run.interpret = interpret;
 run.createScope = createScope;
+run.Continuation = Continuation;
 module.exports = run;
