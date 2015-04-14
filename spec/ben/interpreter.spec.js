@@ -54,6 +54,20 @@ describe("interpreter", function() {
     it("should return last expression in a do block", function() {
       expect(r.complete(r("1\n2\n3"))).toEqual(3);
     });
+
+    it("should call all expressions in a do block", function() {
+      var lib = standardLibrary();
+      var callCount = 0;
+      lib.called = function() {
+        callCount += 1;
+        return callCount;
+      };
+
+      var env = i.createScope(lib);
+
+      r.complete(r('(let [a { (called) }] (a) (a))', env));
+      expect(callCount).toEqual(2);
+    });
   });
 
   describe("let blocks", function() {
