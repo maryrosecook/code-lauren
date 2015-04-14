@@ -36,8 +36,7 @@ function isRunning(runnable) {
 };
 
 function complete(runnable) {
-  runnable = step(runnable);
-  return isDone(runnable) ? runnable.lastResult : complete(runnable);
+  return isDone(runnable) ? runnable.lastResult : complete(step(runnable));
 };
 
 function ParseError(e) {
