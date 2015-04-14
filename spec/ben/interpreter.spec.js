@@ -51,6 +51,10 @@ describe("interpreter", function() {
   });
 
   describe("do blocks", function() {
+    it("should be able to run an empty program", function() {
+      expect(r.complete(r(""))).toBeUndefined();
+    });
+
     it("should return last expression in a do block", function() {
       expect(r.complete(r("1\n2\n3"))).toEqual(3);
     });
