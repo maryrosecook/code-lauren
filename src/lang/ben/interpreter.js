@@ -32,10 +32,6 @@ Scope.prototype = {
   }
 };
 
-function Continuation(fn) {
-  this.fn = fn;
-};
-
 function createScope(scope, parent) {
   return new Scope(scope, parent);
 };
@@ -75,10 +71,8 @@ function interpretInvocation(ast, env) {
 };
 
 function interpretDo(ast, env) {
-  return new Continuation(function() {
-    var exprs = ast.c.map(function(x) { return interpret(x, env); });
-    return _.last(exprs);
-  });
+  var exprs = ast.c.map(function(x) { return interpret(x, env); });
+  return _.last(exprs);
 };
 
 function interpretLiteral(ast, env) {
@@ -90,8 +84,6 @@ function interpret(ast, env) {
     return;
   } else if (env === undefined) {
     return interpret(ast, createScope(standardLibrary()));
-  } else if (ast instanceof Continuation) {
-    return ast.fn();
   } else if (ast.t === "invocation") {
     return interpretInvocation(ast, env);
   } else if (ast.t === "lambda") {
@@ -116,5 +108,4 @@ function run(str, env) {
 run.parse = parse;
 run.interpret = interpret;
 run.createScope = createScope;
-run.Continuation = Continuation;
 module.exports = run;

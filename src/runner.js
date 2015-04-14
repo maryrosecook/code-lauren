@@ -8,9 +8,7 @@ function runnable(code, env) {
   }
 
   return {
-    lastResult: new lang.Continuation(function() {
-      return lang.interpret(ast, env);
-    })
+    lastResult: lang.interpret(ast, env)
   }
 };
 
@@ -28,7 +26,7 @@ function step(runnable) {
 };
 
 function isDone(runnable) {
-  return !(runnable.lastResult instanceof lang.Continuation);
+  return true; // temp
 };
 
 function isRunning(runnable) {
