@@ -1,41 +1,28 @@
 var lang = require("./lang/ben/interpreter");
 
-function runnable(code, env) {
+function run(code, env) {
   try {
     var ast = lang.parse(code);
   } catch(e) {
     throw new ParseError(e);
   }
 
-  return {
-    lastResult: lang.interpret(ast, env)
-  }
+  return lang.interpret(ast, env);
 };
 
-function step(runnable) {
-  if (isDone(runnable)) {
-    throw new DoneError("Runnable is done");
-  }
-
-  try {
-    runnable.lastResult = lang.interpret(runnable.lastResult);
-    return runnable;
-  } catch(e) {
-    throw new RuntimeError(e);
-  }
+function isDone(value) {
+  return value instanceof Function;
 };
 
-function isDone(runnable) {
-  return true; // temp
-};
-
-function isRunning(runnable) {
-  return runnable.timeout !== undefined;
-};
-
-function complete(runnable) {
-  return isDone(runnable) ? runnable.lastResult : complete(step(runnable));
-};
+// function step(vOrContinuation, done) {
+//   if (isDone(vOrContinuation)) {
+//     done(vOrContinuation);
+//   } else {
+//     vOrContinuation(function(v) {
+//       step(v, done);
+//     });
+//   };
+// };
 
 function ParseError(e) {
   copyException(e, this);
@@ -58,11 +45,7 @@ function copyException(from, to) {
 }
 
 
-runnable.ParseError = ParseError;
-runnable.RuntimeError = RuntimeError;
-runnable.DoneError = DoneError;
-
-runnable.step = step;
-runnable.complete = complete;
-
-module.exports = runnable;
+run.ParseError = ParseError;
+run.RuntimeError = RuntimeError;
+run.DoneError = DoneError;
+module.exports = run;
