@@ -11,7 +11,7 @@ var createEditor = module.exports = function(initialText) {
 
   editor.setOptions({
     fontFamily: "courier",
-    fontSize: "11pt"
+    fontSize: "13pt"
   });
 
   editor.renderer.setShowGutter(false);
