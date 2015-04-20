@@ -46,7 +46,6 @@ function* listStar(gs) {
 }
 
 function* interpretInvocation(ast, env) {
-  yield null;
   var exprs = yield* listStar(ast.c.map(function(x) { return interpret(x, env); }));
   return yield* exprs[0].apply(null, exprs.slice(1));
 };
@@ -79,6 +78,7 @@ function* interpretIf(ast, env) {
 
 function interpretLambdaDef(ast, env) {
   return function* () {
+    yield null;
     var lambdaArguments = arguments;
     var lambdaParameters = _.pluck(ast.c[0], "c");
     var lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
