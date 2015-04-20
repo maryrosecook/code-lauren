@@ -15,9 +15,9 @@ window.addEventListener("load", function() {
   function restart() {
     clearInterval(interval);
 
-    var runnable;
+    var g;
     try {
-      runnable = r(editor.getValue(), env);
+      g = r(editor.getValue(), env);
     } catch (e) {
       if (e instanceof r.ParseError) {
         console.log(e.message);
@@ -31,7 +31,7 @@ window.addEventListener("load", function() {
 
     interval = setInterval(function() {
       try {
-        runnable = r.step(runnable);
+        r.step(g);
       } catch (e) {
         if (e instanceof r.DoneError) {
           clearInterval(interval);
