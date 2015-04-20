@@ -11,18 +11,5 @@ var util = module.exports = {
     }
 
     return obj
-  },
-
-  complete: function(g) {
-    var result = g.next();
-    if (result.done === true) {
-      return result.value;
-    } else {
-      return util.complete(g);
-    }
-  },
-
-  step: function(g) {
-    return g.next().value;
   }
 };

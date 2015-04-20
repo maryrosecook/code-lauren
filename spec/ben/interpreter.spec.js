@@ -1,10 +1,9 @@
-var r = require("../../src/runner");
 var i = require("../../src/lang/ben/interpreter");
 var standardLibrary = require("../../src/lang/ben/standard-library");
 
-var util = require("../util");
-var c = util.complete;
-var step = util.step;
+var r = require("../../src/runner");
+var c = r.complete;
+var step = r.step;
 
 describe("interpreter", function() {
   describe("env", function() {

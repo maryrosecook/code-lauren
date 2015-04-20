@@ -1,6 +1,6 @@
 var standardLibrary = require("../../src/lang/ben/standard-library.js");
-var util = require("../util");
-var c = util.complete;
+var r = require("../../src/runner");
+var c = r.complete;
 
 describe("library", function() {
   describe("new-dictionary", function() {

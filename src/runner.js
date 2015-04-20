@@ -1,6 +1,6 @@
 var lang = require("./lang/ben/interpreter");
 
-function run(code, env) {
+function start(code, env) {
   try {
     var ast = lang.parse(code);
   } catch(e) {
@@ -10,19 +10,22 @@ function run(code, env) {
   return lang.interpret(ast, env);
 };
 
+function complete(g) {
+  var result = g.next();
+  if (result.done === true) {
+    return result.value;
+  } else {
+    return complete(g);
+  }
+};
+
+function step(g) {
+  return g.next().value;
+};
+
 function isDone(value) {
   return value instanceof Function;
 };
-
-// function step(vOrContinuation, done) {
-//   if (isDone(vOrContinuation)) {
-//     done(vOrContinuation);
-//   } else {
-//     vOrContinuation(function(v) {
-//       step(v, done);
-//     });
-//   };
-// };
 
 function ParseError(e) {
   copyException(e, this);
@@ -42,10 +45,11 @@ DoneError.prototype = new Error();
 function copyException(from, to) {
   to.stack = from.stack;
   to.message = from.message;
-}
+};
 
-
-run.ParseError = ParseError;
-run.RuntimeError = RuntimeError;
-run.DoneError = DoneError;
-module.exports = run;
+start.ParseError = ParseError;
+start.RuntimeError = RuntimeError;
+start.DoneError = DoneError;
+start.complete = complete;
+start.step = step;
+module.exports = start;
