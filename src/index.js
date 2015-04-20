@@ -1,4 +1,4 @@
-var lang = require("./lang/ben/interpreter");
+var lang = require("./lang/interpreter");
 var parse = lang.parse;
 var interpret = lang.interpret;
 var r = require("./runner");

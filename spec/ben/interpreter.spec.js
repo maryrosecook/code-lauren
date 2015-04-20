@@ -1,5 +1,5 @@
-var i = require("../../src/lang/ben/interpreter");
-var standardLibrary = require("../../src/lang/ben/standard-library");
+var i = require("../../src/lang/interpreter");
+var standardLibrary = require("../../src/lang/standard-library");
 
 var r = require("../../src/runner");
 var c = r.complete;

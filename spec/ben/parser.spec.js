@@ -1,4 +1,4 @@
-var parse = require("../../src/lang/ben/interpreter.js").parse;
+var parse = require("../../src/lang/interpreter.js").parse;
 var _ = require("underscore");
 var util = require("../util");
 

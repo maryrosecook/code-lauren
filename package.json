@@ -13,7 +13,6 @@
     "watch": "node build.js watch"
   },
   "dependencies": {
-    "immutable": "3.4.1",
     "pegjs": "^0.8.0",
     "underscore": "^1.8.2"
   },

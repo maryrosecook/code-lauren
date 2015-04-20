@@ -1,4 +1,4 @@
-var standardLibrary = require("../../src/lang/ben/standard-library.js");
+var standardLibrary = require("../../src/lang/standard-library.js");
 var r = require("../../src/runner");
 var c = r.complete;
 

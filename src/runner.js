@@ -1,4 +1,4 @@
-var lang = require("./lang/ben/interpreter");
+var lang = require("./lang/interpreter");
 
 function start(code, env) {
   try {
