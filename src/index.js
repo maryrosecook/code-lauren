@@ -6,7 +6,7 @@ var createEditor = require("./editor");
 var createEnv = require("./env");
 
 window.addEventListener("load", function() {
-  var editor = createEditor('(print "one") (print "two")');
+  var editor = createEditor('(let [draw { ?r (draw-filled-circle 250 250 r "red") }\n      update { ?r \n        (draw r) \n        (update (add r 1))\n      }]       \n\n (update 30))');
   var screen = document.getElementById("screen").getContext("2d");
   var env = lang.createScope(createEnv(screen)); // will get mutated for now
 
