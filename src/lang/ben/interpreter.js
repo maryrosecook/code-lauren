@@ -1,4 +1,3 @@
-var im = require("immutable");
 var peg = require("pegjs");
 var fs = require("fs");
 var _ = require("underscore");
