@@ -36,25 +36,60 @@ function createScope(scope, parent) {
   return new Scope(scope, parent);
 };
 
-// function* sExpressionList(ast, env) {
-//   var exprs = [];
-//   for (var i = 0; i < ast.c.length; i++) {
-//     interpret(ast.c[i], env);
-//   }
-// };
+  // for (var i = 0; i < gs.length; i++) {
+  //   var prev;
+  //   while (true) {
+  //     var next = gs[i].next();
+  //     if (next.done === true) {
+  //       break;
+  //     }
+
+  //     prev = next;
+  //   }
+
+  //   exprs.push(prev.value);
+  // }
+
+function* listStar(gs) {
+  var exprs = [];
+  for (var i = 0; i < gs.length; i++) {
+    var x = yield* gs[i];
+    exprs.push(x);
+  }
+
+  return exprs;
+}
 
 function* interpretInvocation(ast, env) {
-  var exprs = ast.c
-      .map(function*(x) { yield* interpret(x, env); })
-      .map(function(x) { return x.next().value; });
-  yield* exprs[0].apply(null, exprs.slice(1));
+  yield null;
+  var exprs = yield* listStar(ast.c.map(function(x) { return interpret(x, env); }));
+  return yield* exprs[0].apply(null, exprs.slice(1));
 };
 
 function* interpretDo(ast, env) {
-  var exprs = ast.c
-      .map(function*(x) { yield* interpret(x, env); })
-      .map(function(x) { return x.next().value; });
-  yield _.last(exprs);
+  var exprs = yield* listStar(ast.c.map(function(x) { return interpret(x, env); }));
+  return _.last(exprs);
+};
+
+function* interpretLet(ast, env) {
+  var labelValuePairs = _.flatten(_.pluck(ast.c[0].c, "c"));
+  var labels = _.filter(_.pluck(labelValuePairs, "c"), function(_, i) { return i % 2 === 0; });
+  var valueAsts = _.filter(labelValuePairs, function(_, i) { return i % 2 === 1; });
+
+  var letScope = createScope({}, env);
+  for (var i = 0; i < labels.length; i++) {
+    var v = yield* interpret(valueAsts[i], letScope);
+    letScope.setBinding(labels[i], v);
+  }
+
+  return yield* interpret(ast.c[1], letScope);
+};
+
+function* interpretIf(ast, env) {
+  var parts = ast.c;
+  return (yield* interpret(parts[0], env)) ?
+    yield* interpret(parts[1], env) :
+    yield* interpret(parts[2], env);
 };
 
 function interpretLambdaDef(ast, env) {
@@ -62,21 +97,29 @@ function interpretLambdaDef(ast, env) {
     var lambdaArguments = arguments;
     var lambdaParameters = _.pluck(ast.c[0], "c");
     var lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
-    yield interpret(ast.c[1], lambdaScope);
+    return yield* interpret(ast.c[1], lambdaScope);
   };
 };
 
 function* interpret(ast, env) {
-  if (env === undefined) {
-    yield interpret(ast, createScope(standardLibrary()));
+  if (ast === undefined) {
+    return;
+  } else if (env === undefined) {
+    return yield* interpret(ast, createScope(standardLibrary()));
   } else if (ast.t === "lambda") {
-    yield interpretLambdaDef(ast, env);
+    return interpretLambdaDef(ast, env);
+  } else if (ast.t === "let") {
+    return yield* interpretLet(ast, env);
+  } else if (ast.t === "if") {
+    return yield* interpretIf(ast, env);
   } else if (ast.t === "do") {
-    yield interpretDo(ast, env);
+    return yield* interpretDo(ast, env);
   } else if (ast.t === "invocation") {
-    yield interpretInvocation(ast, env);
+    return yield* interpretInvocation(ast, env);
+  } else if (ast.t === "label") {
+    return env.get(ast.c);
   } else if (ast.t === "number" || ast.t === "string" || ast.t === "boolean" ) {
-    yield ast.c;
+    return ast.c;
   }
 };
 
