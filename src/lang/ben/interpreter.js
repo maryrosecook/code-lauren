@@ -35,20 +35,6 @@ function createScope(scope, parent) {
   return new Scope(scope, parent);
 };
 
-  // for (var i = 0; i < gs.length; i++) {
-  //   var prev;
-  //   while (true) {
-  //     var next = gs[i].next();
-  //     if (next.done === true) {
-  //       break;
-  //     }
-
-  //     prev = next;
-  //   }
-
-  //   exprs.push(prev.value);
-  // }
-
 function* listStar(gs) {
   var exprs = [];
   for (var i = 0; i < gs.length; i++) {
