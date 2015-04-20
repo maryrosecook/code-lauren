@@ -36,8 +36,10 @@ window.addEventListener("load", function() {
         if (e instanceof r.DoneError) {
           clearInterval(interval);
           console.log("Program complete.");
-        } else if (e instanceof r.ParseError) {
-          // do nothing for now
+        } else if (e instanceof r.RuntimeError) {
+          console.log(e.stack);
+        } else {
+          console.log(e.stack);
         }
       }
     }, 1000);
