@@ -42,7 +42,7 @@ window.addEventListener("load", function() {
           console.log(e.stack);
         }
       }
-    }, 1000);
+    }, 16);
   };
 
   editor.on("change", function() {
