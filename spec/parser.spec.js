@@ -1,6 +1,6 @@
-var parse = require("../../src/lang/interpreter.js").parse;
+var parse = require("../src/lang/interpreter.js").parse;
 var _ = require("underscore");
-var util = require("../util");
+var util = require("./util");
 
 function getNodeAt(node, keys) {
   var nextKey = keys[0];

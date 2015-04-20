@@ -1,5 +1,5 @@
-var standardLibrary = require("../../src/lang/standard-library.js");
-var r = require("../../src/runner");
+var standardLibrary = require("../src/lang/standard-library.js");
+var r = require("../src/runner");
 var c = r.complete;
 
 describe("library", function() {
