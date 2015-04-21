@@ -21,14 +21,14 @@ s_expression
   / atom
 
 parenthetical
-  = let
+  = name
   / if
   / invocation
   / lambda
 
-let
-  = '(' _* 'let' _* binding_list:binding_list _* body:do ')'
-    { return node("let", [binding_list, body], line, column); }
+name
+  = '(' _* 'name' _* binding_list:binding_list _* body:do ')'
+    { return node("name", [binding_list, body], line, column); }
 
 if
   = '(' _* 'if' _+ test:s_expression _* then_branch:s_expression _* else_branch:s_expression? ')'

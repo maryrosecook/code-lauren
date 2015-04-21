@@ -1,4 +1,4 @@
-(let [draw { ?r
+(name [draw { ?r
         (clear-screen)
         (draw-filled-circle 500 300 r "red")
       }

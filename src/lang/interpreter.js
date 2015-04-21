@@ -55,18 +55,18 @@ function* interpretDo(ast, env) {
   return _.last(exprs);
 };
 
-function* interpretLet(ast, env) {
+function* interpretName(ast, env) {
   var labelValuePairs = _.flatten(_.pluck(ast.c[0].c, "c"));
   var labels = _.filter(_.pluck(labelValuePairs, "c"), function(_, i) { return i % 2 === 0; });
   var valueAsts = _.filter(labelValuePairs, function(_, i) { return i % 2 === 1; });
 
-  var letScope = createScope({}, env);
+  var nameScope = createScope({}, env);
   for (var i = 0; i < labels.length; i++) {
-    var v = yield* interpret(valueAsts[i], letScope);
-    letScope.setBinding(labels[i], v);
+    var v = yield* interpret(valueAsts[i], nameScope);
+    nameScope.setBinding(labels[i], v);
   }
 
-  return yield* interpret(ast.c[1], letScope);
+  return yield* interpret(ast.c[1], nameScope);
 };
 
 function* interpretIf(ast, env) {
@@ -93,8 +93,8 @@ function* interpret(ast, env) {
     return yield* interpret(ast, createScope(standardLibrary()));
   } else if (ast.t === "lambda") {
     return interpretLambdaDef(ast, env);
-  } else if (ast.t === "let") {
-    return yield* interpretLet(ast, env);
+  } else if (ast.t === "name") {
+    return yield* interpretName(ast, env);
   } else if (ast.t === "if") {
     return yield* interpretIf(ast, env);
   } else if (ast.t === "do") {
