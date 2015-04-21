@@ -18,6 +18,7 @@ var createEditor = module.exports = function(initialText) {
   editor.getSession().setTabSize(2);
   editor.getSession().setUseSoftTabs(true);
   editor.getSession().setMode('ace/mode/scheme');
+  editor.setShowPrintMargin(false);
   editor.setHighlightActiveLine(false);
 
   return editor;

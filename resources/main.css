@@ -4,24 +4,21 @@
 }
 
 body {
-  margin: 10px 0 0 10px;
+  background-color: #272822;
 }
 
 #container {
-  width: 1012px;
+
 }
 
 #editor {
-  float: left;
-  width: 480px;
-  height: 482px;
-
-  border: 10px solid #272822;
+  width: 98%;
+  height: 100vh;
+  margin: 3px 0 0 3px;
 }
 
 #screen {
-  float: right;
-  border: 1px solid #272822;
-  width: 500px;
-  height: 500px;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
