@@ -1,23 +1,23 @@
 var ace = require('brace');
-require('brace/mode/scheme');
-require('brace/theme/monokai');
+require('./mode-lauren');
+require('./theme-lauren');
 
 var createEditor = module.exports = function(initialText) {
   var editor = ace.edit('editor');
   editor.setValue(initialText);
   editor.clearSelection(); // for some reason, setting the initial text selects everything
   editor.focus();
-  editor.setTheme('ace/theme/monokai');
+  editor.setTheme('ace/theme/lauren');
 
   editor.setOptions({
     fontFamily: "courier",
-    fontSize: "13pt"
+    fontSize: "14pt"
   });
 
   editor.renderer.setShowGutter(false);
   editor.getSession().setTabSize(2);
   editor.getSession().setUseSoftTabs(true);
-  editor.getSession().setMode('ace/mode/scheme');
+  editor.getSession().setMode("ace/mode/lauren");
   editor.setShowPrintMargin(false);
   editor.setHighlightActiveLine(false);
   editor.setDisplayIndentGuides(false)
