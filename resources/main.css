@@ -5,20 +5,20 @@
 
 body {
   background-color: #272822;
-}
-
-#container {
-
+  overflow: hidden;
 }
 
 #editor {
-  width: 98%;
-  height: 98vh;
-  margin: 5px 0 0 5px;
+  width: 100%;
+  height: 100vh;
+  border-top: 3px solid #272822;
+  z-index: 1;
+  opacity: 0.7;
 }
 
 #screen {
   position: absolute;
-  right: 0;
+  left: 0;
   top: 0;
+  z-index: -1;
 }

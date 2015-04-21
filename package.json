@@ -13,6 +13,7 @@
     "watch": "node build.js watch"
   },
   "dependencies": {
+    "jquery": "^1.11.2",
     "pegjs": "^0.8.0",
     "underscore": "^1.8.2"
   },
