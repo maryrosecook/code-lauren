@@ -20,6 +20,7 @@ var createEditor = module.exports = function(initialText) {
   editor.getSession().setMode('ace/mode/scheme');
   editor.setShowPrintMargin(false);
   editor.setHighlightActiveLine(false);
+  editor.setDisplayIndentGuides(false)
 
   return editor;
 };
