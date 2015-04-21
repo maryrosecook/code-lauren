@@ -1,3 +1,4 @@
+var fs = require("fs");
 var lang = require("./lang/interpreter");
 var parse = lang.parse;
 var interpret = lang.interpret;
@@ -5,49 +6,54 @@ var r = require("./runner");
 var createEditor = require("./editor");
 var createEnv = require("./env");
 
-window.addEventListener("load", function() {
-  var editor = createEditor('(let [draw { ?r\n        (clear-screen)\n        (draw-filled-circle 500 300 r "red")\n      }\n\n      update { ?r \n        (draw r) \n        (update (add r 3))\n      }]       \n\n (update 0))');
-  var screen = document.getElementById("screen").getContext("2d");
-  var env = lang.createScope(createEnv(screen)); // will get mutated for now
-
-  var interval;
-
-  function restart() {
-    clearInterval(interval);
-
-    var g;
-    try {
-      g = r(editor.getValue(), env);
-    } catch (e) {
-      if (e instanceof r.ParseError) {
-        console.log(e.message);
-        return;
-      } else {
-        throw e;
-      }
+function step(g) {
+  try {
+    r.step(g);
+  } catch (e) {
+    if (e instanceof r.DoneError) {
+      console.log("Program complete.");
+    } else if (e instanceof r.RuntimeError) {
+      console.log(e.stack);
+    } else {
+      console.log(e.stack);
     }
+  }
+};
 
+function start(code) {
+  var screen = document.getElementById("screen").getContext("2d");
+  var env = lang.createScope(createEnv(screen));
+
+  try {
+    var g = r(code, env);
     console.log("Parsed ok");
 
-    interval = setInterval(function() {
-      try {
-        r.step(g);
-      } catch (e) {
-        if (e instanceof r.DoneError) {
-          clearInterval(interval);
-          console.log("Program complete.");
-        } else if (e instanceof r.RuntimeError) {
-          console.log(e.stack);
-        } else {
-          console.log(e.stack);
-        }
+    var going = true;
+    (function tick() {
+      if (going) {
+        step(g);
+        requestAnimationFrame(tick);
       }
-    }, 16);
-  };
+    })();
 
+    return function() {
+      going = false;
+    };
+  } catch (e) {
+    if (e instanceof r.ParseError) {
+      console.log(e.message);
+    } else {
+      throw e;
+    }
+  }
+};
+
+window.addEventListener("load", function() {
+  var editor = createEditor(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
+
+  var tickStop = start(editor.getValue());
   editor.on("change", function() {
-    restart();
+    tickStop();
+    tickStop = start(editor.getValue());
   });
-
-  restart();
 });

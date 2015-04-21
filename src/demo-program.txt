@@ -1,0 +1,11 @@
+(let [draw { ?r
+        (clear-screen)
+        (draw-filled-circle 500 300 r "red")
+      }
+
+      update { ?r
+        (draw r)
+        (update (add r 3))
+      }]
+
+  (update 0))
