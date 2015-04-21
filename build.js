@@ -4,7 +4,7 @@ var brfs = require('brfs');
 var browserify = require('browserify');
 var watchify = require('watchify');
 
-var bundle = browserify({ debug: true })
+var bundle = browserify({ debug: true, "insert-globals": true })
     .add(es6ify.runtime)
     .transform(es6ify.configure(/^(?!.*node_modules)+.+\.js$/))
     .transform(brfs)
