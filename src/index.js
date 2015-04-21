@@ -53,7 +53,10 @@ window.addEventListener("load", function() {
 
   var tickStop = start(editor.getValue());
   editor.on("change", function() {
-    tickStop();
+    if (tickStop !== undefined) {
+      tickStop();
+    }
+
     tickStop = start(editor.getValue());
   });
 });
