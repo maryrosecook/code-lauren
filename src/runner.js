@@ -12,11 +12,11 @@ function start(code, env) {
 
 function complete(g) {
   var result = g.next();
-  if (result.done === true) {
-    return result.value;
-  } else {
-    return complete(g);
+  while (result.done !== true) {
+    result = g.next();
   }
+
+  return result.value
 };
 
 function step(g) {

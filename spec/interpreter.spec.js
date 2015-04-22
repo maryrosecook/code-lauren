@@ -171,10 +171,19 @@ describe("interpreter", function() {
       expect(callCount).toEqual(6);
     });
 
-    it("should throw that stack has blown if recurse infinitely", function() {
+    it("should allow recursion > 18000 times because of trampolining", function() {
       expect(function() {
-        c(r('(let [b { (b) }] (b))'));
-      }).toThrow("Maximum call stack size exceeded");
+        var lib = standardLibrary();
+        lib.done = function*(n) {
+          if (n > 18000) {
+            throw "Made it to 18000";
+          }
+        };
+
+        var env = i.createScope(lib);
+        c(r('(name [b { ?n (done n) (b (add n 1)) }] (b 0))', env));
+      }).toThrow("Made it to 18000");
+    });
     });
   });
 });

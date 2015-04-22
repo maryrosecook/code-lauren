@@ -31,6 +31,10 @@ Scope.prototype = {
   }
 };
 
+function Thunk(gFn) {
+  this.g = gFn();
+};
+
 function createScope(scope, parent) {
   return new Scope(scope, parent);
 };
@@ -43,16 +47,34 @@ function* listStar(gs) {
   }
 
   return exprs;
-}
+};
+
+function* trampoline(v) {
+  while(v instanceof Thunk) {
+    v = yield* v.g;
+  }
+
+  return v;
+};
 
 function* interpretInvocation(ast, env) {
   var exprs = yield* listStar(ast.c.map(function(x) { return interpret(x, env); }));
-  return yield* exprs[0].apply(null, exprs.slice(1));
+
+  var t = new Thunk(function*() { return yield* exprs[0].apply(null, exprs.slice(1)) });
+  return yield* trampoline(t);
 };
 
 function* interpretDo(ast, env) {
-  var exprs = yield* listStar(ast.c.map(function(x) { return interpret(x, env); }));
-  return _.last(exprs);
+  yield* listStar(_.initial(ast.c).map(function(x) { return interpret(x, env); }));
+
+  var astLastLine = _.last(ast.c);
+  if (astLastLine !== undefined && astLastLine.t === "invocation") {
+    var exprs = yield* listStar(astLastLine.c.map(function(x) { return interpret(x, env); }));
+    var t = new Thunk(function*() { return yield* exprs[0].apply(null, exprs.slice(1)); })
+    return t;
+  } else {
+    return yield* interpret(astLastLine, env);
+  }
 };
 
 function* interpretName(ast, env) {
@@ -78,7 +100,8 @@ function* interpretIf(ast, env) {
 
 function interpretLambdaDef(ast, env) {
   return function* () {
-    yield null;
+    yield null; // allows the program to be stepped, rather than only invoked in one go
+
     var lambdaArguments = arguments;
     var lambdaParameters = _.pluck(ast.c[0], "c");
     var lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
