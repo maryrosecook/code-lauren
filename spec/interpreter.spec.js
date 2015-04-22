@@ -167,7 +167,7 @@ describe("interpreter", function() {
 
       var env = i.createScope(lib);
 
-      c(r('(let [b { ?x (called) (if (less-than x 5) (b (add x 1))) }] (b 0))', env));
+      c(r('(name [b { ?x (called) (if (less-than x 5) (b (add x 1))) }] (b 0))', env));
       expect(callCount).toEqual(6);
     });
 
