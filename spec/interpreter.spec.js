@@ -113,21 +113,21 @@ describe("interpreter", function() {
     });
   });
 
-  describe("let blocks", function() {
-    it("should return last expression in a let block", function() {
-      expect(c(r("(let [] 1\n2\n3)"))).toEqual(3);
+  describe("name blocks", function() {
+    it("should return last expression in a name block", function() {
+      expect(c(r("(name [] 1\n2\n3)"))).toEqual(3);
     });
 
     it("should allow usage of a binding in the body", function() {
-      expect(c(r("(let [a 1] 2\na)"))).toEqual(1);
+      expect(c(r("(name [a 1] 2\na)"))).toEqual(1);
     });
 
     it("should allow letrec behaviour of bindings", function() {
-      expect(c(r("(let [a 1\nb (add a 1)\nc (add b 1)] c)"))).toEqual(3);
+      expect(c(r("(name [a 1\nb (add a 1)\nc (add b 1)] c)"))).toEqual(3);
     });
 
-    it("should allow let lambda to be run in body", function() {
-      expect(c(r("(let [f { ?a (add a 1) }] (f 1))"))).toEqual(2);
+    it("should allow name lambda to be run in body", function() {
+      expect(c(r("(name [f { ?a (add a 1) }] (f 1))"))).toEqual(2);
     });
   });
 

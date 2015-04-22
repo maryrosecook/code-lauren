@@ -143,25 +143,25 @@ describe("parser", function() {
     });
   });
 
-  describe("let", function() {
-    it("should parse a let with no bindings or body", function() {
-      var ast = parse("(let [])");
+  describe("name", function() {
+    it("should parse a name with no bindings or body", function() {
+      var ast = parse("(name [])");
       expect(util.stripAst(getNodeAt(ast, ["invocation", 0, "lambda", 1, "do", 0])))
-        .toEqual({ t: "let", c: [{ t: "bindings", c: [] }, { t: "do", c: []}]});
+        .toEqual({ t: "name", c: [{ t: "bindings", c: [] }, { t: "do", c: []}]});
     });
 
-    it("should parse a let with no bindings and several body expressions", function() {
-      var ast = parse("(let [] 1 2)");
+    it("should parse a name with no bindings and several body expressions", function() {
+      var ast = parse("(name [] 1 2)");
       expect(util.stripAst(getNodeAt(ast, ["invocation", 0, "lambda", 1, "do", 0])))
-        .toEqual({ t: "let", c: [{ t: "bindings", c: [] },
+        .toEqual({ t: "name", c: [{ t: "bindings", c: [] },
                                  { t: "do", c: [{ t: "number", c: 1 },
                                                              { t: "number", c: 2 }]}]});
     });
 
-    it("should parse a let with several bindings and several body expressions", function() {
-      var ast = parse("(let [a 1 b 2] 3 4)");
+    it("should parse a name with several bindings and several body expressions", function() {
+      var ast = parse("(name [a 1 b 2] 3 4)");
       expect(util.stripAst(getNodeAt(ast, ["invocation", 0, "lambda", 1, "do", 0])))
-        .toEqual({ t: "let", c: [{ t: "bindings", c: [{ t: "binding",
+        .toEqual({ t: "name", c: [{ t: "bindings", c: [{ t: "binding",
                                                         c: [{ t: "label", c: "a" },
                                                             { t: "number", c: 1 }]},
                                                       { t: "binding",
@@ -171,10 +171,10 @@ describe("parser", function() {
                                                              { t: "number", c: 4 }]}]});
     });
 
-    it("should parse a let with several parentheticals in the body", function() {
-      var ast = parse("(let [] (add a) (subtract b))");
+    it("should parse a name with several parentheticals in the body", function() {
+      var ast = parse("(name [] (add a) (subtract b))");
       expect(util.stripAst(getNodeAt(ast, ["invocation", 0, "lambda", 1, "do", 0])))
-        .toEqual({ t: "let", c: [{ t: "bindings", c: []},
+        .toEqual({ t: "name", c: [{ t: "bindings", c: []},
                                  { t: "do",
                                    c: [{ t: "invocation",
                                          c: [{ t: "label", c: "add" },
@@ -184,10 +184,10 @@ describe("parser", function() {
                                              { t: "label", c: "b" }]}]}]});
     });
 
-    it("should parse a let var bound to a lambda", function() {
-      var ast = parse("(let [a { ?b 2 }])");
+    it("should parse a name var bound to a lambda", function() {
+      var ast = parse("(name [a { ?b 2 }])");
       expect(util.stripAst(getNodeAt(ast, ["invocation", 0, "lambda", 1, "do", 0])))
-        .toEqual({ t: "let", c: [{ t: "bindings",
+        .toEqual({ t: "name", c: [{ t: "bindings",
                                    c: [{ t: "binding",
                                          c: [{ t: "label", c: "a" },
                                              { t: "lambda",
@@ -197,10 +197,10 @@ describe("parser", function() {
                                  { t: "do", c: []}]});
     });
 
-    it("should parse a let var bound to a lambda", function() {
-      var ast = parse("(let [a (add b)])");
+    it("should parse a name var bound to a lambda", function() {
+      var ast = parse("(name [a (add b)])");
       expect(util.stripAst(getNodeAt(ast, ["invocation", 0, "lambda", 1, "do", 0])))
-        .toEqual({ t: "let", c: [{ t: "bindings",
+        .toEqual({ t: "name", c: [{ t: "bindings",
                                    c: [{ t: "binding",
                                          c: [{ t: "label", c: "a" },
                                              { t: "invocation",
