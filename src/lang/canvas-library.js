@@ -36,6 +36,18 @@ var canvasLibrary = module.exports = function(screen) {
     "draw-filled-rectangle": function*(x, y, width, height, color) {
       screen.fillStyle = color;
       screen.fillRect(x, y, width, height);
+    },
+
+    sine: function*(x) {
+      return Math.sin(x);
+    },
+
+    cosine: function*(x) {
+      return Math.cos(x);
+    },
+
+    radians: function*(x) {
+      return 0.01745 * x;
     }
   };
 };
