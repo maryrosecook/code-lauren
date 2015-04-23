@@ -188,5 +188,9 @@ describe("interpreter", function() {
     it("should trampoline a program where there is an if in the tail position", function() {
       expect(c(r('(name [countto { ?x (if (greater-than x 0) (countto (subtract x 1) y) "done") }] (countto 20000))'))).toEqual("done");
     });
+
+    it("should trampoline a program where there is name block in tail position", function() {
+      expect(c(r('(name [countto { ?x (name [] (if (greater-than x 0) (countto (subtract x 1) y) "done")) }] (countto 20000))'))).toEqual("done");
+    });
   });
 });
