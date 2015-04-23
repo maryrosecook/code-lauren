@@ -1,11 +1,16 @@
-(name [draw { ?r
+(name [draw { ?x ?y
         (clear-screen)
-        (draw-filled-circle 500 300 r "red")
+        (draw-filled-circle (add 220 x)
+                            (add 170 y)
+                            20
+                            "blue")
       }
 
-      update { ?r
-        (draw r)
-        (update (add r 3))
+      update { ?x ?y ?a
+        (draw x y r)
+        (update (multiply 100 (cosine a))
+                (multiply 100 (sine a))
+                (add a 0.1))
       }]
 
-  (update 0))
+  (update 0 0 0))
