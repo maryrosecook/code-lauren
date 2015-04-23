@@ -81,7 +81,7 @@ number
     { return node("number", parseInt(all.join(""), 10), line, column); }
 
 string
-  = '"' all:[A-Za-z0-9., ]* '"'
+  = '"' all:[A-Za-z0-9.,# ]* '"'
     { return node('string', all.join(""), line, column); }
 
 boolean
