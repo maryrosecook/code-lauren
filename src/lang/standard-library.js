@@ -6,6 +6,22 @@ var createStandardLibrary = module.exports = function () {
       return _.reduce(arguments, function(a, n) { return a + n; });
     },
 
+    multiply: function*() {
+      return _.reduce(arguments, function(a, n) { return a * n; });
+    },
+
+    sine: function*(x) {
+      return Math.sin(x);
+    },
+
+    cosine: function*(x) {
+      return Math.cos(x);
+    },
+
+    radians: function*(x) {
+      return 0.01745 * x;
+    },
+
     "new-dictionary": function*() {
       return _.object(_.filter(arguments, function(_, i) { return i % 2 === 0; }),
                       _.filter(arguments, function(_, i) { return i % 2 === 1; }));
