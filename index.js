@@ -38117,7 +38117,7 @@ function start(code) {
 }
 ;
 window.addEventListener("load", function() {
-  var editor = createEditor("(name [draw { ?x ?y\n        (clear-screen)\n        (draw-filled-circle (add 220 x)\n                            (add 170 y)\n                            20\n                            \"blue\")\n      }\n\n      update { ?x ?y ?a\n        (draw x y r)\n        (update (multiply 100 (cosine a))\n                (multiply 100 (sine a))\n                (add a 0.1))\n      }]\n\n  (update 0 0 0))\n");
+  var editor = createEditor("(name [draw { ?x ?y\n        (clear-screen)\n        (draw-filled-circle (add 220 x)\n                            (add 200 y)\n                            20\n                            \"blue\")\n      }\n\n      orbit-radius 100\n\n      update { ?x ?y ?current-angle\n        (draw x y)\n\n        (update (multiply orbit-radius (cosine current-angle))\n                (multiply orbit-radius (sine current-angle))\n                (add current-angle 0.1))\n      }]\n\n  (update 0 0 0))\n");
   var tickStop = start(editor.getValue());
   editor.on("change", function() {
     if (tickStop !== undefined) {
