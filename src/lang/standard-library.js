@@ -6,6 +6,10 @@ var createStandardLibrary = module.exports = function () {
       return _.reduce(arguments, function(a, n) { return a + n; });
     },
 
+    subtract: function*() {
+      return _.reduce(arguments, function(a, n) { return a - n; });
+    },
+
     multiply: function*() {
       return _.reduce(arguments, function(a, n) { return a * n; });
     },
