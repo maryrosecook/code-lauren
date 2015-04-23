@@ -75,7 +75,9 @@ atom
   / label
 
 number
-  = all: [0-9]+[.]*[0-9]*
+  = a:[0-9]+ b:[.] c:[0-9]+
+    { return node("number", parseFloat(a.join("") + b + c.join(""), 10), line, column); }
+  / all:[0-9]+
     { return node("number", parseInt(all.join(""), 10), line, column); }
 
 string

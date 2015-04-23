@@ -17,11 +17,18 @@ function getNodeAt(node, keys) {
 
 describe("parser", function() {
   describe("atoms", function() {
-    it("should parse a number", function() {
+    it("should parse an int", function() {
       var ast = parse("1");
       expect(util.stripAst(getNodeAt(ast,
                                      ["invocation", 0, "lambda", 1, "do", 0])))
         .toEqual({ t: "number", c: 1 });
+    });
+
+    it("should parse a float", function() {
+      var ast = parse("0.5");
+      expect(util.stripAst(getNodeAt(ast,
+                                     ["invocation", 0, "lambda", 1, "do", 0])))
+        .toEqual({ t: "number", c: 0.5 });
     });
 
     it("should parse a string", function() {
