@@ -7,7 +7,7 @@ function start(code, env) {
     throw new ParseError(e);
   }
 
-  return lang.interpret(ast, env);
+  return lang.trampoline(lang.interpret(ast, env).next().value);
 };
 
 function complete(g) {

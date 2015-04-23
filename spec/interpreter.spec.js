@@ -184,6 +184,9 @@ describe("interpreter", function() {
         c(r('(name [b { ?n (done n) (b (add n 1)) }] (b 0))', env));
       }).toThrow("Made it to 18000");
     });
+
+    it("should trampoline a program where there is an if in the tail position", function() {
+      expect(c(r('(name [countto { ?x (if (greater-than x 0) (countto (subtract x 1) y) "done") }] (countto 20000))'))).toEqual("done");
     });
   });
 });

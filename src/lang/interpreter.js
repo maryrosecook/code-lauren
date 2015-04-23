@@ -42,7 +42,7 @@ function createScope(scope, parent) {
 function* listStar(gs) {
   var exprs = [];
   for (var i = 0; i < gs.length; i++) {
-    var x = yield* gs[i];
+    var x = yield* trampoline(yield* gs[i]);
     exprs.push(x);
   }
 
@@ -59,22 +59,13 @@ function* trampoline(v) {
 
 function* interpretInvocation(ast, env) {
   var exprs = yield* listStar(ast.c.map(function(x) { return interpret(x, env); }));
-
-  var t = new Thunk(function*() { return yield* exprs[0].apply(null, exprs.slice(1)) });
-  return yield* trampoline(t);
+  return new Thunk(function*() { return yield* exprs[0].apply(null, exprs.slice(1)) });
 };
 
 function* interpretDo(ast, env) {
-  yield* listStar(_.initial(ast.c).map(function(x) { return interpret(x, env); }));
-
+  var a = yield* listStar(_.initial(ast.c).map(function(x) { return interpret(x, env); }));
   var astLastLine = _.last(ast.c);
-  if (astLastLine !== undefined && astLastLine.t === "invocation") {
-    var exprs = yield* listStar(astLastLine.c.map(function(x) { return interpret(x, env); }));
-    var t = new Thunk(function*() { return yield* exprs[0].apply(null, exprs.slice(1)); })
-    return t;
-  } else {
-    return yield* interpret(astLastLine, env);
-  }
+  return yield* interpret(astLastLine, env);
 };
 
 function* interpretName(ast, env) {
@@ -93,7 +84,7 @@ function* interpretName(ast, env) {
 
 function* interpretIf(ast, env) {
   var parts = ast.c;
-  return (yield* interpret(parts[0], env)) ?
+  return (yield* trampoline(yield* interpret(parts[0], env))) ?
     yield* interpret(parts[1], env) :
     yield* interpret(parts[2], env);
 };
@@ -105,6 +96,7 @@ function interpretLambdaDef(ast, env) {
     var lambdaArguments = arguments;
     var lambdaParameters = _.pluck(ast.c[0], "c");
     var lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
+
     return yield* interpret(ast.c[1], lambdaScope);
   };
 };
@@ -134,5 +126,6 @@ function* interpret(ast, env) {
 module.exports = {
   parse: parse,
   interpret: interpret,
-  createScope: createScope
+  createScope: createScope,
+  trampoline: trampoline
 };
