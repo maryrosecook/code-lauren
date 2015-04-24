@@ -1,3 +1,4 @@
+require("babel-core/polyfill");
 var fs = require("fs");
 var lang = require("./lang/interpreter");
 var parse = lang.parse;
