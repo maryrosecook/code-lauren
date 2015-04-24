@@ -86,6 +86,10 @@ describe("interpreter", function() {
       it("should be able to call lambda nested many layers deep", function() {
         expect(c(r('({ ({ ({ ({ 1 }) }) }) })'))).toEqual(1);
       });
+
+      it("should be able to execute lambda on arg from lambda invocation", function() {
+        expect(c(r("({1} ({2}))"))).toEqual(1);
+      });
     });
   });
 
@@ -96,6 +100,19 @@ describe("interpreter", function() {
 
     it("should return last expression in a do block", function() {
       expect(c(r("1\n2\n3"))).toEqual(3);
+    });
+
+    it("should call all expressions in a top level do block", function() {
+      var lib = standardLibrary();
+      var callCount = 0;
+      lib.called = function*() {
+        callCount += 1;
+      };
+
+      var env = i.createScope(lib);
+
+      c(r("(called) (called)", env));
+      expect(callCount).toEqual(2);
     });
 
     it("should call all expressions in a do block", function() {
