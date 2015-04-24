@@ -1,6 +1,7 @@
 var peg = require("pegjs");
 var fs = require("fs");
 var _ = require("underscore");
+var util = require("../util");
 
 var standardLibrary = require("./standard-library");
 
@@ -9,7 +10,7 @@ var pegParse = peg.buildParser(
 ).parse;
 
 function parse(codeStr) {
-  return pegParse("({" + codeStr + "})"); // wrap in invoked lambda
+  return pegParse(codeStr);
 };
 
 function Scope(scope, parent) {
@@ -63,9 +64,12 @@ function* interpretInvocation(ast, env) {
 };
 
 function* interpretDo(ast, env) {
-  var a = yield* listStar(_.initial(ast.c).map(function(x) { return interpret(x, env); }));
-  var astLastLine = _.last(ast.c);
-  return yield* interpret(astLastLine, env);
+  yield* listStar(_.initial(ast.c).map(function(x) { return interpret(x, env); }));
+  return yield* interpret(_.last(ast.c), env);
+};
+
+function* interpretTop(ast, env) {
+  return yield* trampoline(yield* interpret(ast.c, env));
 };
 
 function* interpretName(ast, env) {
@@ -106,6 +110,8 @@ function* interpret(ast, env) {
     return;
   } else if (env === undefined) {
     return yield* interpret(ast, createScope(standardLibrary()));
+  } else if (ast.t === "top") {
+    return yield* interpretTop(ast, env);
   } else if (ast.t === "lambda") {
     return interpretLambdaDef(ast, env);
   } else if (ast.t === "name") {

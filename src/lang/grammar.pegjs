@@ -14,7 +14,10 @@
 }
 
 start
-  = invocation
+  = all:top { return node("top", all, line, column); }
+
+top
+  = do
 
 s_expression
   = parenthetical

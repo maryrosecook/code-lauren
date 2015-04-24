@@ -31,7 +31,6 @@ describe("interpreter", function() {
       var g = r("({1} ({2}))");
       expect(step(g)).toEqual(null);
       expect(step(g)).toEqual(null);
-      expect(step(g)).toEqual(null);
       expect(step(g)).toEqual(1);
     });
   });
