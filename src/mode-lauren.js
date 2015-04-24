@@ -8,7 +8,7 @@ ace.define("ace/mode/scheme_highlight_rules",["require","exports","module","ace/
     var keywordControl = "case|do|name|name|if|else|when";
     var keywordOperator = "eq?|eqv?|equal?|and|or|not|null?";
     var constantLanguage = "true|false";
-    var supportFunctions = "cons|car|cdr|cond|lambda|lambda*|syntax-rules|format|set!|quote|eval|append|list|list?|member?|load";
+    var supportFunctions = "add|multiply|subtract|divide|clear-screen|sine|cosine|draw-filled-circle";
 
     var keywordMapper = this.createKeywordMapper({
       "keyword.control": keywordControl,
