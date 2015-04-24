@@ -45,13 +45,13 @@ color: rgba(255, 255, 255, 0.15)\
 }\
 .ace-lauren .ace_keyword,\
 .ace-lauren .ace_meta {\
-color: #ffff00\
+color: #FFE342\
 }\
 .ace-lauren .ace_constant,\
 .ace-lauren .ace_constant.ace_character,\
 .ace-lauren .ace_constant.ace_character.ace_escape,\
 .ace-lauren .ace_constant.ace_other {\
-color: #FF70DB\
+color: #FF5BAE\
 }\
 .ace-lauren .ace_invalid {\
 color: #F8F8F8;\
@@ -77,7 +77,7 @@ color: #FFEE80\
 color: #FFDD00\
 }\
 .ace-lauren .ace_string {\
-color: #00FF00\
+color: #70D34C\
 }\
 .ace-lauren .ace_string.ace_regexp {\
 color: #80FFC2\
