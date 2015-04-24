@@ -1,19 +1,21 @@
 (name [draw { ?x ?y
-        (clear-screen)
-        (draw-filled-circle (add 220 x)
-                            (add 200 y)
-                            20
-                            "blue")
-      }
+         (name [radius 20]
 
-      orbit-radius 100
+           (clear-screen)
+           (draw-filled-circle (add 220 x)
+                               (add 200 y)
+                               radius
+                               "blue"))
+       }
 
-      update { ?x ?y ?current-angle
-        (draw x y)
+       update { ?x ?y ?angle
+         (name [orbit-radius 100
+                angle-step 0.1]
 
-        (update (multiply orbit-radius (cosine current-angle))
-                (multiply orbit-radius (sine current-angle))
-                (add current-angle 0.1))
-      }]
+           (draw x y)
+           (update (multiply orbit-radius (cosine angle))
+                   (multiply orbit-radius (sine angle))
+                   (add angle angle-step)))
+       }]
 
   (update 0 0 0))
