@@ -45,6 +45,9 @@ DoneError.prototype = new Error();
 function copyException(from, to) {
   to.stack = from.stack;
   to.message = from.message;
+  for (var i in from) {
+    to[i] = from[i];
+  }
 };
 
 start.ParseError = ParseError;
