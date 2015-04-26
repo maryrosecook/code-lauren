@@ -6,22 +6,21 @@ people: [
   ]
 ]
 
-describePerson: f { ?person
+describePerson: { ?person
   concat(person/"name" " " person/"height"
          join(hobbies " "))
 }
 
 print(all(people describePerson))
 
-print(choose {
-  eq(mary/"name" "Mary"): "hi Mary"
-  else: "hi stranger"
-})
-
+if equals(person/"name" "Mary") {
+  print("Hi Mary")
+} elseif equals(person/"name" "Lauren") {
+  print("Hi Lauren")
+}
 
 + no spaces for lists
 + lists and maps have same enclosing []s
 + ?param syntax
 + url/syntax for lookup
-- colon overloaded
 - more punctuation: { ( [
