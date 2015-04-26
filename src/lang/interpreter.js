@@ -5,9 +5,8 @@ var util = require("../util");
 
 var standardLibrary = require("./standard-library");
 
-var pegParse = peg.buildParser(
-  fs.readFileSync(__dirname + "/grammar.pegjs", "utf8")
-).parse;
+var pegParse = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
+                               { cache: true }).parse;
 
 function parse(codeStr) {
   return pegParse(codeStr);
