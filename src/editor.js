@@ -2,6 +2,8 @@ var ace = require('brace');
 require('./mode-lauren');
 require('./theme-lauren');
 
+require('./ace-requires');
+
 var createEditor = module.exports = function(initialText) {
   var editor = ace.edit('editor');
   editor.setValue(initialText);
