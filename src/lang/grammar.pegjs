@@ -1,103 +1,141 @@
 {
   function node(tag, content, line, column, syntax, raw) {
-    var node = { t: tag, c: content, l: line(), i: column() };
+    var node = addLineColumn({ t: tag, c: content}, line, column);
     if(syntax !== undefined) {
       node.syntax = syntax;
     }
 
-    if (raw !== undefined) {
-      node.raw = raw;
-    }
-
     return node;
   };
+
+  function flatten(arr) {
+    return arr.reduce(function(a, e) {
+      return a.concat(e instanceof Array ? flatten(e) : e);
+    }, []);
+  };
+
+  function addLineColumn(node, line, column) {
+    node.l = line;
+    node.i = column;
+    return node;
+  }
+
+  function bundleApplications(f, applications) {
+    if (applications.length > 0) {
+      return bundleApplications({ t: "invocation", c: [f].concat(applications[0]) },
+                                applications.slice(1));
+    } else {
+      return f;
+    }
+  }
 }
 
 start
   = all:top { return node("top", all, line, column); }
 
-top
+top "top"
   = do
 
-s_expression
-  = parenthetical
+do "do"
+  = _* first:expression _* rest:do_continue* __*
+    { return node("do", [first].concat(rest), line, column); }
+  / __*
+    { return node("do", [], line, column); }
+
+do_continue "do_continue"
+  = _* nl __* all:expression _*
+    { return all }
+
+expression "expression"
+  = conditional
+  / parenthetical
+  / assignment
   / atom
 
-parenthetical
-  = name
-  / if
-  / invocation
+parenthetical "parenthetical"
+  = invocation
   / lambda
 
-name
-  = '(' _* 'name' _* binding_list:binding_list _* body:do ')'
-    { return node("name", [binding_list, body], line, column); }
+invocation "invocation"
+  = f:function applications:application+ _*
+    { return addLineColumn(bundleApplications(f, applications),
+                           line,
+                           column); }
 
-if
-  = '(' _* 'if' _+ test:s_expression _* then_branch:s_expression _* else_branch:s_expression? ')'
-    { return node("if",
-                  [test, then_branch, else_branch === null ? undefined : else_branch],
-                  line,
-                  column); }
+function "function"
+  = all: lambda
+  / all: label
 
-binding_list
-  = '[' bindings:binding* ']'
-    { return node("bindings", bindings, line, column); }
+application "application"
+  = '(' arguments:argument* ')'
+    { return arguments; }
 
-binding
-  = _* label:label _+ s_expression:s_expression _*
-    { return node("binding", [label, s_expression], line, column); }
+argument "argument"
+  = __* expression:expression __*
+    { return expression }
 
-invocation
-  = '(' elements:do_item* ')'
-    { return node("invocation", elements, line, column); }
-
-lambda
-  = '{' _* parameters:parameter* _* body:do '}'
+lambda "lambda"
+  = '{' __? parameters:parameter* __? body:do '}'
     { return node("lambda", [parameters, body], line, column); }
 
-do
-  = all: do_item*
-    { return node("do", all, line, column); }
+assignment "assignment"
+  = label:label ':' _* expression:expression
+    { return node("assignment", [label, expression], line, column); }
 
-do_item
-  = s_expression:s_expression _*
-    { return s_expression; }
+conditional "conditional"
+  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
+    { return node("conditional", [condition, lambda].concat(rest ? rest : []), line, column); }
 
-parameter
-  = '?' label:label _*
-    { return node("parameter", label.c, line, column); }
+elseif "elseif"
+  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
+    { return [condition, lambda].concat(rest ? rest : []); }
 
-mapping
-  = label ':'
+else "else"
+  = 'else' _* lambda:lambda
+    { return [{ t: "boolean", c: true }, lambda]; }
 
-atom
+atom "atom"
   = number
   / string
   / boolean
   / label
 
-number
+parameter "parameter"
+  = '?' label:label _*
+    { return node("parameter", label.c, line, column); }
+
+number "number"
   = a:[0-9]+ b:[.] c:[0-9]+
     { return node("number", parseFloat(a.join("") + b + c.join(""), 10), line, column); }
   / all:[0-9]+
     { return node("number", parseInt(all.join(""), 10), line, column); }
 
-string
+string "string"
   = '"' all:[A-Za-z0-9.,# ]* '"'
     { return node('string', all.join(""), line, column); }
 
-boolean
+boolean "boolean"
   = 'true'  { return node("boolean", true, line, column); }
   / 'false' { return node("boolean", false, line, column); }
 
-label
-  = all: [a-zA-Z-_]+
+label "label"
+  = !keyword all: label_char+
     { return node("label", all.join(""), line, column); }
 
-nl
+label_char "label_char"
+  = [a-zA-Z0-9_\-]
+
+nl "new line"
   = all:[\n]+
     { return node('nl', all, line, column); }
 
-_
+_ "space"
+  = [ \t\r]+
+
+__ "space or newline"
   = [ \t\r\n]+
+
+keyword
+  = 'if' !label_char
+  / 'elseif' !label_char
+  / 'else' !label_char

@@ -71,25 +71,22 @@ function* interpretTop(ast, env) {
   return yield* trampoline(yield* interpret(ast.c, env));
 };
 
-function* interpretName(ast, env) {
-  var labelValuePairs = _.flatten(_.pluck(ast.c[0].c, "c"));
-  var labels = _.filter(_.pluck(labelValuePairs, "c"), function(_, i) { return i % 2 === 0; });
-  var valueAsts = _.filter(labelValuePairs, function(_, i) { return i % 2 === 1; });
-
-  var nameScope = createScope({}, env);
-  for (var i = 0; i < labels.length; i++) {
-    var v = yield* interpret(valueAsts[i], nameScope);
-    nameScope.setBinding(labels[i], v);
-  }
-
-  return yield* interpret(ast.c[1], nameScope);
+function* interpretAssignment(ast, env) {
+  var name = ast.c[0].c
+  var value = yield* trampoline(yield* interpret(ast.c[1], env));
+  env.setBinding(name, value);
+  return value;
 };
 
-function* interpretIf(ast, env) {
+function* interpretConditional(ast, env) {
   var parts = ast.c;
-  return (yield* trampoline(yield* interpret(parts[0], env))) ?
-    yield* interpret(parts[1], env) :
-    yield* interpret(parts[2], env);
+  for (var i = 0; i < parts.length; i += 2) {
+    var conditionReturn = yield* trampoline(yield* interpret(parts[i], env));
+    if (conditionReturn === true) {
+      var bodyLambdaFn = yield* interpret(parts[i + 1], env);
+      return yield* bodyLambdaFn();
+    }
+  }
 };
 
 function interpretLambdaDef(ast, env) {
@@ -113,10 +110,10 @@ function* interpret(ast, env) {
     return yield* interpretTop(ast, env);
   } else if (ast.t === "lambda") {
     return interpretLambdaDef(ast, env);
-  } else if (ast.t === "name") {
-    return yield* interpretName(ast, env);
-  } else if (ast.t === "if") {
-    return yield* interpretIf(ast, env);
+  } else if (ast.t === "assignment") {
+    return yield* interpretAssignment(ast, env);
+  } else if (ast.t === "conditional") {
+    return yield* interpretConditional(ast, env);
   } else if (ast.t === "do") {
     return yield* interpretDo(ast, env);
   } else if (ast.t === "invocation") {
