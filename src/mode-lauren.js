@@ -5,7 +5,7 @@ ace.define("ace/mode/scheme_highlight_rules",["require","exports","module","ace/
   var TextHighlightRules = acequire("./text_highlight_rules").TextHighlightRules;
 
   var SchemeHighlightRules = function() {
-    var keywordControl = "case|do|name|name|if|else|when";
+    var keywordControl = "case|do|name|name|if|else|elseif|when";
     var keywordOperator = "eq?|eqv?|equal?|and|or|not|null?";
     var constantLanguage = "true|false";
     var supportFunctions = "add|multiply|subtract|divide|clear-screen|sine|cosine|draw-filled-circle";

@@ -1,20 +1,17 @@
 ace.define("ace/theme/lauren",["require","exports","module","ace/lib/dom"], function(acequire, exports, module) {
 
-exports.isDark = true;
+exports.isDark = false;
 exports.cssClass = "ace-lauren";
 exports.cssText = ".ace-lauren .ace_gutter {\
-background: #011e3a;\
-color: rgb(128,145,160)\
+background: #FFFFFF;\
+color: rgb(255, 255, 255)\
 }\
 .ace-lauren .ace_print-margin {\
 width: 1px;\
-background: #011e3a\
+background: #ffffff\
 }\
 .ace-lauren {\
 background-color: #002240;\
-color: #FFFFFF\
-}\
-.ace-lauren .ace_cursor {\
 color: #FFFFFF\
 }\
 .ace-lauren .ace_marker-layer .ace_selection {\
@@ -45,7 +42,7 @@ color: rgba(255, 255, 255, 0.15)\
 }\
 .ace-lauren .ace_keyword,\
 .ace-lauren .ace_meta {\
-color: #FFE342\
+color: #F2A844\
 }\
 .ace-lauren .ace_constant,\
 .ace-lauren .ace_constant.ace_character,\
@@ -61,14 +58,14 @@ background-color: #800F00\
 color: #80FFBB\
 }\
 .ace-lauren .ace_support.ace_constant {\
-color: #EB939A\
+color: #EB5B5A\
 }\
 .ace-lauren .ace_fold {\
 background-color: #FF9D00;\
 border-color: #FFFFFF\
 }\
 .ace-lauren .ace_support.ace_function {\
-color: #8888ff\
+color: #4A9CC9\
 }\
 .ace-lauren .ace_storage {\
 color: #FFEE80\
@@ -77,7 +74,7 @@ color: #FFEE80\
 color: #FFDD00\
 }\
 .ace-lauren .ace_string {\
-color: #70D34C\
+color: #578622\
 }\
 .ace-lauren .ace_string.ace_regexp {\
 color: #80FFC2\
