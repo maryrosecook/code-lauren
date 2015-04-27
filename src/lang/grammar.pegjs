@@ -37,7 +37,7 @@ top "top"
   = do
 
 do "do"
-  = _* first:expression _* rest:do_continue* __*
+  = __* first:expression _* rest:do_continue* __*
     { return node("do", [first].concat(rest), line, column); }
   / __*
     { return node("do", [], line, column); }

@@ -79,7 +79,7 @@ describe("parser", function() {
     });
 
     it("should allow nl AND SPACE separated expressions", function() {
-      var ast = parse(" 1 \n 2 \n 3 ");
+      var ast = parse(" \n 1 \n 2 \n 3 ");
       expect(util.stripAst(getNodeAt(ast,
                                      ["top", "do"])))
         .toEqual([{ t: "number", c: 1 },
