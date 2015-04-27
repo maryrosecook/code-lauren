@@ -1,8 +1,6 @@
 require("babel-core/polyfill");
 var fs = require("fs");
 var lang = require("./lang/interpreter");
-var parse = lang.parse;
-var interpret = lang.interpret;
 var r = require("./runner");
 var createEditor = require("./editor");
 var createEnv = require("./env");
@@ -35,17 +33,29 @@ function step(g) {
   }
 };
 
-function reportError(editSession, e) {
-  return editSession.addMarker(new range.Range(e.line - 1,
-                                               e.column - 2,
-                                               e.line - 1,
-                                               e.column - 1),
-                               "ace_parse_error",
-                               "text",
-                               true);
+function reportError(editSession, range) {
+  return editSession.addMarker(range, "ace_parse_error", "text", true);
+};
+
+function errorRange(initialException, code) {
+  function successfulParseStart(code) {
+    for (var i = 0; i < code.length; i++) {
+      try {
+        lang.parse(code.slice(i));
+        return i;
+      } catch (e) {}
+    }
+  };
+
+  var errorEnd = lang.indexToLineAndColumn(successfulParseStart(code), code);
+  return new range.Range(initialException.line - 1,
+                         initialException.column - 1,
+                         errorEnd.line - 1,
+                         errorEnd.column);
 };
 
 var markerIds = [];
+var errorZone;
 function start(editor) {
   var code = editor.getValue();
   var editSession = editor.getSession();
@@ -72,9 +82,8 @@ function start(editor) {
     };
   } catch (e) {
     if (e instanceof r.ParseError) {
-      console.log(e);
       console.log(e.message);
-      markerIds.push(reportError(editor.getSession(), e));
+      markerIds.push(reportError(editor.getSession(), errorRange(e, code)));
     } else {
       throw e;
     }
