@@ -15,7 +15,7 @@ background-color: #002240;\
 color: #FFFFFF\
 }\
 .ace-lauren .ace_marker-layer .ace_selection {\
-background: rgba(179, 101, 57, 0.75)\
+background: rgba(200, 200, 255, 0.75)\
 }\
 .ace-lauren.ace_multiselect .ace_selection.ace_start {\
 box-shadow: 0 0 3px 0px #002240;\

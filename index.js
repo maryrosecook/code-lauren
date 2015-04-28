@@ -144,14 +144,14 @@
 	"use strict";
 
 	var marked0$0 = [listStar, trampoline, interpretInvocation, interpretDo, interpretTop, interpretAssignment, interpretConditional, interpret].map(regeneratorRuntime.mark);
-	var peg = __webpack_require__(16);
+	var peg = __webpack_require__(15);
 
-	var _ = __webpack_require__(15);
+	var _ = __webpack_require__(16);
 	var util = __webpack_require__(12);
 
 	var standardLibrary = __webpack_require__(9);
 
-	var pegParse = peg.buildParser("{\n  function node(tag, content, line, column, syntax, raw) {\n    var node = addLineColumn({ t: tag, c: content}, line, column);\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function addLineColumn(node, line, column) {\n    node.l = line;\n    node.i = column;\n    return node;\n  }\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, line, column); }\n\ntop \"top\"\n  = do\n\ndo \"do\"\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), line, column); }\n  / __*\n    { return node(\"do\", [], line, column); }\n\ndo_continue \"do_continue\"\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression \"expression\"\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical \"parenthetical\"\n  = invocation\n  / lambda\n\ninvocation \"invocation\"\n  = f:function applications:application+ _*\n    { return addLineColumn(bundleApplications(f, applications),\n                           line,\n                           column); }\n\nfunction \"function\"\n  = all: lambda\n  / all: label\n\napplication \"application\"\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument \"argument\"\n  = __* expression:expression __*\n    { return expression }\n\nlambda \"lambda\"\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], line, column); }\n\nassignment \"assignment\"\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], line, column); }\n\nconditional \"conditional\"\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), line, column); }\n\nelseif \"elseif\"\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse \"else\"\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom \"atom\"\n  = number\n  / string\n  / boolean\n  / label\n\nparameter \"parameter\"\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, line, column); }\n\nnumber \"number\"\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), line, column); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), line, column); }\n\nstring \"string\"\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), line, column); }\n\nboolean \"boolean\"\n  = 'true'  { return node(\"boolean\", true, line, column); }\n  / 'false' { return node(\"boolean\", false, line, column); }\n\nlabel \"label\"\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), line, column); }\n\nlabel_char \"label_char\"\n  = [a-zA-Z0-9_\\-]\n\nnl \"new line\"\n  = all:[\\n]+\n    { return node('nl', all, line, column); }\n\n_ \"space\"\n  = [ \\t\\r]+\n\n__ \"space or newline\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
+	var pegParse = peg.buildParser("{\n  function node(tag, content, line, column, syntax, raw) {\n    var node = addLineColumn({ t: tag, c: content}, line, column);\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function addLineColumn(node, line, column) {\n    node.l = line;\n    node.i = column;\n    return node;\n  }\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, line, column); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), line, column); }\n  / __*\n    { return node(\"do\", [], line, column); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation \"invocation\"\n  = f:function applications:application+ _*\n    { return addLineColumn(bundleApplications(f, applications),\n                           line,\n                           column); }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication \"application\"\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument \"argument\"\n  = __* expression:expression __*\n    { return expression }\n\nlambda \"lambda\"\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], line, column); }\n\nassignment \"assignment\"\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], line, column); }\n\nconditional \"conditional\"\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), line, column); }\n\nelseif \"elseif\"\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse \"else\"\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter \"parameter\"\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, line, column); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), line, column); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), line, column); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), line, column); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, line, column); }\n  / 'false' { return node(\"boolean\", false, line, column); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), line, column); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, line, column); }\n\n_\n  = [ \\t\\r]+\n\n__\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
 
 	function parse(codeStr) {
 	  return pegParse(codeStr);
@@ -213,13 +213,13 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(gs[i], "t45", 4);
+	        return context$1$0.delegateYield(gs[i], "t0", 4);
 
 	      case 4:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t45), "t46", 5);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t0), "t1", 5);
 
 	      case 5:
-	        x = context$1$0.t46;
+	        x = context$1$0.t1;
 
 	        exprs.push(x);
 
@@ -247,10 +247,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(v.g, "t47", 2);
+	        return context$1$0.delegateYield(v.g, "t2", 2);
 
 	      case 2:
-	        v = context$1$0.t47;
+	        v = context$1$0.t2;
 	        context$1$0.next = 0;
 	        break;
 
@@ -271,18 +271,18 @@
 	      case 0:
 	        return context$1$0.delegateYield(listStar(ast.c.map(function (x) {
 	          return interpret(x, env);
-	        })), "t49", 1);
+	        })), "t4", 1);
 
 	      case 1:
-	        exprs = context$1$0.t49;
+	        exprs = context$1$0.t4;
 	        return context$1$0.abrupt("return", new Thunk(regeneratorRuntime.mark(function callee$1$0() {
 	          return regeneratorRuntime.wrap(function callee$1$0$(context$2$0) {
 	            while (1) switch (context$2$0.prev = context$2$0.next) {
 	              case 0:
-	                return context$2$0.delegateYield(exprs[0].apply(null, exprs.slice(1)), "t48", 1);
+	                return context$2$0.delegateYield(exprs[0].apply(null, exprs.slice(1)), "t3", 1);
 
 	              case 1:
-	                return context$2$0.abrupt("return", context$2$0.t48);
+	                return context$2$0.abrupt("return", context$2$0.t3);
 
 	              case 2:
 	              case "end":
@@ -304,13 +304,13 @@
 	      case 0:
 	        return context$1$0.delegateYield(listStar(_.initial(ast.c).map(function (x) {
 	          return interpret(x, env);
-	        })), "t50", 1);
+	        })), "t5", 1);
 
 	      case 1:
-	        return context$1$0.delegateYield(interpret(_.last(ast.c), env), "t51", 2);
+	        return context$1$0.delegateYield(interpret(_.last(ast.c), env), "t6", 2);
 
 	      case 2:
-	        return context$1$0.abrupt("return", context$1$0.t51);
+	        return context$1$0.abrupt("return", context$1$0.t6);
 
 	      case 3:
 	      case "end":
@@ -323,13 +323,13 @@
 	  return regeneratorRuntime.wrap(function interpretTop$(context$1$0) {
 	    while (1) switch (context$1$0.prev = context$1$0.next) {
 	      case 0:
-	        return context$1$0.delegateYield(interpret(ast.c, env), "t52", 1);
+	        return context$1$0.delegateYield(interpret(ast.c, env), "t7", 1);
 
 	      case 1:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t52), "t53", 2);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t7), "t8", 2);
 
 	      case 2:
-	        return context$1$0.abrupt("return", context$1$0.t53);
+	        return context$1$0.abrupt("return", context$1$0.t8);
 
 	      case 3:
 	      case "end":
@@ -344,13 +344,13 @@
 	    while (1) switch (context$1$0.prev = context$1$0.next) {
 	      case 0:
 	        name = ast.c[0].c;
-	        return context$1$0.delegateYield(interpret(ast.c[1], env), "t54", 2);
+	        return context$1$0.delegateYield(interpret(ast.c[1], env), "t9", 2);
 
 	      case 2:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t54), "t55", 3);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t9), "t10", 3);
 
 	      case 3:
-	        value = context$1$0.t55;
+	        value = context$1$0.t10;
 
 	        env.setBinding(name, value);
 	        return context$1$0.abrupt("return", value);
@@ -376,27 +376,27 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(parts[i], env), "t56", 4);
+	        return context$1$0.delegateYield(interpret(parts[i], env), "t11", 4);
 
 	      case 4:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t56), "t57", 5);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t11), "t12", 5);
 
 	      case 5:
-	        conditionReturn = context$1$0.t57;
+	        conditionReturn = context$1$0.t12;
 
 	        if (!(conditionReturn === true)) {
 	          context$1$0.next = 11;
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(parts[i + 1], env), "t58", 8);
+	        return context$1$0.delegateYield(interpret(parts[i + 1], env), "t13", 8);
 
 	      case 8:
-	        bodyLambdaFn = context$1$0.t58;
-	        return context$1$0.delegateYield(bodyLambdaFn(), "t59", 10);
+	        bodyLambdaFn = context$1$0.t13;
+	        return context$1$0.delegateYield(bodyLambdaFn(), "t14", 10);
 
 	      case 10:
-	        return context$1$0.abrupt("return", context$1$0.t59);
+	        return context$1$0.abrupt("return", context$1$0.t14);
 
 	      case 11:
 	        i += 2;
@@ -426,10 +426,10 @@
 	          lambdaArguments = args$2$0;
 	          lambdaParameters = _.pluck(ast.c[0], "c");
 	          lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
-	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t60", 6);
+	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t15", 6);
 
 	        case 6:
-	          return context$2$0.abrupt("return", context$2$0.t60);
+	          return context$2$0.abrupt("return", context$2$0.t15);
 
 	        case 7:
 	        case "end":
@@ -456,10 +456,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(ast, createScope(standardLibrary())), "t61", 6);
+	        return context$1$0.delegateYield(interpret(ast, createScope(standardLibrary())), "t16", 6);
 
 	      case 6:
-	        return context$1$0.abrupt("return", context$1$0.t61);
+	        return context$1$0.abrupt("return", context$1$0.t16);
 
 	      case 9:
 	        if (!(ast.t === "top")) {
@@ -467,10 +467,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretTop(ast, env), "t62", 11);
+	        return context$1$0.delegateYield(interpretTop(ast, env), "t17", 11);
 
 	      case 11:
-	        return context$1$0.abrupt("return", context$1$0.t62);
+	        return context$1$0.abrupt("return", context$1$0.t17);
 
 	      case 14:
 	        if (!(ast.t === "lambda")) {
@@ -486,10 +486,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t63", 20);
+	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t18", 20);
 
 	      case 20:
-	        return context$1$0.abrupt("return", context$1$0.t63);
+	        return context$1$0.abrupt("return", context$1$0.t18);
 
 	      case 23:
 	        if (!(ast.t === "conditional")) {
@@ -497,10 +497,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretConditional(ast, env), "t64", 25);
+	        return context$1$0.delegateYield(interpretConditional(ast, env), "t19", 25);
 
 	      case 25:
-	        return context$1$0.abrupt("return", context$1$0.t64);
+	        return context$1$0.abrupt("return", context$1$0.t19);
 
 	      case 28:
 	        if (!(ast.t === "do")) {
@@ -508,10 +508,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretDo(ast, env), "t65", 30);
+	        return context$1$0.delegateYield(interpretDo(ast, env), "t20", 30);
 
 	      case 30:
-	        return context$1$0.abrupt("return", context$1$0.t65);
+	        return context$1$0.abrupt("return", context$1$0.t20);
 
 	      case 33:
 	        if (!(ast.t === "invocation")) {
@@ -519,10 +519,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t66", 35);
+	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t21", 35);
 
 	      case 35:
-	        return context$1$0.abrupt("return", context$1$0.t66);
+	        return context$1$0.abrupt("return", context$1$0.t21);
 
 	      case 38:
 	        if (!(ast.t === "label")) {
@@ -807,7 +807,7 @@
 
 	  exports.isDark = false;
 	  exports.cssClass = "ace-lauren";
-	  exports.cssText = ".ace-lauren .ace_gutter {background: #FFFFFF;color: rgb(255, 255, 255)}.ace-lauren .ace_print-margin {width: 1px;background: #ffffff}.ace-lauren {background-color: #002240;color: #FFFFFF}.ace-lauren .ace_marker-layer .ace_selection {background: rgba(179, 101, 57, 0.75)}.ace-lauren.ace_multiselect .ace_selection.ace_start {box-shadow: 0 0 3px 0px #002240;border-radius: 2px}.ace-lauren .ace_marker-layer .ace_step {background: rgb(127, 111, 19)}.ace-lauren .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid rgba(255, 255, 255, 0.15)}.ace-lauren .ace_marker-layer .ace_active-line {background: rgba(0, 0, 0, 0.35)}.ace-lauren .ace_gutter-active-line {background-color: rgba(0, 0, 0, 0.35)}.ace-lauren .ace_marker-layer .ace_selected-word {border: 1px solid rgba(179, 101, 57, 0.75)}.ace-lauren .ace_invisible {color: rgba(255, 255, 255, 0.15)}.ace-lauren .ace_keyword,.ace-lauren .ace_meta {color: #F2A844}.ace-lauren .ace_constant,.ace-lauren .ace_constant.ace_character,.ace-lauren .ace_constant.ace_character.ace_escape,.ace-lauren .ace_constant.ace_other {color: #FF5BAE}.ace-lauren .ace_invalid {color: #F8F8F8;background-color: #800F00}.ace-lauren .ace_support {color: #80FFBB}.ace-lauren .ace_support.ace_constant {color: #EB5B5A}.ace-lauren .ace_fold {background-color: #FF9D00;border-color: #FFFFFF}.ace-lauren .ace_support.ace_function {color: #4A9CC9}.ace-lauren .ace_storage {color: #FFEE80}.ace-lauren .ace_entity {color: #FFDD00}.ace-lauren .ace_string {color: #578622}.ace-lauren .ace_string.ace_regexp {color: #80FFC2}.ace-lauren .ace_comment {font-style: italic;color: #0088FF}.ace-lauren .ace_heading,.ace-lauren .ace_markup.ace_heading {color: #C8E4FD;background-color: #001221}.ace-lauren .ace_list,.ace-lauren .ace_markup.ace_list {background-color: #130D26}.ace-lauren .ace_variable {color: #CCCCCC}.ace-lauren .ace_variable.ace_language {color: #FF80E1}.ace-lauren .ace_meta.ace_tag {color: #9EFFFF}.ace-lauren .ace_indent-guide {background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWNgYGBgYHCLSvkPAAP3AgSDTRd4AAAAAElFTkSuQmCC) right repeat-y}";
+	  exports.cssText = ".ace-lauren .ace_gutter {background: #FFFFFF;color: rgb(255, 255, 255)}.ace-lauren .ace_print-margin {width: 1px;background: #ffffff}.ace-lauren {background-color: #002240;color: #FFFFFF}.ace-lauren .ace_marker-layer .ace_selection {background: rgba(200, 200, 255, 0.75)}.ace-lauren.ace_multiselect .ace_selection.ace_start {box-shadow: 0 0 3px 0px #002240;border-radius: 2px}.ace-lauren .ace_marker-layer .ace_step {background: rgb(127, 111, 19)}.ace-lauren .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid rgba(255, 255, 255, 0.15)}.ace-lauren .ace_marker-layer .ace_active-line {background: rgba(0, 0, 0, 0.35)}.ace-lauren .ace_gutter-active-line {background-color: rgba(0, 0, 0, 0.35)}.ace-lauren .ace_marker-layer .ace_selected-word {border: 1px solid rgba(179, 101, 57, 0.75)}.ace-lauren .ace_invisible {color: rgba(255, 255, 255, 0.15)}.ace-lauren .ace_keyword,.ace-lauren .ace_meta {color: #F2A844}.ace-lauren .ace_constant,.ace-lauren .ace_constant.ace_character,.ace-lauren .ace_constant.ace_character.ace_escape,.ace-lauren .ace_constant.ace_other {color: #FF5BAE}.ace-lauren .ace_invalid {color: #F8F8F8;background-color: #800F00}.ace-lauren .ace_support {color: #80FFBB}.ace-lauren .ace_support.ace_constant {color: #EB5B5A}.ace-lauren .ace_fold {background-color: #FF9D00;border-color: #FFFFFF}.ace-lauren .ace_support.ace_function {color: #4A9CC9}.ace-lauren .ace_storage {color: #FFEE80}.ace-lauren .ace_entity {color: #FFDD00}.ace-lauren .ace_string {color: #578622}.ace-lauren .ace_string.ace_regexp {color: #80FFC2}.ace-lauren .ace_comment {font-style: italic;color: #0088FF}.ace-lauren .ace_heading,.ace-lauren .ace_markup.ace_heading {color: #C8E4FD;background-color: #001221}.ace-lauren .ace_list,.ace-lauren .ace_markup.ace_list {background-color: #130D26}.ace-lauren .ace_variable {color: #CCCCCC}.ace-lauren .ace_variable.ace_language {color: #FF80E1}.ace-lauren .ace_meta.ace_tag {color: #9EFFFF}.ace-lauren .ace_indent-guide {background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWNgYGBgYHCLSvkPAAP3AgSDTRd4AAAAAElFTkSuQmCC) right repeat-y}";
 
 	  var dom = acequire("../lib/dom");
 	  dom.importCssString(exports.cssText, exports.cssClass);
@@ -829,7 +829,7 @@
 
 	"use strict";
 
-	var _ = __webpack_require__(15);
+	var _ = __webpack_require__(16);
 
 	var createStandardLibrary = module.exports = function () {
 	  var lib = {
@@ -1057,7 +1057,7 @@
 
 	"use strict";
 
-	var _ = __webpack_require__(15);
+	var _ = __webpack_require__(16);
 
 	var canvasLibrary = module.exports = function (screen) {
 	  return {
@@ -29765,6 +29765,62 @@
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var utils = __webpack_require__(18);
+
+	module.exports = {
+	  /* PEG.js version (uses semantic versioning). */
+	  VERSION: "0.8.0",
+
+	  GrammarError: __webpack_require__(19),
+	  parser:       __webpack_require__(20),
+	  compiler:     __webpack_require__(21),
+
+	  /*
+	   * Generates a parser from a specified grammar and returns it.
+	   *
+	   * The grammar must be a string in the format described by the metagramar in
+	   * the parser.pegjs file.
+	   *
+	   * Throws |PEG.parser.SyntaxError| if the grammar contains a syntax error or
+	   * |PEG.GrammarError| if it contains a semantic error. Note that not all
+	   * errors are detected during the generation and some may protrude to the
+	   * generated parser and cause its malfunction.
+	   */
+	  buildParser: function(grammar) {
+	    function convertPasses(passes) {
+	      var converted = {}, stage;
+
+	      for (stage in passes) {
+	        if (passes.hasOwnProperty(stage)) {
+	          converted[stage] = utils.values(passes[stage]);
+	        }
+	      }
+
+	      return converted;
+	    }
+
+	    var options = arguments.length > 1 ? utils.clone(arguments[1]) : {},
+	        plugins = "plugins" in options ? options.plugins : [],
+	        config  = {
+	          parser: this.parser,
+	          passes: convertPasses(this.compiler.passes)
+	        };
+
+	    utils.each(plugins, function(p) { p.use(config, options); });
+
+	    return this.compiler.compile(
+	      config.parser.parse(grammar),
+	      config.passes,
+	      options
+	    );
+	  }
+	};
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.2
 	//     http://underscorejs.org
 	//     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -31301,62 +31357,6 @@
 	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	  }
 	}.call(this));
-
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var utils = __webpack_require__(18);
-
-	module.exports = {
-	  /* PEG.js version (uses semantic versioning). */
-	  VERSION: "0.8.0",
-
-	  GrammarError: __webpack_require__(19),
-	  parser:       __webpack_require__(20),
-	  compiler:     __webpack_require__(21),
-
-	  /*
-	   * Generates a parser from a specified grammar and returns it.
-	   *
-	   * The grammar must be a string in the format described by the metagramar in
-	   * the parser.pegjs file.
-	   *
-	   * Throws |PEG.parser.SyntaxError| if the grammar contains a syntax error or
-	   * |PEG.GrammarError| if it contains a semantic error. Note that not all
-	   * errors are detected during the generation and some may protrude to the
-	   * generated parser and cause its malfunction.
-	   */
-	  buildParser: function(grammar) {
-	    function convertPasses(passes) {
-	      var converted = {}, stage;
-
-	      for (stage in passes) {
-	        if (passes.hasOwnProperty(stage)) {
-	          converted[stage] = utils.values(passes[stage]);
-	        }
-	      }
-
-	      return converted;
-	    }
-
-	    var options = arguments.length > 1 ? utils.clone(arguments[1]) : {},
-	        plugins = "plugins" in options ? options.plugins : [],
-	        config  = {
-	          parser: this.parser,
-	          passes: convertPasses(this.compiler.passes)
-	        };
-
-	    utils.each(plugins, function(p) { p.use(config, options); });
-
-	    return this.compiler.compile(
-	      config.parser.parse(grammar),
-	      config.passes,
-	      options
-	    );
-	  }
-	};
 
 
 /***/ },
@@ -37870,7 +37870,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $          = __webpack_require__(74)
-	  , setUnscope = __webpack_require__(93)
+	  , setUnscope = __webpack_require__(92)
 	  , ITER       = __webpack_require__(77).safe('iter')
 	  , $iter      = __webpack_require__(89)
 	  , step       = $iter.step
@@ -37908,7 +37908,7 @@
 /* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(92)(Array);
+	__webpack_require__(93)(Array);
 
 /***/ },
 /* 53 */
@@ -37942,7 +37942,7 @@
 	    } return O;
 	  }
 	});
-	__webpack_require__(93)('copyWithin');
+	__webpack_require__(92)('copyWithin');
 
 /***/ },
 /* 54 */
@@ -37964,7 +37964,7 @@
 	    return O;
 	  }
 	});
-	__webpack_require__(93)('fill');
+	__webpack_require__(92)('fill');
 
 /***/ },
 /* 55 */
@@ -37975,7 +37975,7 @@
 	  // 22.1.3.8 Array.prototype.find(predicate, thisArg = undefined)
 	  find: __webpack_require__(82)(5)
 	});
-	__webpack_require__(93)('find');
+	__webpack_require__(92)('find');
 
 /***/ },
 /* 56 */
@@ -37986,7 +37986,7 @@
 	  // 22.1.3.9 Array.prototype.findIndex(predicate, thisArg = undefined)
 	  findIndex: __webpack_require__(82)(6)
 	});
-	__webpack_require__(93)('findIndex');
+	__webpack_require__(92)('findIndex');
 
 /***/ },
 /* 57 */
@@ -38021,7 +38021,7 @@
 	    get: __webpack_require__(85)(/^.*\/(\w*)$/, '$1')
 	  });
 	}
-	__webpack_require__(92)(RegExp);
+	__webpack_require__(93)(RegExp);
 
 /***/ },
 /* 58 */
@@ -38183,7 +38183,7 @@
 	// export
 	$def($def.G + $def.W + $def.F * (P != Base), {Promise: P});
 	cof.set(P, PROMISE);
-	__webpack_require__(92)(P);
+	__webpack_require__(93)(P);
 
 	// statics
 	$def($def.S, PROMISE, {
@@ -38473,7 +38473,7 @@
 	$def($def.P, 'Array', {
 	  includes: __webpack_require__(84)(true)
 	});
-	__webpack_require__(93)('includes');
+	__webpack_require__(92)('includes');
 
 /***/ },
 /* 65 */
@@ -39264,24 +39264,24 @@
 /* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $ = __webpack_require__(74);
-	module.exports = function(C){
-	  if($.DESC && $.FW)$.setDesc(C, __webpack_require__(80)('species'), {
-	    configurable: true,
-	    get: $.that
-	  });
-	};
-
-/***/ },
-/* 93 */
-/***/ function(module, exports, __webpack_require__) {
-
 	// 22.1.3.31 Array.prototype[@@unscopables]
 	var $           = __webpack_require__(74)
 	  , UNSCOPABLES = __webpack_require__(80)('unscopables');
 	if($.FW && !(UNSCOPABLES in []))$.hide(Array.prototype, UNSCOPABLES, {});
 	module.exports = function(key){
 	  if($.FW)[][UNSCOPABLES][key] = true;
+	};
+
+/***/ },
+/* 93 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(74);
+	module.exports = function(C){
+	  if($.DESC && $.FW)$.setDesc(C, __webpack_require__(80)('species'), {
+	    configurable: true,
+	    get: $.that
+	  });
 	};
 
 /***/ },
@@ -39585,7 +39585,7 @@
 	  }
 
 	  __webpack_require__(76).set(C, NAME);
-	  __webpack_require__(92)(C);
+	  __webpack_require__(93)(C);
 
 	  O[NAME] = C;
 	  $def($def.G + $def.W + $def.F * (C != Base), O);
