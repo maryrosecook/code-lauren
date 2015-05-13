@@ -24,9 +24,6 @@ function step(g) {
   return g.next().value;
 };
 
-function isDone(value) {
-  return value instanceof Function;
-};
 
 function ParseError(e) {
   copyException(e, this);
