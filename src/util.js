@@ -11,5 +11,15 @@ var util = module.exports = {
     }
 
     return obj
+  },
+
+  copyException: function(from, to) {
+    to.stack = from.stack;
+    to.message = from.message;
+    for (var i in from) {
+      to[i] = from[i];
+    }
+
+    return to;
   }
 };

@@ -1,6 +1,7 @@
 require("babel-core/polyfill");
 var fs = require("fs");
-var lang = require("./lang/interpreter");
+var parse = require("./lang/parser");
+var interpret = require("./lang/interpreter");
 var r = require("./runner");
 var createEditor = require("./editor");
 var createEnv = require("./env");
@@ -43,7 +44,7 @@ function start(editor) {
   var code = editor.getValue();
   var editSession = editor.getSession();
   var screen = document.getElementById("screen").getContext("2d");
-  var env = lang.createScope(createEnv(screen));
+  var env = interpret.createScope(createEnv(screen));
 
   markerIds.forEach(function(x) { editSession.removeMarker(x); });
   markerIds = [];
@@ -64,7 +65,7 @@ function start(editor) {
       going = false;
     };
   } catch (e) {
-    if (e instanceof r.ParseError) {
+    if (e instanceof parse.ParseError) {
       console.log(e.message);
       markerIds.push(reportError(editor.getSession(), e));
     } else {
