@@ -33,106 +33,106 @@
 start
   = all:top { return node("top", all, line, column); }
 
-top "top"
+top
   = do
 
-do "do"
+do
   = __* first:expression _* rest:do_continue* __*
     { return node("do", [first].concat(rest), line, column); }
   / __*
     { return node("do", [], line, column); }
 
-do_continue "do_continue"
+do_continue
   = _* nl __* all:expression _*
     { return all }
 
-expression "expression"
+expression
   = conditional
   / parenthetical
   / assignment
   / atom
 
-parenthetical "parenthetical"
+parenthetical
   = invocation
   / lambda
 
-invocation "invocation"
+invocation
   = f:function applications:application+ _*
     { return addLineColumn(bundleApplications(f, applications),
                            line,
                            column); }
 
-function "function"
+function
   = all: lambda
   / all: label
 
-application "application"
+application
   = '(' arguments:argument* ')'
     { return arguments; }
 
-argument "argument"
+argument
   = __* expression:expression __*
     { return expression }
 
-lambda "lambda"
+lambda
   = '{' __? parameters:parameter* __? body:do '}'
     { return node("lambda", [parameters, body], line, column); }
 
-assignment "assignment"
+assignment
   = label:label ':' _* expression:expression
     { return node("assignment", [label, expression], line, column); }
 
-conditional "conditional"
+conditional
   = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
     { return node("conditional", [condition, lambda].concat(rest ? rest : []), line, column); }
 
-elseif "elseif"
+elseif
   = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
     { return [condition, lambda].concat(rest ? rest : []); }
 
-else "else"
+else
   = 'else' _* lambda:lambda
     { return [{ t: "boolean", c: true }, lambda]; }
 
-atom "atom"
+atom
   = number
   / string
   / boolean
   / label
 
-parameter "parameter"
+parameter
   = '?' label:label _*
     { return node("parameter", label.c, line, column); }
 
-number "number"
+number
   = a:[0-9]+ b:[.] c:[0-9]+
     { return node("number", parseFloat(a.join("") + b + c.join(""), 10), line, column); }
   / all:[0-9]+
     { return node("number", parseInt(all.join(""), 10), line, column); }
 
-string "string"
+string
   = '"' all:[A-Za-z0-9.,# ]* '"'
     { return node('string', all.join(""), line, column); }
 
-boolean "boolean"
+boolean
   = 'true'  { return node("boolean", true, line, column); }
   / 'false' { return node("boolean", false, line, column); }
 
-label "label"
+label
   = !keyword all: label_char+
     { return node("label", all.join(""), line, column); }
 
-label_char "label_char"
+label_char
   = [a-zA-Z0-9_\-]
 
-nl "new line"
+nl
   = all:[\n]+
     { return node('nl', all, line, column); }
 
-_ "space"
+_
   = [ \t\r]+
 
-__ "space or newline"
+__
   = [ \t\r\n]+
 
 keyword
