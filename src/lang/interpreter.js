@@ -118,5 +118,4 @@ function* interpret(ast, env) {
 
 interpret.interpret = interpret;
 interpret.createScope = createScope;
-interpret.trampoline = trampoline;
 module.exports = interpret;
