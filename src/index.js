@@ -33,29 +33,12 @@ function step(g) {
   }
 };
 
-function reportError(editSession, range) {
-  return editSession.addMarker(range, "ace_parse_error", "text", true);
-};
-
-function errorRange(initialException, code) {
-  function successfulParseStart(code) {
-    for (var i = 0; i < code.length; i++) {
-      try {
-        lang.parse(code.slice(i));
-        return i;
-      } catch (e) {}
-    }
-  };
-
-  var errorEnd = lang.indexToLineAndColumn(successfulParseStart(code), code);
-  return new range.Range(initialException.line - 1,
-                         initialException.column - 1,
-                         errorEnd.line - 1,
-                         errorEnd.column);
+function reportError(editSession, e) {
+  var r = new range.Range(e.line - 1, e.column - 1, e.line - 1, e.column);
+  return editSession.addMarker(r, "ace_parse_error", "text", true);
 };
 
 var markerIds = [];
-var errorZone;
 function start(editor) {
   var code = editor.getValue();
   var editSession = editor.getSession();
@@ -83,7 +66,7 @@ function start(editor) {
   } catch (e) {
     if (e instanceof r.ParseError) {
       console.log(e.message);
-      markerIds.push(reportError(editor.getSession(), errorRange(e, code)));
+      markerIds.push(reportError(editor.getSession(), e));
     } else {
       throw e;
     }
