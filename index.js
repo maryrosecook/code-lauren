@@ -130,18 +130,10 @@
 	"use strict";
 
 	var marked0$0 = [listStar, trampoline, interpretInvocation, interpretDo, interpretTop, interpretAssignment, interpretConditional, interpret].map(regeneratorRuntime.mark);
-	var peg = __webpack_require__(16);
-
 	var _ = __webpack_require__(15);
 	var util = __webpack_require__(12);
 
 	var standardLibrary = __webpack_require__(9);
-
-	var pegParse = peg.buildParser("{\n  function node(tag, content, line, column, syntax, raw) {\n    var node = addLineColumn({ t: tag, c: content}, line, column);\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function addLineColumn(node, line, column) {\n    node.l = line;\n    node.i = column;\n    return node;\n  }\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, line, column); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), line, column); }\n  / __*\n    { return node(\"do\", [], line, column); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { return addLineColumn(bundleApplications(f, applications),\n                           line,\n                           column); }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], line, column); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], line, column); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), line, column); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, line, column); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), line, column); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), line, column); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), line, column); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, line, column); }\n  / 'false' { return node(\"boolean\", false, line, column); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), line, column); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, line, column); }\n\n_\n  = [ \\t\\r]+\n\n__\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
-
-	function parse(codeStr) {
-	  return pegParse(codeStr);
-	};
 
 	function Scope(scope, parent) {
 	  this.scope = scope;
@@ -184,13 +176,13 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(gs[i], "t45", 4);
+	        return context$1$0.delegateYield(gs[i], "t375", 4);
 
 	      case 4:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t45), "t46", 5);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t375), "t376", 5);
 
 	      case 5:
-	        x = context$1$0.t46;
+	        x = context$1$0.t376;
 
 	        exprs.push(x);
 
@@ -218,10 +210,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(v.g, "t47", 2);
+	        return context$1$0.delegateYield(v.g, "t377", 2);
 
 	      case 2:
-	        v = context$1$0.t47;
+	        v = context$1$0.t377;
 	        context$1$0.next = 0;
 	        break;
 
@@ -242,18 +234,18 @@
 	      case 0:
 	        return context$1$0.delegateYield(listStar(ast.c.map(function (x) {
 	          return interpret(x, env);
-	        })), "t49", 1);
+	        })), "t379", 1);
 
 	      case 1:
-	        exprs = context$1$0.t49;
+	        exprs = context$1$0.t379;
 	        return context$1$0.abrupt("return", new Thunk(regeneratorRuntime.mark(function callee$1$0() {
 	          return regeneratorRuntime.wrap(function callee$1$0$(context$2$0) {
 	            while (1) switch (context$2$0.prev = context$2$0.next) {
 	              case 0:
-	                return context$2$0.delegateYield(exprs[0].apply(null, exprs.slice(1)), "t48", 1);
+	                return context$2$0.delegateYield(exprs[0].apply(null, exprs.slice(1)), "t378", 1);
 
 	              case 1:
-	                return context$2$0.abrupt("return", context$2$0.t48);
+	                return context$2$0.abrupt("return", context$2$0.t378);
 
 	              case 2:
 	              case "end":
@@ -275,13 +267,13 @@
 	      case 0:
 	        return context$1$0.delegateYield(listStar(_.initial(ast.c).map(function (x) {
 	          return interpret(x, env);
-	        })), "t50", 1);
+	        })), "t380", 1);
 
 	      case 1:
-	        return context$1$0.delegateYield(interpret(_.last(ast.c), env), "t51", 2);
+	        return context$1$0.delegateYield(interpret(_.last(ast.c), env), "t381", 2);
 
 	      case 2:
-	        return context$1$0.abrupt("return", context$1$0.t51);
+	        return context$1$0.abrupt("return", context$1$0.t381);
 
 	      case 3:
 	      case "end":
@@ -294,13 +286,13 @@
 	  return regeneratorRuntime.wrap(function interpretTop$(context$1$0) {
 	    while (1) switch (context$1$0.prev = context$1$0.next) {
 	      case 0:
-	        return context$1$0.delegateYield(interpret(ast.c, env), "t52", 1);
+	        return context$1$0.delegateYield(interpret(ast.c, env), "t382", 1);
 
 	      case 1:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t52), "t53", 2);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t382), "t383", 2);
 
 	      case 2:
-	        return context$1$0.abrupt("return", context$1$0.t53);
+	        return context$1$0.abrupt("return", context$1$0.t383);
 
 	      case 3:
 	      case "end":
@@ -315,13 +307,13 @@
 	    while (1) switch (context$1$0.prev = context$1$0.next) {
 	      case 0:
 	        name = ast.c[0].c;
-	        return context$1$0.delegateYield(interpret(ast.c[1], env), "t54", 2);
+	        return context$1$0.delegateYield(interpret(ast.c[1], env), "t384", 2);
 
 	      case 2:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t54), "t55", 3);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t384), "t385", 3);
 
 	      case 3:
-	        value = context$1$0.t55;
+	        value = context$1$0.t385;
 
 	        env.setBinding(name, value);
 	        return context$1$0.abrupt("return", value);
@@ -347,27 +339,27 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(parts[i], env), "t56", 4);
+	        return context$1$0.delegateYield(interpret(parts[i], env), "t386", 4);
 
 	      case 4:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t56), "t57", 5);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t386), "t387", 5);
 
 	      case 5:
-	        conditionReturn = context$1$0.t57;
+	        conditionReturn = context$1$0.t387;
 
 	        if (!(conditionReturn === true)) {
 	          context$1$0.next = 11;
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(parts[i + 1], env), "t58", 8);
+	        return context$1$0.delegateYield(interpret(parts[i + 1], env), "t388", 8);
 
 	      case 8:
-	        bodyLambdaFn = context$1$0.t58;
-	        return context$1$0.delegateYield(bodyLambdaFn(), "t59", 10);
+	        bodyLambdaFn = context$1$0.t388;
+	        return context$1$0.delegateYield(bodyLambdaFn(), "t389", 10);
 
 	      case 10:
-	        return context$1$0.abrupt("return", context$1$0.t59);
+	        return context$1$0.abrupt("return", context$1$0.t389);
 
 	      case 11:
 	        i += 2;
@@ -397,10 +389,10 @@
 	          lambdaArguments = args$2$0;
 	          lambdaParameters = _.pluck(ast.c[0], "c");
 	          lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
-	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t60", 6);
+	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t390", 6);
 
 	        case 6:
-	          return context$2$0.abrupt("return", context$2$0.t60);
+	          return context$2$0.abrupt("return", context$2$0.t390);
 
 	        case 7:
 	        case "end":
@@ -427,10 +419,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(ast, createScope(standardLibrary())), "t61", 6);
+	        return context$1$0.delegateYield(interpret(ast, createScope(standardLibrary())), "t391", 6);
 
 	      case 6:
-	        return context$1$0.abrupt("return", context$1$0.t61);
+	        return context$1$0.abrupt("return", context$1$0.t391);
 
 	      case 9:
 	        if (!(ast.t === "top")) {
@@ -438,10 +430,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretTop(ast, env), "t62", 11);
+	        return context$1$0.delegateYield(interpretTop(ast, env), "t392", 11);
 
 	      case 11:
-	        return context$1$0.abrupt("return", context$1$0.t62);
+	        return context$1$0.abrupt("return", context$1$0.t392);
 
 	      case 14:
 	        if (!(ast.t === "lambda")) {
@@ -457,10 +449,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t63", 20);
+	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t393", 20);
 
 	      case 20:
-	        return context$1$0.abrupt("return", context$1$0.t63);
+	        return context$1$0.abrupt("return", context$1$0.t393);
 
 	      case 23:
 	        if (!(ast.t === "conditional")) {
@@ -468,10 +460,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretConditional(ast, env), "t64", 25);
+	        return context$1$0.delegateYield(interpretConditional(ast, env), "t394", 25);
 
 	      case 25:
-	        return context$1$0.abrupt("return", context$1$0.t64);
+	        return context$1$0.abrupt("return", context$1$0.t394);
 
 	      case 28:
 	        if (!(ast.t === "do")) {
@@ -479,10 +471,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretDo(ast, env), "t65", 30);
+	        return context$1$0.delegateYield(interpretDo(ast, env), "t395", 30);
 
 	      case 30:
-	        return context$1$0.abrupt("return", context$1$0.t65);
+	        return context$1$0.abrupt("return", context$1$0.t395);
 
 	      case 33:
 	        if (!(ast.t === "invocation")) {
@@ -490,10 +482,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t66", 35);
+	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t396", 35);
 
 	      case 35:
-	        return context$1$0.abrupt("return", context$1$0.t66);
+	        return context$1$0.abrupt("return", context$1$0.t396);
 
 	      case 38:
 	        if (!(ast.t === "label")) {
@@ -518,12 +510,10 @@
 	  }, marked0$0[7], this);
 	};
 
-	module.exports = {
-	  parse: parse,
-	  interpret: interpret,
-	  createScope: createScope,
-	  trampoline: trampoline
-	};
+	interpret.interpret = interpret;
+	interpret.createScope = createScope;
+	interpret.trampoline = trampoline;
+	module.exports = interpret;
 	// allows the program to be stepped, rather than only invoked in one go
 
 /***/ },
@@ -532,16 +522,17 @@
 
 	"use strict";
 
-	var lang = __webpack_require__(1);
+	var parse = __webpack_require__(101);
+	var interpret = __webpack_require__(1);
 
 	function start(code, env) {
 	  try {
-	    var ast = lang.parse(code);
+	    var ast = parse(code);
 	  } catch (e) {
 	    throw new ParseError(e);
 	  }
 
-	  return lang.interpret(ast, env);
+	  return interpret(ast, env);
 	};
 
 	function complete(g) {
@@ -39707,6 +39698,22 @@
 	  $.path = $.g;
 	  return $;
 	};
+
+/***/ },
+/* 101 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var peg = __webpack_require__(16);
+
+	var pegParse = peg.buildParser("{\n  function node(tag, content, line, column, syntax, raw) {\n    var node = addLineColumn({ t: tag, c: content}, line, column);\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function addLineColumn(node, line, column) {\n    node.l = line;\n    node.i = column;\n    return node;\n  }\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, line, column); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), line, column); }\n  / __*\n    { return node(\"do\", [], line, column); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { return addLineColumn(bundleApplications(f, applications),\n                           line,\n                           column); }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], line, column); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], line, column); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), line, column); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, line, column); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), line, column); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), line, column); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), line, column); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, line, column); }\n  / 'false' { return node(\"boolean\", false, line, column); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), line, column); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, line, column); }\n\n_\n  = [ \\t\\r]+\n\n__\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
+
+	function parse(codeStr) {
+	  return pegParse(codeStr);
+	};
+
+	module.exports = parse;
 
 /***/ }
 /******/ ]);
