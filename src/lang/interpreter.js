@@ -12,21 +12,6 @@ function parse(codeStr) {
   return pegParse(codeStr);
 };
 
-function indexToLineAndColumn(index, code) {
-  var l = 1;
-  var c = 1;
-  for (var i = 0; i < index; i++) {
-    if (code[i] === "\n") {
-      l += 1;
-      c = 1;
-    } else {
-      c += 1;
-    }
-  }
-
-  return { line: l, column: c };
-};
-
 function Scope(scope, parent) {
   this.scope = scope;
   this.parent = parent;
@@ -142,7 +127,6 @@ function* interpret(ast, env) {
 
 module.exports = {
   parse: parse,
-  indexToLineAndColumn: indexToLineAndColumn,
   interpret: interpret,
   createScope: createScope,
   trampoline: trampoline
