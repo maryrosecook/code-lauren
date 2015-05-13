@@ -1,13 +1,14 @@
-var lang = require("./lang/interpreter");
+var parse = require("./lang/parser");
+var interpret = require("./lang/interpreter");
 
 function start(code, env) {
   try {
-    var ast = lang.parse(code);
+    var ast = parse(code);
   } catch(e) {
     throw new ParseError(e);
   }
 
-  return lang.interpret(ast, env);
+  return interpret(ast, env);
 };
 
 function complete(g) {

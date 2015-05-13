@@ -1,16 +1,7 @@
-var peg = require("pegjs");
-var fs = require("fs");
 var _ = require("underscore");
 var util = require("../util");
 
 var standardLibrary = require("./standard-library");
-
-var pegParse = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
-                               { cache: true }).parse;
-
-function parse(codeStr) {
-  return pegParse(codeStr);
-};
 
 function Scope(scope, parent) {
   this.scope = scope;
@@ -125,9 +116,7 @@ function* interpret(ast, env) {
   }
 };
 
-module.exports = {
-  parse: parse,
-  interpret: interpret,
-  createScope: createScope,
-  trampoline: trampoline
-};
+interpret.interpret = interpret;
+interpret.createScope = createScope;
+interpret.trampoline = trampoline;
+module.exports = interpret;
