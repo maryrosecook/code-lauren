@@ -149,8 +149,9 @@
 	  }
 	};
 
-	var openParentheses = { "(": ")", "{": "}" };
-	var closeParentheses = { ")": "(", "}": "{" };
+	var parenthesisPairs = { "(": ")", "{": "}", ")": "(", "}": "{" };
+	var openParentheses = util.defaultObj(["(", "{"], true);
+	var closeParentheses = util.defaultObj([")", "}"], true);
 	function balanceParentheses(codeStr) {
 	  function createError(i, message) {
 	    var error = indexToLineAndColumn(i, codeStr);
@@ -158,29 +159,40 @@
 	    throw new ParseError([error]);
 	  };
 
-	  var opens = [];
-	  var orphanCloses = [];
+	  function firstError(parenObj) {
+	    return Object.keys(parenObj).reduce(function (a, p) {
+	      return a.concat(parenObj[p].map(function (i) {
+	        return { c: p, i: i };
+	      }));
+	    }, []).sort(function (a, b) {
+	      return a.i - b.i;
+	    })[0];
+	  };
+
+	  var opens = util.defaultObj(Object.keys(openParentheses), Array);
+	  var orphanCloses = util.defaultObj(Object.keys(closeParentheses), Array);
 
 	  for (var i = 0; i < codeStr.length; i++) {
 	    var c = codeStr[i];
 	    if (c in openParentheses) {
-	      opens.push({ c: c, i: i });
+	      opens[c].push(i);
 	    } else if (c in closeParentheses) {
-	      var open = _.last(opens);
-	      if (open !== undefined && closeParentheses[c] === open.c) {
-	        opens.pop();
+	      var open = parenthesisPairs[c];
+	      if (opens[open].length > 0) {
+	        opens[open].pop();
 	      } else {
-	        orphanCloses.push({ c: c, i: i });
+	        orphanCloses[c].push(i);
 	      }
 	    }
 	  }
 
-	  if (opens.length > 0) {
-	    var p = _.last(opens);
-	    throw createError(p.i, "Missing a closing " + openParentheses[p.c]);
-	  } else if (orphanCloses.length > 0) {
-	    var p = orphanCloses[0];
-	    throw createError(p.i, "Missing a preceding opening " + closeParentheses[p.c]);
+	  var firstUnmatchedOpen = firstError(opens);
+	  var firstOrphanClose = firstError(orphanCloses);
+
+	  if (firstUnmatchedOpen !== undefined) {
+	    throw createError(firstUnmatchedOpen.i, "Missing a closing " + parenthesisPairs[firstUnmatchedOpen.c]);
+	  } else if (firstOrphanClose !== undefined) {
+	    throw createError(firstOrphanClose.i, "Missing a preceding opening " + parenthesisPairs[firstOrphanClose.c]);
 	  }
 	};
 
@@ -750,6 +762,13 @@
 	    }
 
 	    return to;
+	  },
+
+	  defaultObj: function defaultObj(keys, def) {
+	    return keys.reduce(function (o, p) {
+	      o[p] = def instanceof Function ? def() : def;
+	      return o;
+	    }, {});
 	  }
 	};
 
