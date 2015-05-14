@@ -21,5 +21,12 @@ var util = module.exports = {
     }
 
     return to;
+  },
+
+  defaultObj: function(keys, def) {
+    return keys.reduce(function(o, p) {
+      o[p] = (def instanceof Function ? def() : def);
+      return o;
+    }, {});
   }
 };
