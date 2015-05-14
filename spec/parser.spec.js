@@ -391,5 +391,10 @@ describe("parser", function() {
       expectParseErrors(function() { parse("{ ) }"); },
                         [{ line: 1, column: 3, message: "Missing a preceding opening ("}]);
     });
+
+    it("should mark orphan close that is last char of input", function() {
+      expectParseErrors(function() { parse("{}())"); },
+                        [{ line: 1, column: 5, message: "Missing a preceding opening ("}]);
+    });
   });
 });

@@ -35,7 +35,7 @@ function balanceParentheses(codeStr) {
       opens.push({ c: c, i: i });
     } else if (c in closeParentheses) {
       var open = _.last(opens);
-      if (closeParentheses[c] === open.c) {
+      if (open !== undefined && closeParentheses[c] === open.c) {
         opens.pop();
       } else {
         orphanCloses.push({ c: c, i: i });
