@@ -34,8 +34,9 @@ function step(g) {
   }
 };
 
-function reportError(editSession, e) {
-  var r = new range.Range(e.line - 1, e.column - 1, e.line - 1, e.column);
+function reportError(editSession, e, code) {
+  var landC = parse.indexToLineAndColumn(e.i, code);
+  var r = new range.Range(landC.line - 1, landC.column - 1, landC.line - 1, landC.column);
   return editSession.addMarker(r, "ace_parse_error", "text", true);
 };
 
@@ -64,14 +65,15 @@ function start(editor) {
     return function() {
       going = false;
     };
-  } catch (exception) {
-    if (exception instanceof parse.ParseError) {
-      exception.errors.forEach(function(e) {
-        console.log(e.message);
-        markerIds.push(reportError(editor.getSession(), e));
-      });
+  } catch (e) {
+    if (e instanceof parse.ParseError) {
+      console.log(e.message);
+      markerIds.push(reportError(editor.getSession(), e, code));
+    } else if (e instanceof parse.ParenthesisError) {
+      console.log(e.message);
+      markerIds.push(reportError(editor.getSession(), e, code));
     } else {
-      throw exception;
+      throw e;
     }
   }
 };

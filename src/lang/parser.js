@@ -12,8 +12,7 @@ function parse(codeStr) {
   try {
     return pegParse(codeStr);
   } catch(e) {
-    throw new ParseError([{ line: e.line, column: e.column, message: e.message }],
-                         e.stack);
+    throw new ParseError(e.line, e.column, e.message, e.stack);
   }
 };
 
@@ -22,9 +21,7 @@ var openParentheses = util.defaultObj(["(", "{"], true);
 var closeParentheses = util.defaultObj([")", "}"], true);
 function balanceParentheses(codeStr) {
   function createError(i, message) {
-    var error = indexToLineAndColumn(i, codeStr);
-    error.message = message;
-    throw new ParseError([error]);
+    throw new ParenthesisError(i, message);
   };
 
   function firstError(parenObj) {
@@ -79,11 +76,21 @@ function indexToLineAndColumn(index, code) {
   return { line: l, column: c };
 };
 
-function ParseError(errors, stack) {
-  this.errors = errors;
-  this.stack = stack || new Error().stack;
+function ParseError(i, message, stack) {
+  this.i = i;
+  this.message = message;
+  this.stack = stack;
 };
 ParseError.prototype = new Error();
 
+function ParenthesisError(i, message, stack) {
+  this.i = i;
+  this.message = message;
+  this.stack = stack;
+};
+ParenthesisError.prototype = new Error();
+
+parse.indexToLineAndColumn = indexToLineAndColumn;
 parse.ParseError = ParseError;
+parse.ParenthesisError = ParenthesisError;
 module.exports = parse;
