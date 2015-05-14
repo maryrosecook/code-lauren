@@ -64,12 +64,14 @@ function start(editor) {
     return function() {
       going = false;
     };
-  } catch (e) {
-    if (e instanceof parse.ParseError) {
-      console.log(e.message);
-      markerIds.push(reportError(editor.getSession(), e));
+  } catch (exception) {
+    if (exception instanceof parse.ParseError) {
+      exception.errors.forEach(function(e) {
+        console.log(e.message);
+        markerIds.push(reportError(editor.getSession(), e));
+      });
     } else {
-      throw e;
+      throw exception;
     }
   }
 };

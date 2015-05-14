@@ -15,6 +15,17 @@ function getNodeAt(node, keys) {
   }
 };
 
+function expectParseErrors(fn, errors) {
+  try {
+    fn();
+  } catch (e) {
+    var threw = true;
+    expect(e.errors).toEqual(errors);
+  }
+
+  expect(threw).toEqual(true);
+};
+
 describe("parser", function() {
   describe("atoms", function() {
     it("should parse an int", function() {
@@ -362,6 +373,23 @@ describe("parser", function() {
                                            c: [{ t: "label", c: "really" },
                                                { t: "boolean", c: true }]},
                                          { t: "lambda", c: [[], { t: "do", c: []}]}]});
+    });
+  });
+
+  describe("balancing parentheses", function() {
+    it("should mark single open w no close", function() {
+      expectParseErrors(function() { parse("{"); },
+                        [{ line: 1, column: 1, message: "Missing a closing }"}]);
+    });
+
+    it("should mark open w no close preceded by some matched parens", function() {
+      expectParseErrors(function() { parse("{}()\n{"); },
+                        [{ line: 2, column: 1, message: "Missing a closing }"}]);
+    });
+
+    it("should mark orphan close, not matched but separated open", function() {
+      expectParseErrors(function() { parse("{ ) }"); },
+                        [{ line: 1, column: 3, message: "Missing a preceding opening ("}]);
     });
   });
 });
