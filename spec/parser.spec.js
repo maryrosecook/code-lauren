@@ -396,5 +396,15 @@ describe("parser", function() {
       expectParseErrors(function() { parse("{}())"); },
                         [{ line: 1, column: 5, message: "Missing a preceding opening ("}]);
     });
+
+    it("should report the first orphan close", function() {
+      expectParseErrors(function() { parse("{}())\n{}())"); },
+                        [{ line: 1, column: 5, message: "Missing a preceding opening ("}]);
+    });
+
+    it("should report the first extra open", function() {
+      expectParseErrors(function() { parse("{}(\n{}("); },
+                        [{ line: 1, column: 3, message: "Missing a closing )"}]);
+    });
   });
 });
