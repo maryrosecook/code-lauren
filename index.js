@@ -98,7 +98,7 @@
 	      errorDisplayer.display(code, e.i, "error");
 	    } else if (e instanceof parser.ParenthesisError) {
 	      console.log(e.message);
-	      errorDisplayer.display(code, e.i, "", "error");
+	      errorDisplayer.display(code, e.i, "error");
 	      displayRainbowParentheses(code, errorDisplayer);
 	    } else {
 	      throw e;
@@ -132,11 +132,13 @@
 	function ErrorDisplayer(editSession) {
 	  var markerIds = [];
 
-	  this.display = function (code, i, message, clazz) {
+	  this.display = function (code, i, codeClazz, message) {
 	    if (_.isNumber(i)) {
 	      var landC = parser.indexToLineAndColumn(i, code);
 	      var r = new range.Range(landC.line - 1, landC.column - 1, landC.line - 1, landC.column);
-	      markerIds.push(editSession.addMarker(r, "ace_parse_annotation " + clazz, "text", true));
+	      markerIds.push(editSession.addMarker(r, "ace_parse_annotation " + codeClazz, "text", true));
+
+	      if (message !== undefined) {}
 	    }
 	  };
 
@@ -151,7 +153,7 @@
 	function displayRainbowParentheses(code, errorDisplayer) {
 	  parser.rainbowParentheses(code).forEach(function (p, i) {
 	    p.map(function (offset) {
-	      errorDisplayer.display(code, offset, "", "rainbow-" + i % 5);
+	      errorDisplayer.display(code, offset, "rainbow-" + i % 5);
 	    });
 	  });
 	};
