@@ -1,5 +1,8 @@
 require("babel-core/polyfill");
+
 var fs = require("fs");
+var _ = require("underscore");
+
 var parser = require("./lang/parser");
 var interpret = require("./lang/interpreter");
 var r = require("./runner");
@@ -7,18 +10,17 @@ var createEditor = require("./editor");
 var createEnv = require("./env");
 var range = ace.acequire("ace/range");
 
-var markerIds = [];
-
 window.addEventListener("load", function() {
   var editor = createEditor(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
+  var errorDisplayer = new ErrorDisplayer(editor.getSession());
 
-  var tickStop = start(editor);
+  var tickStop = start(editor, errorDisplayer);
   editor.on("change", function() {
     if (tickStop !== undefined) {
       tickStop();
     }
 
-    tickStop = start(editor);
+    tickStop = start(editor, errorDisplayer);
   });
 });
 
@@ -36,13 +38,7 @@ function step(g) {
   }
 };
 
-function reportError(editSession, e, code) {
-  var landC = parser.indexToLineAndColumn(e.i, code);
-  var r = new range.Range(landC.line - 1, landC.column - 1, landC.line - 1, landC.column);
-  return editSession.addMarker(r, "ace_parse_error", "text", true);
-};
-
-function parse(code, editor) {
+function parse(code, errorDisplayer) {
   try {
     parser.balanceParentheses(code);
 
@@ -51,27 +47,25 @@ function parse(code, editor) {
     return ast;
   } catch(e) {
     if (e instanceof parser.ParseError) {
-      console.log(e.message);
-      markerIds.push(reportError(editor.getSession(), e, code));
+      console.log(e);
+      errorDisplayer.display(e, code);
     } else if (e instanceof parser.ParenthesisError) {
       console.log(e.message);
-      markerIds.push(reportError(editor.getSession(), e, code));
+      errorDisplayer.display(e, code);
     } else {
       throw e;
     }
   }
 };
 
-function start(editor) {
+function start(editor, errorDisplayer) {
   var code = editor.getValue();
-  var editSession = editor.getSession();
   var screen = document.getElementById("screen").getContext("2d");
   var env = interpret.createScope(createEnv(screen));
 
-  markerIds.forEach(function(x) { editSession.removeMarker(x); });
-  markerIds = [];
+  errorDisplayer.clear();
 
-  var ast = parse(code, editor);
+  var ast = parse(code, errorDisplayer);
   var g = r(ast, env);
 
   var going = true;
@@ -84,5 +78,22 @@ function start(editor) {
 
   return function() {
     going = false;
+  };
+};
+
+function ErrorDisplayer(editSession) {
+  var markerIds = [];
+
+  this.display = function(e, code) {
+    if (_.isNumber(e.i)) {
+      var landC = parser.indexToLineAndColumn(e.i, code);
+      var r = new range.Range(landC.line - 1, landC.column - 1, landC.line - 1, landC.column);
+      markerIds.push(editSession.addMarker(r, "ace_parse_error", "text", true));
+    }
+  };
+
+  this.clear = function() {
+    markerIds.forEach(function(x) { editSession.removeMarker(x); });
+    markerIds = [];
   };
 };
