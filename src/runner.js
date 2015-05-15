@@ -2,8 +2,8 @@ var util = require("./util");
 var parse = require("./lang/parser");
 var interpret = require("./lang/interpreter");
 
-function start(code, env) {
-  return interpret(parse(code), env);
+function start(ast, env) {
+  return interpret(ast, env);
 };
 
 function complete(g) {

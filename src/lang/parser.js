@@ -6,9 +6,7 @@ var util = require("../util");
 var pegParse = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
                                { cache: true }).parse;
 
-function parse(codeStr) {
-  balanceParentheses(codeStr); // might throw
-
+function parseSyntax(codeStr) {
   try {
     return pegParse(codeStr);
   } catch(e) {
@@ -90,7 +88,9 @@ function ParenthesisError(i, message, stack) {
 };
 ParenthesisError.prototype = new Error();
 
-parse.indexToLineAndColumn = indexToLineAndColumn;
-parse.ParseError = ParseError;
-parse.ParenthesisError = ParenthesisError;
-module.exports = parse;
+parseSyntax.indexToLineAndColumn = indexToLineAndColumn;
+parseSyntax.balanceParentheses = balanceParentheses;
+parseSyntax.parseSyntax = parseSyntax;
+parseSyntax.ParseError = ParseError;
+parseSyntax.ParenthesisError = ParenthesisError;
+module.exports = parseSyntax;

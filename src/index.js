@@ -1,11 +1,13 @@
 require("babel-core/polyfill");
 var fs = require("fs");
-var parse = require("./lang/parser");
+var parser = require("./lang/parser");
 var interpret = require("./lang/interpreter");
 var r = require("./runner");
 var createEditor = require("./editor");
 var createEnv = require("./env");
 var range = ace.acequire("ace/range");
+
+var markerIds = [];
 
 window.addEventListener("load", function() {
   var editor = createEditor(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
@@ -35,12 +37,31 @@ function step(g) {
 };
 
 function reportError(editSession, e, code) {
-  var landC = parse.indexToLineAndColumn(e.i, code);
+  var landC = parser.indexToLineAndColumn(e.i, code);
   var r = new range.Range(landC.line - 1, landC.column - 1, landC.line - 1, landC.column);
   return editSession.addMarker(r, "ace_parse_error", "text", true);
 };
 
-var markerIds = [];
+function parse(code, editor) {
+  try {
+    parser.balanceParentheses(code);
+
+    var ast = parser.parseSyntax(code);
+    console.log("Parsed ok");
+    return ast;
+  } catch(e) {
+    if (e instanceof parser.ParseError) {
+      console.log(e.message);
+      markerIds.push(reportError(editor.getSession(), e, code));
+    } else if (e instanceof parser.ParenthesisError) {
+      console.log(e.message);
+      markerIds.push(reportError(editor.getSession(), e, code));
+    } else {
+      throw e;
+    }
+  }
+};
+
 function start(editor) {
   var code = editor.getValue();
   var editSession = editor.getSession();
@@ -50,30 +71,18 @@ function start(editor) {
   markerIds.forEach(function(x) { editSession.removeMarker(x); });
   markerIds = [];
 
-  try {
-    var g = r(code, env);
-    console.log("Parsed ok");
+  var ast = parse(code, editor);
+  var g = r(ast, env);
 
-    var going = true;
-    (function tick() {
-      if (going) {
-        step(g);
-        requestAnimationFrame(tick);
-      }
-    })();
-
-    return function() {
-      going = false;
-    };
-  } catch (e) {
-    if (e instanceof parse.ParseError) {
-      console.log(e.message);
-      markerIds.push(reportError(editor.getSession(), e, code));
-    } else if (e instanceof parse.ParenthesisError) {
-      console.log(e.message);
-      markerIds.push(reportError(editor.getSession(), e, code));
-    } else {
-      throw e;
+  var going = true;
+  (function tick() {
+    if (going) {
+      step(g);
+      requestAnimationFrame(tick);
     }
-  }
+  })();
+
+  return function() {
+    going = false;
+  };
 };
