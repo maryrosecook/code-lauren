@@ -26,7 +26,14 @@ body {
   z-index: -1;
 }
 
-.ace_parse_error {
-  background-color: rgba(255, 0, 0, 0.2);
+.ace_parse_annotation {
   position: absolute;
 }
+
+.ace_parse_annotation.error { background-color: rgba(255, 0, 0, 0.4); }
+
+.ace_parse_annotation.rainbow-0 { background-color: rgba(0, 255, 0, 0.2); }
+.ace_parse_annotation.rainbow-1 { background-color: rgba(0, 0, 255, 0.2); }
+.ace_parse_annotation.rainbow-2 { background-color: rgba(255, 255, 0, 0.2); }
+.ace_parse_annotation.rainbow-3 { background-color: rgba(0, 255, 255, 0.2); }
+.ace_parse_annotation.rainbow-4 { background-color: rgba(255, 0, 255, 0.2); }

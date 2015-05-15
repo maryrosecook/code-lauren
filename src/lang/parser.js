@@ -71,6 +71,25 @@ function indexToLineAndColumn(index, code) {
   return { line: l, column: c };
 };
 
+function rainbowParentheses(codeStr) {
+  var pairs = [];
+  var opens = util.defaultObj(Object.keys(openParentheses), Array);
+
+  for (var i = 0; i < codeStr.length; i++) {
+    var c = codeStr[i];
+    if (c in openParentheses) {
+      opens[c].push(i);
+    } else if (c in closeParentheses) {
+      var open = parenthesisPairs[c];
+      if (opens[open].length > 0) {
+        pairs.push([opens[open].pop(), i])
+      }
+    }
+  }
+
+  return pairs;
+};
+
 function ParseError(i, message, stack) {
   this.i = i;
   this.message = message;
@@ -87,6 +106,7 @@ ParenthesisError.prototype = new Error();
 
 parseSyntax.indexToLineAndColumn = indexToLineAndColumn;
 parseSyntax.balanceParentheses = balanceParentheses;
+parseSyntax.rainbowParentheses = rainbowParentheses;
 parseSyntax.parseSyntax = parseSyntax;
 parseSyntax.ParseError = ParseError;
 parseSyntax.ParenthesisError = ParenthesisError;

@@ -48,10 +48,11 @@ function parse(code, errorDisplayer) {
   } catch(e) {
     if (e instanceof parser.ParseError) {
       console.log(e);
-      errorDisplayer.display(e, code);
+      errorDisplayer.display(code, e.i, "error");
     } else if (e instanceof parser.ParenthesisError) {
       console.log(e.message);
-      errorDisplayer.display(e, code);
+      errorDisplayer.display(code, e.i, "", "error");
+      displayRainbowParentheses(code, errorDisplayer);
     } else {
       throw e;
     }
@@ -84,11 +85,11 @@ function start(editor, errorDisplayer) {
 function ErrorDisplayer(editSession) {
   var markerIds = [];
 
-  this.display = function(e, code) {
-    if (_.isNumber(e.i)) {
-      var landC = parser.indexToLineAndColumn(e.i, code);
+  this.display = function(code, i, message, clazz) {
+    if (_.isNumber(i)) {
+      var landC = parser.indexToLineAndColumn(i, code);
       var r = new range.Range(landC.line - 1, landC.column - 1, landC.line - 1, landC.column);
-      markerIds.push(editSession.addMarker(r, "ace_parse_error", "text", true));
+      markerIds.push(editSession.addMarker(r, "ace_parse_annotation " + clazz, "text", true));
     }
   };
 
@@ -96,4 +97,12 @@ function ErrorDisplayer(editSession) {
     markerIds.forEach(function(x) { editSession.removeMarker(x); });
     markerIds = [];
   };
+};
+
+function displayRainbowParentheses(code, errorDisplayer) {
+  parser.rainbowParentheses(code)
+    .forEach(function(p, i) {
+      p.map(function(offset) {
+        errorDisplayer.display(code, offset, "", "rainbow-" + i % 5);  });
+    });
 };
