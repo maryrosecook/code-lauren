@@ -1,6 +1,6 @@
 {
-  function node(tag, content, line, column, syntax, raw) {
-    var node = addLineColumn({ t: tag, c: content}, line, column);
+  function node(tag, content, offset, syntax, raw) {
+    var node = { t: tag, c: content, i: offset };
     if(syntax !== undefined) {
       node.syntax = syntax;
     }
@@ -14,12 +14,6 @@
     }, []);
   };
 
-  function addLineColumn(node, line, column) {
-    node.l = line;
-    node.i = column;
-    return node;
-  }
-
   function bundleApplications(f, applications) {
     if (applications.length > 0) {
       return bundleApplications({ t: "invocation", c: [f].concat(applications[0]) },
@@ -31,16 +25,16 @@
 }
 
 start
-  = all:top { return node("top", all, line, column); }
+  = all:top { return node("top", all, offset); }
 
 top
   = do
 
 do
   = __* first:expression _* rest:do_continue* __*
-    { return node("do", [first].concat(rest), line, column); }
+    { return node("do", [first].concat(rest), offset); }
   / __*
-    { return node("do", [], line, column); }
+    { return node("do", [], offset); }
 
 do_continue
   = _* nl __* all:expression _*
@@ -58,9 +52,7 @@ parenthetical
 
 invocation
   = f:function applications:application+ _*
-    { return addLineColumn(bundleApplications(f, applications),
-                           line,
-                           column); }
+    { var n = bundleApplications(f, applications); n.i = offset; return n; }
 
 function
   = all: lambda
@@ -76,15 +68,15 @@ argument
 
 lambda
   = '{' __? parameters:parameter* __? body:do '}'
-    { return node("lambda", [parameters, body], line, column); }
+    { return node("lambda", [parameters, body], offset); }
 
 assignment
   = label:label ':' _* expression:expression
-    { return node("assignment", [label, expression], line, column); }
+    { return node("assignment", [label, expression], offset); }
 
 conditional
   = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
-    { return node("conditional", [condition, lambda].concat(rest ? rest : []), line, column); }
+    { return node("conditional", [condition, lambda].concat(rest ? rest : []), offset); }
 
 elseif
   = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
@@ -102,32 +94,32 @@ atom
 
 parameter
   = '?' label:label _*
-    { return node("parameter", label.c, line, column); }
+    { return node("parameter", label.c, offset); }
 
 number
   = a:[0-9]+ b:[.] c:[0-9]+
-    { return node("number", parseFloat(a.join("") + b + c.join(""), 10), line, column); }
+    { return node("number", parseFloat(a.join("") + b + c.join(""), 10), offset); }
   / all:[0-9]+
-    { return node("number", parseInt(all.join(""), 10), line, column); }
+    { return node("number", parseInt(all.join(""), 10), offset); }
 
 string
   = '"' all:[A-Za-z0-9.,# ]* '"'
-    { return node('string', all.join(""), line, column); }
+    { return node('string', all.join(""), offset); }
 
 boolean
-  = 'true'  { return node("boolean", true, line, column); }
-  / 'false' { return node("boolean", false, line, column); }
+  = 'true'  { return node("boolean", true, offset); }
+  / 'false' { return node("boolean", false, offset); }
 
 label
   = !keyword all: label_char+
-    { return node("label", all.join(""), line, column); }
+    { return node("label", all.join(""), offset); }
 
 label_char
   = [a-zA-Z0-9_\-]
 
 nl
   = all:[\n]+
-    { return node('nl', all, line, column); }
+    { return node('nl', all, offset); }
 
 _
   = [ \t\r]+
