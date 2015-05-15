@@ -48,7 +48,9 @@
 
 	__webpack_require__(6);
 
-	var parse = __webpack_require__(1);
+	var _ = __webpack_require__(14);
+
+	var parser = __webpack_require__(1);
 	var interpret = __webpack_require__(2);
 	var r = __webpack_require__(3);
 	var createEditor = __webpack_require__(4);
@@ -57,14 +59,15 @@
 
 	window.addEventListener("load", function () {
 	  var editor = createEditor("draw: { ?x ?y\n  radius: 20\n\n  clear-screen()\n  draw-filled-circle(add(220 x)\n                     add(200 y)\n                     radius\n                     \"blue\")\n}\n\nupdate: { ?x ?y ?angle\n  orbit-radius: 100\n  angle-step: 0.1\n\n  draw(x y)\n  update(multiply(orbit-radius cosine(angle))\n         multiply(orbit-radius sine(angle))\n         add(angle angle-step))\n}\n\nupdate(0 0 0)\n");
+	  var errorDisplayer = new ErrorDisplayer(editor.getSession());
 
-	  var tickStop = start(editor);
+	  var tickStop = start(editor, errorDisplayer);
 	  editor.on("change", function () {
 	    if (tickStop !== undefined) {
 	      tickStop();
 	    }
 
-	    tickStop = start(editor);
+	    tickStop = start(editor, errorDisplayer);
 	  });
 	});
 
@@ -82,50 +85,66 @@
 	  }
 	};
 
-	function reportError(editSession, e, code) {
-	  var landC = parse.indexToLineAndColumn(e.i, code);
-	  var r = new range.Range(landC.line - 1, landC.column - 1, landC.line - 1, landC.column);
-	  return editSession.addMarker(r, "ace_parse_error", "text", true);
-	};
-
-	var markerIds = [];
-	function start(editor) {
-	  var code = editor.getValue();
-	  var editSession = editor.getSession();
-	  var screen = document.getElementById("screen").getContext("2d");
-	  var env = interpret.createScope(createEnv(screen));
-
-	  markerIds.forEach(function (x) {
-	    editSession.removeMarker(x);
-	  });
-	  markerIds = [];
-
+	function parse(code, errorDisplayer) {
 	  try {
-	    var g = r(code, env);
+	    parser.balanceParentheses(code);
+
+	    var ast = parser.parseSyntax(code);
 	    console.log("Parsed ok");
-
-	    var going = true;
-	    (function tick() {
-	      if (going) {
-	        step(g);
-	        requestAnimationFrame(tick);
-	      }
-	    })();
-
-	    return function () {
-	      going = false;
-	    };
+	    return ast;
 	  } catch (e) {
-	    if (e instanceof parse.ParseError) {
+	    if (e instanceof parser.ParseError) {
+	      console.log(e);
+	      errorDisplayer.display(e, code);
+	    } else if (e instanceof parser.ParenthesisError) {
 	      console.log(e.message);
-	      markerIds.push(reportError(editor.getSession(), e, code));
-	    } else if (e instanceof parse.ParenthesisError) {
-	      console.log(e.message);
-	      markerIds.push(reportError(editor.getSession(), e, code));
+	      errorDisplayer.display(e, code);
 	    } else {
 	      throw e;
 	    }
 	  }
+	};
+
+	function start(editor, errorDisplayer) {
+	  var code = editor.getValue();
+	  var screen = document.getElementById("screen").getContext("2d");
+	  var env = interpret.createScope(createEnv(screen));
+
+	  errorDisplayer.clear();
+
+	  var ast = parse(code, errorDisplayer);
+	  var g = r(ast, env);
+
+	  var going = true;
+	  (function tick() {
+	    if (going) {
+	      step(g);
+	      requestAnimationFrame(tick);
+	    }
+	  })();
+
+	  return function () {
+	    going = false;
+	  };
+	};
+
+	function ErrorDisplayer(editSession) {
+	  var markerIds = [];
+
+	  this.display = function (e, code) {
+	    if (_.isNumber(e.i)) {
+	      var landC = parser.indexToLineAndColumn(e.i, code);
+	      var r = new range.Range(landC.line - 1, landC.column - 1, landC.line - 1, landC.column);
+	      markerIds.push(editSession.addMarker(r, "ace_parse_error", "text", true));
+	    }
+	  };
+
+	  this.clear = function () {
+	    markerIds.forEach(function (x) {
+	      editSession.removeMarker(x);
+	    });
+	    markerIds = [];
+	  };
 	};
 
 /***/ },
@@ -139,15 +158,13 @@
 	var _ = __webpack_require__(14);
 	var util = __webpack_require__(7);
 
-	var pegParse = peg.buildParser("{\n  function node(tag, content, line, column, syntax, raw) {\n    var node = addLineColumn({ t: tag, c: content}, line, column);\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function addLineColumn(node, line, column) {\n    node.l = line;\n    node.i = column;\n    return node;\n  }\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, line, column); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), line, column); }\n  / __*\n    { return node(\"do\", [], line, column); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { return addLineColumn(bundleApplications(f, applications),\n                           line,\n                           column); }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], line, column); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], line, column); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), line, column); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, line, column); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), line, column); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), line, column); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), line, column); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, line, column); }\n  / 'false' { return node(\"boolean\", false, line, column); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), line, column); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, line, column); }\n\n_\n  = [ \\t\\r]+\n\n__\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
+	var pegParse = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, i: offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), offset); }\n  / __*\n    { return node(\"do\", [], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.i = offset; return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
 
-	function parse(codeStr) {
-	  balanceParentheses(codeStr); // might throw
-
+	function parseSyntax(codeStr) {
 	  try {
 	    return pegParse(codeStr);
 	  } catch (e) {
-	    throw new ParseError(e.line, e.column, e.message, e.stack);
+	    throw new ParseError(e.offset, e.message, e.stack);
 	  }
 	};
 
@@ -155,10 +172,6 @@
 	var openParentheses = util.defaultObj(["(", "{"], true);
 	var closeParentheses = util.defaultObj([")", "}"], true);
 	function balanceParentheses(codeStr) {
-	  function createError(i, message) {
-	    throw new ParenthesisError(i, message);
-	  };
-
 	  function firstError(parenObj) {
 	    return Object.keys(parenObj).reduce(function (a, p) {
 	      return a.concat(parenObj[p].map(function (i) {
@@ -190,9 +203,9 @@
 	  var firstOrphanClose = firstError(orphanCloses);
 
 	  if (firstUnmatchedOpen !== undefined) {
-	    throw createError(firstUnmatchedOpen.i, "Missing a closing " + parenthesisPairs[firstUnmatchedOpen.c]);
+	    throw new ParenthesisError(firstUnmatchedOpen.i, "Missing a closing " + parenthesisPairs[firstUnmatchedOpen.c]);
 	  } else if (firstOrphanClose !== undefined) {
-	    throw createError(firstOrphanClose.i, "Missing a preceding opening " + parenthesisPairs[firstOrphanClose.c]);
+	    throw new ParenthesisError(firstOrphanClose.i, "Missing a preceding opening " + parenthesisPairs[firstOrphanClose.c]);
 	  }
 	};
 
@@ -225,10 +238,12 @@
 	};
 	ParenthesisError.prototype = new Error();
 
-	parse.indexToLineAndColumn = indexToLineAndColumn;
-	parse.ParseError = ParseError;
-	parse.ParenthesisError = ParenthesisError;
-	module.exports = parse;
+	parseSyntax.indexToLineAndColumn = indexToLineAndColumn;
+	parseSyntax.balanceParentheses = balanceParentheses;
+	parseSyntax.parseSyntax = parseSyntax;
+	parseSyntax.ParseError = ParseError;
+	parseSyntax.ParenthesisError = ParenthesisError;
+	module.exports = parseSyntax;
 
 /***/ },
 /* 2 */
@@ -283,13 +298,13 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(gs[i], "t46", 4);
+	        return context$1$0.delegateYield(gs[i], "t138", 4);
 
 	      case 4:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t46), "t47", 5);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t138), "t139", 5);
 
 	      case 5:
-	        x = context$1$0.t47;
+	        x = context$1$0.t139;
 
 	        exprs.push(x);
 
@@ -317,10 +332,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(v.g, "t48", 2);
+	        return context$1$0.delegateYield(v.g, "t140", 2);
 
 	      case 2:
-	        v = context$1$0.t48;
+	        v = context$1$0.t140;
 	        context$1$0.next = 0;
 	        break;
 
@@ -341,18 +356,18 @@
 	      case 0:
 	        return context$1$0.delegateYield(listStar(ast.c.map(function (x) {
 	          return interpret(x, env);
-	        })), "t50", 1);
+	        })), "t142", 1);
 
 	      case 1:
-	        exprs = context$1$0.t50;
+	        exprs = context$1$0.t142;
 	        return context$1$0.abrupt("return", new Thunk(regeneratorRuntime.mark(function callee$1$0() {
 	          return regeneratorRuntime.wrap(function callee$1$0$(context$2$0) {
 	            while (1) switch (context$2$0.prev = context$2$0.next) {
 	              case 0:
-	                return context$2$0.delegateYield(exprs[0].apply(null, exprs.slice(1)), "t49", 1);
+	                return context$2$0.delegateYield(exprs[0].apply(null, exprs.slice(1)), "t141", 1);
 
 	              case 1:
-	                return context$2$0.abrupt("return", context$2$0.t49);
+	                return context$2$0.abrupt("return", context$2$0.t141);
 
 	              case 2:
 	              case "end":
@@ -374,13 +389,13 @@
 	      case 0:
 	        return context$1$0.delegateYield(listStar(_.initial(ast.c).map(function (x) {
 	          return interpret(x, env);
-	        })), "t51", 1);
+	        })), "t143", 1);
 
 	      case 1:
-	        return context$1$0.delegateYield(interpret(_.last(ast.c), env), "t52", 2);
+	        return context$1$0.delegateYield(interpret(_.last(ast.c), env), "t144", 2);
 
 	      case 2:
-	        return context$1$0.abrupt("return", context$1$0.t52);
+	        return context$1$0.abrupt("return", context$1$0.t144);
 
 	      case 3:
 	      case "end":
@@ -393,13 +408,13 @@
 	  return regeneratorRuntime.wrap(function interpretTop$(context$1$0) {
 	    while (1) switch (context$1$0.prev = context$1$0.next) {
 	      case 0:
-	        return context$1$0.delegateYield(interpret(ast.c, env), "t53", 1);
+	        return context$1$0.delegateYield(interpret(ast.c, env), "t145", 1);
 
 	      case 1:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t53), "t54", 2);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t145), "t146", 2);
 
 	      case 2:
-	        return context$1$0.abrupt("return", context$1$0.t54);
+	        return context$1$0.abrupt("return", context$1$0.t146);
 
 	      case 3:
 	      case "end":
@@ -414,13 +429,13 @@
 	    while (1) switch (context$1$0.prev = context$1$0.next) {
 	      case 0:
 	        name = ast.c[0].c;
-	        return context$1$0.delegateYield(interpret(ast.c[1], env), "t55", 2);
+	        return context$1$0.delegateYield(interpret(ast.c[1], env), "t147", 2);
 
 	      case 2:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t55), "t56", 3);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t147), "t148", 3);
 
 	      case 3:
-	        value = context$1$0.t56;
+	        value = context$1$0.t148;
 
 	        env.setBinding(name, value);
 	        return context$1$0.abrupt("return", value);
@@ -446,27 +461,27 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(parts[i], env), "t57", 4);
+	        return context$1$0.delegateYield(interpret(parts[i], env), "t149", 4);
 
 	      case 4:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t57), "t58", 5);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t149), "t150", 5);
 
 	      case 5:
-	        conditionReturn = context$1$0.t58;
+	        conditionReturn = context$1$0.t150;
 
 	        if (!(conditionReturn === true)) {
 	          context$1$0.next = 11;
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(parts[i + 1], env), "t59", 8);
+	        return context$1$0.delegateYield(interpret(parts[i + 1], env), "t151", 8);
 
 	      case 8:
-	        bodyLambdaFn = context$1$0.t59;
-	        return context$1$0.delegateYield(bodyLambdaFn(), "t60", 10);
+	        bodyLambdaFn = context$1$0.t151;
+	        return context$1$0.delegateYield(bodyLambdaFn(), "t152", 10);
 
 	      case 10:
-	        return context$1$0.abrupt("return", context$1$0.t60);
+	        return context$1$0.abrupt("return", context$1$0.t152);
 
 	      case 11:
 	        i += 2;
@@ -496,10 +511,10 @@
 	          lambdaArguments = args$2$0;
 	          lambdaParameters = _.pluck(ast.c[0], "c");
 	          lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
-	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t61", 6);
+	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t153", 6);
 
 	        case 6:
-	          return context$2$0.abrupt("return", context$2$0.t61);
+	          return context$2$0.abrupt("return", context$2$0.t153);
 
 	        case 7:
 	        case "end":
@@ -526,10 +541,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(ast, createScope(standardLibrary())), "t62", 6);
+	        return context$1$0.delegateYield(interpret(ast, createScope(standardLibrary())), "t154", 6);
 
 	      case 6:
-	        return context$1$0.abrupt("return", context$1$0.t62);
+	        return context$1$0.abrupt("return", context$1$0.t154);
 
 	      case 9:
 	        if (!(ast.t === "top")) {
@@ -537,10 +552,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretTop(ast, env), "t63", 11);
+	        return context$1$0.delegateYield(interpretTop(ast, env), "t155", 11);
 
 	      case 11:
-	        return context$1$0.abrupt("return", context$1$0.t63);
+	        return context$1$0.abrupt("return", context$1$0.t155);
 
 	      case 14:
 	        if (!(ast.t === "lambda")) {
@@ -556,10 +571,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t64", 20);
+	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t156", 20);
 
 	      case 20:
-	        return context$1$0.abrupt("return", context$1$0.t64);
+	        return context$1$0.abrupt("return", context$1$0.t156);
 
 	      case 23:
 	        if (!(ast.t === "conditional")) {
@@ -567,10 +582,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretConditional(ast, env), "t65", 25);
+	        return context$1$0.delegateYield(interpretConditional(ast, env), "t157", 25);
 
 	      case 25:
-	        return context$1$0.abrupt("return", context$1$0.t65);
+	        return context$1$0.abrupt("return", context$1$0.t157);
 
 	      case 28:
 	        if (!(ast.t === "do")) {
@@ -578,10 +593,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretDo(ast, env), "t66", 30);
+	        return context$1$0.delegateYield(interpretDo(ast, env), "t158", 30);
 
 	      case 30:
-	        return context$1$0.abrupt("return", context$1$0.t66);
+	        return context$1$0.abrupt("return", context$1$0.t158);
 
 	      case 33:
 	        if (!(ast.t === "invocation")) {
@@ -589,10 +604,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t67", 35);
+	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t159", 35);
 
 	      case 35:
-	        return context$1$0.abrupt("return", context$1$0.t67);
+	        return context$1$0.abrupt("return", context$1$0.t159);
 
 	      case 38:
 	        if (!(ast.t === "label")) {
@@ -632,8 +647,8 @@
 	var parse = __webpack_require__(1);
 	var interpret = __webpack_require__(2);
 
-	function start(code, env) {
-	  return interpret(parse(code), env);
+	function start(ast, env) {
+	  return interpret(ast, env);
 	};
 
 	function complete(g) {
@@ -947,10 +962,10 @@
 	            return context$2$0.abrupt("return", true);
 
 	          case 9:
-	            return context$2$0.delegateYield(lib.equals.apply(null, args.slice(1)), "t68", 10);
+	            return context$2$0.delegateYield(lib.equals.apply(null, args.slice(1)), "t160", 10);
 
 	          case 10:
-	            return context$2$0.abrupt("return", context$2$0.t68);
+	            return context$2$0.abrupt("return", context$2$0.t160);
 
 	          case 11:
 	          case "end":
