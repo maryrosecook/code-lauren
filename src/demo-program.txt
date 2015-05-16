@@ -10,7 +10,7 @@ draw: { ?x ?y
 
 update: { ?x ?y ?angle
   orbit-radius: 100
-  angle-step: 0.1
+  angle-step: 0.05
 
   draw(x y)
   update(multiply(orbit-radius cosine(angle))
