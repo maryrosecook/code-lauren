@@ -15,17 +15,6 @@ function getNodeAt(node, keys) {
   }
 };
 
-function expectParseErrors(fn, errors) {
-  try {
-    fn();
-  } catch (e) {
-    var threw = true;
-    expect(e.errors).toEqual(errors);
-  }
-
-  expect(threw).toEqual(true);
-};
-
 describe("parser", function() {
   describe("atoms", function() {
     it("should parse an int", function() {
@@ -378,33 +367,32 @@ describe("parser", function() {
 
   describe("balancing parentheses", function() {
     it("should mark single open w no close", function() {
-      expectParseErrors(function() { parse("{"); },
-                        [{ line: 1, column: 1, message: "Missing a closing }"}]);
+      expect(function() { parse.balanceParentheses("{"); }).toThrow("Missing a closing }");
     });
 
     it("should mark open w no close preceded by some matched parens", function() {
-      expectParseErrors(function() { parse("{}()\n{"); },
-                        [{ line: 2, column: 1, message: "Missing a closing }"}]);
+      expect(function() { parse.balanceParentheses("{}()\n{"); })
+        .toThrow("Missing a closing }");
     });
 
     it("should mark orphan close, not matched but separated open", function() {
-      expectParseErrors(function() { parse("{ ) }"); },
-                        [{ line: 1, column: 3, message: "Missing a preceding opening ("}]);
+      expect(function() { parse.balanceParentheses("{ ) }"); })
+        .toThrow("Missing a preceding opening (");
     });
 
     it("should mark orphan close that is last char of input", function() {
-      expectParseErrors(function() { parse("{}())"); },
-                        [{ line: 1, column: 5, message: "Missing a preceding opening ("}]);
+      expect(function() { parse.balanceParentheses("{}())"); })
+        .toThrow("Missing a preceding opening (");
     });
 
     it("should report the first orphan close", function() {
-      expectParseErrors(function() { parse("{}())\n{}())"); },
-                        [{ line: 1, column: 5, message: "Missing a preceding opening ("}]);
+      expect(function() { parse.balanceParentheses("{}())\n{}())"); })
+        .toThrow("Missing a preceding opening (");
     });
 
     it("should report the first extra open", function() {
-      expectParseErrors(function() { parse("{}(\n{}("); },
-                        [{ line: 1, column: 3, message: "Missing a closing )"}]);
+      expect(function() { parse.balanceParentheses("{}(\n{}("); })
+        .toThrow("Missing a closing )");
     });
   });
 });
