@@ -317,13 +317,13 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(gs[i], "t115", 4);
+	        return context$1$0.delegateYield(gs[i], "t226", 4);
 
 	      case 4:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t115), "t116", 5);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t226), "t227", 5);
 
 	      case 5:
-	        x = context$1$0.t116;
+	        x = context$1$0.t227;
 
 	        exprs.push(x);
 
@@ -351,10 +351,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(v.g, "t117", 2);
+	        return context$1$0.delegateYield(v.g, "t228", 2);
 
 	      case 2:
-	        v = context$1$0.t117;
+	        v = context$1$0.t228;
 	        context$1$0.next = 0;
 	        break;
 
@@ -375,18 +375,18 @@
 	      case 0:
 	        return context$1$0.delegateYield(listStar(ast.c.map(function (x) {
 	          return interpret(x, env);
-	        })), "t119", 1);
+	        })), "t230", 1);
 
 	      case 1:
-	        exprs = context$1$0.t119;
+	        exprs = context$1$0.t230;
 	        return context$1$0.abrupt("return", new Thunk(regeneratorRuntime.mark(function callee$1$0() {
 	          return regeneratorRuntime.wrap(function callee$1$0$(context$2$0) {
 	            while (1) switch (context$2$0.prev = context$2$0.next) {
 	              case 0:
-	                return context$2$0.delegateYield(exprs[0].apply(null, exprs.slice(1)), "t118", 1);
+	                return context$2$0.delegateYield(exprs[0].apply(null, exprs.slice(1)), "t229", 1);
 
 	              case 1:
-	                return context$2$0.abrupt("return", context$2$0.t118);
+	                return context$2$0.abrupt("return", context$2$0.t229);
 
 	              case 2:
 	              case "end":
@@ -408,13 +408,13 @@
 	      case 0:
 	        return context$1$0.delegateYield(listStar(_.initial(ast.c).map(function (x) {
 	          return interpret(x, env);
-	        })), "t120", 1);
+	        })), "t231", 1);
 
 	      case 1:
-	        return context$1$0.delegateYield(interpret(_.last(ast.c), env), "t121", 2);
+	        return context$1$0.delegateYield(interpret(_.last(ast.c), env), "t232", 2);
 
 	      case 2:
-	        return context$1$0.abrupt("return", context$1$0.t121);
+	        return context$1$0.abrupt("return", context$1$0.t232);
 
 	      case 3:
 	      case "end":
@@ -427,13 +427,13 @@
 	  return regeneratorRuntime.wrap(function interpretTop$(context$1$0) {
 	    while (1) switch (context$1$0.prev = context$1$0.next) {
 	      case 0:
-	        return context$1$0.delegateYield(interpret(ast.c, env), "t122", 1);
+	        return context$1$0.delegateYield(interpret(ast.c, env), "t233", 1);
 
 	      case 1:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t122), "t123", 2);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t233), "t234", 2);
 
 	      case 2:
-	        return context$1$0.abrupt("return", context$1$0.t123);
+	        return context$1$0.abrupt("return", context$1$0.t234);
 
 	      case 3:
 	      case "end":
@@ -448,13 +448,13 @@
 	    while (1) switch (context$1$0.prev = context$1$0.next) {
 	      case 0:
 	        name = ast.c[0].c;
-	        return context$1$0.delegateYield(interpret(ast.c[1], env), "t124", 2);
+	        return context$1$0.delegateYield(interpret(ast.c[1], env), "t235", 2);
 
 	      case 2:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t124), "t125", 3);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t235), "t236", 3);
 
 	      case 3:
-	        value = context$1$0.t125;
+	        value = context$1$0.t236;
 
 	        env.setBinding(name, value);
 	        return context$1$0.abrupt("return", value);
@@ -480,27 +480,27 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(parts[i], env), "t126", 4);
+	        return context$1$0.delegateYield(interpret(parts[i], env), "t237", 4);
 
 	      case 4:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t126), "t127", 5);
+	        return context$1$0.delegateYield(trampoline(context$1$0.t237), "t238", 5);
 
 	      case 5:
-	        conditionReturn = context$1$0.t127;
+	        conditionReturn = context$1$0.t238;
 
 	        if (!(conditionReturn === true)) {
 	          context$1$0.next = 11;
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(parts[i + 1], env), "t128", 8);
+	        return context$1$0.delegateYield(interpret(parts[i + 1], env), "t239", 8);
 
 	      case 8:
-	        bodyLambdaFn = context$1$0.t128;
-	        return context$1$0.delegateYield(bodyLambdaFn(), "t129", 10);
+	        bodyLambdaFn = context$1$0.t239;
+	        return context$1$0.delegateYield(bodyLambdaFn(), "t240", 10);
 
 	      case 10:
-	        return context$1$0.abrupt("return", context$1$0.t129);
+	        return context$1$0.abrupt("return", context$1$0.t240);
 
 	      case 11:
 	        i += 2;
@@ -530,10 +530,10 @@
 	          lambdaArguments = args$2$0;
 	          lambdaParameters = _.pluck(ast.c[0], "c");
 	          lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
-	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t130", 6);
+	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t241", 6);
 
 	        case 6:
-	          return context$2$0.abrupt("return", context$2$0.t130);
+	          return context$2$0.abrupt("return", context$2$0.t241);
 
 	        case 7:
 	        case "end":
@@ -560,10 +560,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(ast, createScope(standardLibrary())), "t131", 6);
+	        return context$1$0.delegateYield(interpret(ast, createScope(standardLibrary())), "t242", 6);
 
 	      case 6:
-	        return context$1$0.abrupt("return", context$1$0.t131);
+	        return context$1$0.abrupt("return", context$1$0.t242);
 
 	      case 9:
 	        if (!(ast.t === "top")) {
@@ -571,10 +571,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretTop(ast, env), "t132", 11);
+	        return context$1$0.delegateYield(interpretTop(ast, env), "t243", 11);
 
 	      case 11:
-	        return context$1$0.abrupt("return", context$1$0.t132);
+	        return context$1$0.abrupt("return", context$1$0.t243);
 
 	      case 14:
 	        if (!(ast.t === "lambda")) {
@@ -590,10 +590,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t133", 20);
+	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t244", 20);
 
 	      case 20:
-	        return context$1$0.abrupt("return", context$1$0.t133);
+	        return context$1$0.abrupt("return", context$1$0.t244);
 
 	      case 23:
 	        if (!(ast.t === "conditional")) {
@@ -601,10 +601,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretConditional(ast, env), "t134", 25);
+	        return context$1$0.delegateYield(interpretConditional(ast, env), "t245", 25);
 
 	      case 25:
-	        return context$1$0.abrupt("return", context$1$0.t134);
+	        return context$1$0.abrupt("return", context$1$0.t245);
 
 	      case 28:
 	        if (!(ast.t === "do")) {
@@ -612,10 +612,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretDo(ast, env), "t135", 30);
+	        return context$1$0.delegateYield(interpretDo(ast, env), "t246", 30);
 
 	      case 30:
-	        return context$1$0.abrupt("return", context$1$0.t135);
+	        return context$1$0.abrupt("return", context$1$0.t246);
 
 	      case 33:
 	        if (!(ast.t === "invocation")) {
@@ -623,10 +623,10 @@
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t136", 35);
+	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t247", 35);
 
 	      case 35:
-	        return context$1$0.abrupt("return", context$1$0.t136);
+	        return context$1$0.abrupt("return", context$1$0.t247);
 
 	      case 38:
 	        if (!(ast.t === "label")) {
