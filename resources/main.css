@@ -11,7 +11,7 @@ body {
   width: 100%;
   height: 100vh;
   z-index: 1;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0);
   color: #333333;
 }
 
@@ -24,16 +24,38 @@ body {
   left: 0;
   top: 0;
   z-index: -1;
+  opacity: 0.5;
 }
 
-.ace_parse_annotation {
+.ace_code_highlight {
   position: absolute;
 }
 
-.ace_parse_annotation.error { background-color: rgba(255, 0, 0, 0.4); }
+.ace_code_highlight.error { background-color: rgba(255, 0, 0, 0.4); }
 
-.ace_parse_annotation.rainbow-0 { background-color: rgba(0, 255, 0, 0.2); }
-.ace_parse_annotation.rainbow-1 { background-color: rgba(0, 0, 255, 0.2); }
-.ace_parse_annotation.rainbow-2 { background-color: rgba(255, 255, 0, 0.2); }
-.ace_parse_annotation.rainbow-3 { background-color: rgba(0, 255, 255, 0.2); }
-.ace_parse_annotation.rainbow-4 { background-color: rgba(255, 0, 255, 0.2); }
+.ace_code_highlight.rainbow-0 { background-color: rgba(0, 255, 0, 0.2); }
+.ace_code_highlight.rainbow-1 { background-color: rgba(0, 0, 255, 0.2); }
+.ace_code_highlight.rainbow-2 { background-color: rgba(255, 255, 0, 0.2); }
+.ace_code_highlight.rainbow-3 { background-color: rgba(0, 255, 255, 0.2); }
+.ace_code_highlight.rainbow-4 { background-color: rgba(255, 0, 255, 0.2); }
+
+#line-messages {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 0;
+}
+
+.line-message {
+  font-family: courier;
+  font-size: 14pt;
+  text-align: right;
+  margin-right: 0;
+}
+
+.line-message span {
+  background-color: rgba(255, 0, 0, 0.4);
+  padding: 0 4px;
+}
