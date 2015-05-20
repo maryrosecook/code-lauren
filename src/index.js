@@ -47,12 +47,9 @@ function parse(code, annotator) {
     return ast;
   } catch(e) {
     if (e instanceof parser.ParseError) {
-      console.log(e);
       annotator.codeHighlight(code, e.i, "error");
       annotator.lineMessage(code, e.i, "error", e.message);
     } else if (e instanceof parser.ParenthesisError) {
-      console.log(e.message);
-
       annotator.codeHighlight(code, e.i, "error");
       displayRainbowParentheses(code, annotator);
 
