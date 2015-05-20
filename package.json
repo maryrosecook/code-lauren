@@ -3,16 +3,19 @@
   "description": "A programming environment for beginners.",
   "author": "Mary Rose Cook <maryrosecook@maryrosecook.com> (http://maryrosecook.com/)",
   "version": "0.1.0",
+
   "repository": {
     "type": "git",
     "url": "https://github.com/maryrosecook/lauren.git"
   },
+
   "scripts": {
     "test": "node --harmony node_modules/jasmine-node/lib/jasmine-node/cli.js --color spec/",
     "build": "webpack --progress --colors",
     "watch": "webpack --progress --colors --watch",
     "start": "live-server --port=4000"
   },
+
   "dependencies": {
     "brace": "0.5.0",
     "brfs": "^1.4.0",
@@ -23,6 +26,7 @@
     "transform-loader": "^0.2.1",
     "underscore": "^1.8.2"
   },
+
   "devDependencies": {
     "babel-core": "^5.1.11",
     "babel-loader": "^5.0.0",
