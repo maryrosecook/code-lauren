@@ -10,7 +10,7 @@ function parseSyntax(codeStr) {
   try {
     return pegParse(codeStr);
   } catch(e) {
-    throw new ParseError(e.offset, e.message, e.stack);
+    throw new ParseError(e.offset, parseErrorToMessage(e), e.stack);
   }
 };
 
@@ -88,6 +88,23 @@ function rainbowParentheses(codeStr) {
   }
 
   return pairs;
+};
+
+function parseErrorToMessage(e) {
+  var expectations = commaSeparate(_.reject(_.pluck(e.expected, "description"), _.isEmpty));
+  if (expectations !== undefined) {
+    return "Expected this to be a " + expectations;
+  } else {
+    return "This character is not understandable in this place.";
+  }
+};
+
+function commaSeparate(items) {
+  if (items.length === 1) {
+    return items[0];
+  } else {
+    return items.slice(0, -1).join(", ") + " or " + _.last(items);
+  }
 };
 
 function ParseError(i, message, stack) {

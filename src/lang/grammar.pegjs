@@ -117,14 +117,14 @@ label
 label_char
   = [a-zA-Z0-9_\-]
 
-nl
+nl "new line"
   = all:[\n]+
     { return node('nl', all, offset); }
 
-_
+_ "space"
   = [ \t\r]+
 
-__
+__ ""
   = [ \t\r\n]+
 
 keyword
