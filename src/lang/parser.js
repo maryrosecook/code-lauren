@@ -93,7 +93,7 @@ function rainbowParentheses(codeStr) {
 function parseErrorToMessage(e) {
   var expectations = commaSeparate(_.reject(_.pluck(e.expected, "description"), _.isEmpty));
   if (expectations !== undefined) {
-    return "Expected this to be a " + expectations;
+    return "Expected this to be " + expectations;
   } else {
     return "This character is not understandable in this place.";
   }
