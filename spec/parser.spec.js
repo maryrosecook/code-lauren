@@ -395,4 +395,14 @@ describe("parser", function() {
         .toThrow("Missing a closing )");
     });
   });
+
+  describe("omitting incorrect parse error corrections", function() {
+    it("should not suggest things that valid but do not fix problem for missing :", function() {
+      expect(function() { parse.parseSyntax("a b"); }).toThrow('Expected this to be a new line');
+    });
+
+    it("should say it cannot understand if there are no valid suggestions", function() {
+      expect(function() { parse.parseSyntax("0."); }).toThrow('This is not understandable here');
+    });
+  });
 });

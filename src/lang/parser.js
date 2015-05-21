@@ -10,7 +10,8 @@ function parseSyntax(codeStr) {
   try {
     return pegParse(codeStr);
   } catch(e) {
-    throw new ParseError(e.offset, parseErrorToMessage(e), e.stack);
+    console.log(e.message);
+    throw new ParseError(e.offset, parseErrorToMessage(e, codeStr), e.stack);
   }
 };
 
@@ -90,19 +91,41 @@ function rainbowParentheses(codeStr) {
   return pairs;
 };
 
-function parseErrorToMessage(e) {
-  var expectations = commaSeparate(_.reject(_.pluck(e.expected, "description"), _.isEmpty));
-  if (expectations !== undefined) {
-    return "Expected this to be " + expectations;
+function parseErrorToMessage(e, code) {
+  var expectations = _.chain(e.expected)
+      .filter(function(p) { return getSyntaxFix(code, e.offset, p.value) !== undefined })
+      .map(function(p) { return getSyntaxFix(code, e.offset, p.value).description; })
+      .value();
+
+  if (expectations.length > 0) {
+    return "Expected this to be " + commaSeparate(expectations);
   } else {
-    return "This character is not understandable in this place.";
+    return "This is not understandable here";
+  }
+};
+
+var SYNTAX_FIXES = {
+  "[ \\t\\r]": { str: " ", description: "a space" },
+  "[\\n]": { str: "\n", description: "a new line" }
+};
+
+function getSyntaxFix(code, offset, parserSuggestion) {
+  var fix = SYNTAX_FIXES[parserSuggestion];
+  if (fix !== undefined) {
+    try {
+      var fixedCode = code.slice(0, offset - 1) + fix.str + code.slice(offset);
+      pegParse(fixedCode);
+      return fix;
+    } catch (e) {
+      return;
+    }
   }
 };
 
 function commaSeparate(items) {
   if (items.length === 1) {
     return items[0];
-  } else {
+  } else if (items.length > 1) {
     return items.slice(0, -1).join(", ") + " or " + _.last(items);
   }
 };
@@ -124,6 +147,7 @@ ParenthesisError.prototype = new Error();
 parseSyntax.indexToLineAndColumn = indexToLineAndColumn;
 parseSyntax.balanceParentheses = balanceParentheses;
 parseSyntax.rainbowParentheses = rainbowParentheses;
+parseSyntax.parseErrorToMessage = parseErrorToMessage;
 parseSyntax.parseSyntax = parseSyntax;
 parseSyntax.ParseError = ParseError;
 parseSyntax.ParenthesisError = ParenthesisError;
