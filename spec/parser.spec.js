@@ -402,7 +402,7 @@ describe("parser", function() {
     });
 
     it("should say it cannot understand if there are no valid suggestions", function() {
-      expect(function() { parse.parseSyntax("0."); }).toThrow('This is not understandable here');
+      expect(function() { parse.parseSyntax(":"); }).toThrow('This is not understandable here');
     });
   });
 });
