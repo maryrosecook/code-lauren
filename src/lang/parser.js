@@ -10,7 +10,6 @@ function parseSyntax(codeStr) {
   try {
     return pegParse(codeStr);
   } catch(e) {
-    console.log(e.message);
     throw new ParseError(e.offset, parseErrorToMessage(e, codeStr), e.stack);
   }
 };
