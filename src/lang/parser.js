@@ -105,7 +105,8 @@ function parseErrorToMessage(e, code) {
 
 var SYNTAX_FIXES = {
   "[ \\t\\r]": { str: " ", description: "a space" },
-  "[\\n]": { str: "\n", description: "a new line" }
+  "[\\n]": { str: "\n", description: "a new line" },
+  "[0-9]": { str: "0", description: "a number" }
 };
 
 function getSyntaxFix(code, offset, parserSuggestion) {
