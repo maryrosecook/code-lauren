@@ -397,7 +397,7 @@ describe("parser", function() {
   });
 
   describe("omitting incorrect parse error corrections", function() {
-    it("should not suggest things that valid but do not fix problem for missing :", function() {
+    it("should suggest only a new line if two expressions on same line", function() {
       expect(function() { parse.parseSyntax("a b"); }).toThrow('Expected this to be a new line');
     });
 
