@@ -138,7 +138,7 @@
 	function displayRainbowParentheses(code, annotator) {
 	  parser.rainbowParentheses(code).forEach(function (p, i) {
 	    p.map(function (offset) {
-	      annotator.codeHighlight(code, offset, "rainbow-" + i % 5);
+	      annotator.codeHighlight(code, offset, "rainbow-" + i % 4);
 	    });
 	  });
 	};
