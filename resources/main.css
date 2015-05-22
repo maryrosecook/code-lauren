@@ -35,11 +35,10 @@ body {
 
 .ace_marker-layer .overhang { padding-right: 13px; }
 
-.ace_code_highlight.rainbow-0 { background-color: rgba(0, 255, 0, 0.2); }
-.ace_code_highlight.rainbow-1 { background-color: rgba(0, 0, 255, 0.2); }
-.ace_code_highlight.rainbow-2 { background-color: rgba(255, 255, 0, 0.2); }
-.ace_code_highlight.rainbow-3 { background-color: rgba(0, 255, 255, 0.2); }
-.ace_code_highlight.rainbow-4 { background-color: rgba(255, 0, 255, 0.2); }
+.ace_code_highlight.rainbow-0 { background-color: rgba(0, 255, 0, 0.12); }
+.ace_code_highlight.rainbow-1 { background-color: rgba(0, 0, 255, 0.12); }
+.ace_code_highlight.rainbow-2 { background-color: rgba(0, 255, 255, 0.12); }
+.ace_code_highlight.rainbow-3 { background-color: rgba(255, 0, 255, 0.12); }
 
 #line-messages {
   position: absolute;
