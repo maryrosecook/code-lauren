@@ -21,7 +21,7 @@
     "brfs": "^1.4.0",
     "jquery": "^1.11.2",
     "live-server": "^0.7.1",
-    "pegjs": "^0.8.0",
+    "pegjs": "pegjs/pegjs#eaca5f0acf97b66ef141fed84aa95d4e72e33757",
     "react": "^0.13.3",
     "transform-loader": "^0.2.1",
     "underscore": "^1.8.2"

@@ -3,12 +3,14 @@ var fs = require("fs");
 var _ = require("underscore");
 var util = require("../util");
 
-var pegParse = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
-                               { cache: true }).parse;
+function buildParser(options) {
+  return peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
+                                 options).parse;
+};
 
 function parseSyntax(codeStr) {
   try {
-    return pegParse(codeStr);
+    return buildParser({ cache: true })(codeStr);
   } catch(e) {
     throw new ParseError(e.offset, parseErrorToMessage(e, codeStr), e.stack);
   }
@@ -91,43 +93,38 @@ function rainbowParentheses(codeStr) {
 };
 
 function parseErrorToMessage(e, code) {
-  var expectations = _.chain(e.expected)
-      .filter(function(p) { return getSyntaxFix(code, e.offset, p.value) !== undefined })
-      .map(function(p) { return getSyntaxFix(code, e.offset, p.value).description; })
-      .value();
+  var tracer = createLastRuleTracer();
 
-  if (expectations.length > 0) {
-    return "Expected this to be " + commaSeparate(expectations);
-  } else {
-    return "This is not understandable here";
-  }
+  try { buildParser({ cache: true, trace: true })(code); }
+  catch (e) {}
+
+  // var indent = 0;
+  // for (var i = 0; i < tracer.events.length; i++) {
+  //   var ev = tracer.events[i];
+  //   if (ev.type === "rule.enter") {
+  //     indent += 1;
+  //   } else if (ev.type === "rule.fail") {
+  //     indent -= 1;
+  //   }
+
+  //   console.log(Array(indent).join(" ") + ev.rule);
+  // }
+
+
+  // if (expectations.length > 0) {
+  //   return "Expected this to be " + commaSeparate(expectations);
+  // } else {
+  //   return "This is not understandable here";
+  // }
 };
 
-var SYNTAX_FIXES = {
-  "[ \\t\\r]": { str: " ", description: "a space" },
-  "[\\n]": { str: "\n", description: "a new line" },
-  "[0-9]": { str: "0", description: "a number" }
-};
-
-function getSyntaxFix(code, offset, parserSuggestion) {
-  var fix = SYNTAX_FIXES[parserSuggestion];
-  if (fix !== undefined) {
-    try {
-      var fixedCode = code.slice(0, offset - 1) + fix.str + code.slice(offset);
-      pegParse(fixedCode);
-      return fix;
-    } catch (e) {
-      return;
+function createLastRuleTracer() {
+  return {
+    events: [],
+    trace: function(event) {
+      this.events.push(event);
     }
-  }
-};
-
-function commaSeparate(items) {
-  if (items.length === 1) {
-    return items[0];
-  } else if (items.length > 1) {
-    return items.slice(0, -1).join(", ") + " or " + _.last(items);
-  }
+  };
 };
 
 function ParseError(i, message, stack) {

@@ -401,8 +401,9 @@ describe("parser", function() {
       expect(function() { parse.parseSyntax("a b"); }).toThrow('Expected this to be a new line');
     });
 
-    it("should say it cannot understand if there are no valid suggestions", function() {
-      expect(function() { parse.parseSyntax(":"); }).toThrow('This is not understandable here');
+    iit("should say it was looking for an expression", function() {
+      expect(function() { parse.parseSyntax("()"); })
+        .toThrow('Expected a number, string, boolean or function call here');
     });
   });
 });
