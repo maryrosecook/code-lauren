@@ -3,14 +3,12 @@ var fs = require("fs");
 var _ = require("underscore");
 var util = require("../util");
 
-function buildParser(options) {
-  return peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
-                                 options).parse;
-};
+var pegParse = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
+                               { cache: true }).parse;
 
 function parseSyntax(codeStr) {
   try {
-    return buildParser({ cache: true })(codeStr);
+    return pegParse(codeStr);
   } catch(e) {
     throw new ParseError(e.offset, parseErrorToMessage(e, codeStr), e.stack);
   }
@@ -93,38 +91,62 @@ function rainbowParentheses(codeStr) {
 };
 
 function parseErrorToMessage(e, code) {
-  var tracer = createLastRuleTracer();
+  var expectations = _.chain(e.expected)
+      .filter(function(p) { return getSyntaxFix(code, e.offset, p.value) !== undefined })
+      .map(function(p) { return getSyntaxFix(code, e.offset, p.value); })
+      .value();
 
-  try { buildParser({ cache: true, trace: true })(code); }
-  catch (e) {}
+  if (expectations.length > 0) {
+    var descriptions = _.chain(expectations).where({ type: "description" }).pluck("value").value();
+    var examples = _.chain(expectations).where({ type: "example" }).pluck("value").value();
 
-  // var indent = 0;
-  // for (var i = 0; i < tracer.events.length; i++) {
-  //   var ev = tracer.events[i];
-  //   if (ev.type === "rule.enter") {
-  //     indent += 1;
-  //   } else if (ev.type === "rule.fail") {
-  //     indent -= 1;
-  //   }
+    var str = "Expected this to be ";
+    if (descriptions.length > 0) {
+      str += commaSeparate(descriptions);
+    }
 
-  //   console.log(Array(indent).join(" ") + ev.rule);
-  // }
+    if (examples.length > 0) {
+      if (descriptions.length > 0) {
+        str += "or ";
+      }
 
+      str += "something like " + commaSeparate(examples);
+    }
 
-  // if (expectations.length > 0) {
-  //   return "Expected this to be " + commaSeparate(expectations);
-  // } else {
-  //   return "This is not understandable here";
-  // }
+    return str;
+  } else {
+    return "This is not understandable here";
+  }
 };
 
-function createLastRuleTracer() {
-  return {
-    events: [],
-    trace: function(event) {
-      this.events.push(event);
+var SYNTAX_FIXES = {
+  "[ \\t\\r]": { str: " ", value: "a space", type: "description" },
+  "[\\n]": { str: "\n", value: "a new line", type: "description" },
+  "[0-9]": { str: "0", value: "231", type: "example" },
+  '\"': { str: '\"', value: '"some words"', type: "example" },
+  "true": { str: "true", value: "true", type: "example" },
+  "[a-zA-Z0-9_\\-]": { str: "the-name-of-a-thing", value: "the-name-of-a-thing", type: "example" }
+};
+
+function getSyntaxFix(code, offset, parserSuggestion) {
+  var fix = SYNTAX_FIXES[parserSuggestion];
+  if (fix !== undefined) {
+    try {
+      var fixedCode = code.slice(0, offset - 1) + fix.str + code.slice(offset);
+      pegParse(fixedCode);
+      return fix;
+    } catch (e) {
+      return;
     }
-  };
+  }
+};
+
+function commaSeparate(items) {
+  if (items.length === 1) {
+    return items[0];
+  } else if (items.length > 1) {
+    return items.slice(0, -1).join(", ") + " or " + _.last(items);
+  }
 };
 
 function ParseError(i, message, stack) {

@@ -401,7 +401,7 @@ describe("parser", function() {
       expect(function() { parse.parseSyntax("a b"); }).toThrow('Expected this to be a new line');
     });
 
-    iit("should say it was looking for an expression", function() {
+    xit("should say it was looking for an expression", function() {
       expect(function() { parse.parseSyntax("()"); })
         .toThrow('Expected a number, string, boolean or function call here');
     });
