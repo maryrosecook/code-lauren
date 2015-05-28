@@ -396,14 +396,17 @@ describe("parser", function() {
     });
   });
 
-  describe("omitting incorrect parse error corrections", function() {
-    it("should suggest only a new line if two expressions on same line", function() {
-      expect(function() { parse.parseSyntax("a b"); }).toThrow('Expected this to be a new line');
+  describe("error messages", function() {
+    it("should expect expression on same line to be preceded by nl", function() {
+      expect(function() {
+        parse.parseSyntax("a b");
+      }).toThrow('Expected this to be on a new line');
     });
 
-    xit("should say it was looking for an expression", function() {
-      expect(function() { parse.parseSyntax("()"); })
-        .toThrow('Expected a number, string, boolean or function call here');
+    it("should expect expression on same line nested in lambda to be preceded by nl", function() {
+      expect(function() {
+        parse.parseSyntax("{ { a b } }");
+      }).toThrow('Expected this to be on a new line');
     });
   });
 });

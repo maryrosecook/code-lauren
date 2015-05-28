@@ -1,0 +1,10 @@
+{
+  "examples": [
+    {
+      "code":    "a b",
+      "stack":   ["do", "do_continue", "nl"],
+      "regex":   "[a-zA-Z0-9_\\-]+",
+      "message": "Expected this to be on a new line"
+    }
+  ]
+}
