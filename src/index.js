@@ -89,7 +89,7 @@ function start(editor, annotator) {
 };
 
 function displayRainbowParentheses(code, annotator) {
-  parse.rainbowParentheses(code)
+  parser.rainbowParentheses(code)
     .forEach(function(p, i) {
       p.map(function(offset) {
         annotator.codeHighlight(code, offset, "rainbow-" + i % 4);  });
