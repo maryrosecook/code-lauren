@@ -42,8 +42,8 @@ function parse(code, annotator) {
   try {
     parser.balanceParentheses(code);
 
-    var ast = parser.parseSyntax(code);
-    console.log("Parsed ok");
+    var ast = parser.parse(code);
+
     return ast;
   } catch(e) {
     if (e instanceof parser.ParseError) {
@@ -89,7 +89,7 @@ function start(editor, annotator) {
 };
 
 function displayRainbowParentheses(code, annotator) {
-  parser.rainbowParentheses(code)
+  parse.rainbowParentheses(code)
     .forEach(function(p, i) {
       p.map(function(offset) {
         annotator.codeHighlight(code, offset, "rainbow-" + i % 4);  });

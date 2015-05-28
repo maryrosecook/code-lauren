@@ -399,13 +399,13 @@ describe("parser", function() {
   describe("error messages", function() {
     it("should expect expression on same line to be preceded by nl", function() {
       expect(function() {
-        parse.parseSyntax("a b");
+        parse("a b");
       }).toThrow('Expected this to be on a new line');
     });
 
     it("should expect expression on same line nested in lambda to be preceded by nl", function() {
       expect(function() {
-        parse.parseSyntax("{ { a b } }");
+        parse("{ { a b } }");
       }).toThrow('Expected this to be on a new line');
     });
   });
