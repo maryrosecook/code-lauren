@@ -2,5 +2,4 @@ tmp/*
 node_modules
 npm-debug.log
 .DS_Store
-src/.tern-port
-spec/.tern-port
+.tern-port
