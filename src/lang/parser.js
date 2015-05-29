@@ -11,8 +11,9 @@ function parse(codeStr) {
   try {
     return pegParse(codeStr);
   } catch(e) {
+    var niceError = parserStateError(codeStr);
     throw new ParseError(e.offset,
-                         parserStateError(codeStr) || e.message,
+                         niceError || e.message,
                          e.stack);
   }
 };
