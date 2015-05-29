@@ -399,8 +399,14 @@ describe("parser", function() {
   describe("error messages", function() {
     it("should expect expression on same line to be preceded by nl", function() {
       expect(function() {
-        parse("a b");
+        parse("a bb");
       }).toThrow('Expected this to be on a new line');
+    });
+
+    it("should expect fn name and application separated by space to be together", function() {
+      expect(function() {
+        parse("a ()");
+      }).toThrow('There should be no spaces between\nthe name of the action and the ()');
     });
 
     it("should expect expression on same line nested in lambda to be preceded by nl", function() {
