@@ -4,13 +4,15 @@ var _ = require("underscore");
 
 var examples = JSON.parse(fs.readFileSync(__dirname + "/examples.json", "utf8")).examples;
 
-var pegParse = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
-                               { cache: true, trace: true }).parse
+var pegParseTrace = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
+                                    { cache: true, trace: true }).parse;
+
+var pegParseNoTrace = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
+                                      { cache: true }).parse;
 
 function parserStateError(code) {
-  var realCodeStack = codeToFailedParseStack(code);
   for (var i = 0; i < examples.length; i++) {
-    if (isParseStacksEqual(examples[i].stack, realCodeStack)) {
+    if (isMatchingExample(examples[i], code)) {
       return examples[i].message;
     }
   }
@@ -19,12 +21,35 @@ function parserStateError(code) {
 // function recordParseFail(code) {
 // };
 
-function isParseStacksEqual(exampleStack, codeStack) {
-  if (exampleStack.length > codeStack.length) {
+function isMatchingExample(example, code) {
+  if (!isMatchingFailedToken(example, code)) {
     return false;
   } else {
-    return _.isEqual(exampleStack, _.last(codeStack, exampleStack.length));
+    var codeStack = codeToFailedParseStack(code);
+    if (example.stack.length > codeStack.length) {
+      return false;
+    } else {
+      return _.isEqual(example.stack, _.last(codeStack, example.stack.length));
+    }
   }
+};
+
+function isMatchingFailedToken(example, code) {
+  return failedToken(code).match(example.failedToken) !== null;
+};
+
+function failedToken(code) {
+  try {
+    pegParseNoTrace(code);
+  } catch (e) {
+    return code.slice(e.offset).match(/^[\s]*([^\s]*)/)[1];
+  }
+
+  throw "Looking for failed token but code parsed";
+};
+
+function isWhitespace(c) {
+  return c.match(/[ \t\r]/);
 };
 
 function eventsToTree(evs, node) {
@@ -52,7 +77,7 @@ function eventsToTree(evs, node) {
 function codeToFailedParseStack(code) {
   var eventGatherer = createEventGathererTracer();
   try {
-    pegParse(code, { tracer: eventGatherer });
+    pegParseTrace(code, { tracer: eventGatherer });
   } catch(e) {
     var tree = eventsToTree(eventGatherer.getEvents());
     var stack = deepestFailedStack(treeToStacks(tree));
@@ -109,4 +134,5 @@ function createEventGathererTracer() {
   };
 };
 
+parserStateError.codeToFailedParseStack = codeToFailedParseStack;
 module.exports = parserStateError;
