@@ -1,4 +1,5 @@
 var _ = require("underscore");
+var interpreter = require("./interpreter");
 
 var createStandardLibrary = module.exports = function () {
   var lib = {
@@ -63,6 +64,12 @@ var createStandardLibrary = module.exports = function () {
       var output = _.map(arguments, function(x) { return x.toString(); }).join(" ");
       console.log(output);
       return output + "\n";
+    },
+
+    forever: function*(fn) {
+      while (true) {
+        yield* require("./interpreter").trampoline(yield* fn());
+      }
     }
   };
 
