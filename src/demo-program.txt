@@ -8,14 +8,13 @@ draw: { ?x ?y
                      "blue")
 }
 
-update: { ?x ?y ?angle
+angle: 0
+
+forever({
   orbit-radius: 100
   angle-step: 0.05
+  angle: add(angle angle-step)
 
-  draw(x y)
-  update(multiply(orbit-radius cosine(angle))
-         multiply(orbit-radius sine(angle))
-         add(angle angle-step))
-}
-
-update(0 0 0)
+  draw(multiply(orbit-radius cosine(angle))
+       multiply(orbit-radius sine(angle)))
+})
