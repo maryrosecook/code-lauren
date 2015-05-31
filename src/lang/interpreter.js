@@ -3,22 +3,22 @@ var util = require("../util");
 
 var standardLibrary = require("./standard-library");
 
-function Scope(scope, parent) {
-  this.scope = scope;
+function Scope(bindings, parent) {
+  this.bindings = bindings;
   this.parent = parent;
 };
 
 Scope.prototype = {
   get: function(identifier) {
-    if (identifier in this.scope) {
-      return this.scope[identifier];
+    if (identifier in this.bindings) {
+      return this.bindings[identifier];
     } else if (this.parent !== undefined) {
       return this.parent.get(identifier);
     }
   },
 
   setBinding: function(k, v) {
-    this.scope[k] = v;
+    this.bindings[k] = v;
   }
 };
 
@@ -26,8 +26,8 @@ function Thunk(gFn) {
   this.g = gFn();
 };
 
-function createScope(scope, parent) {
-  return new Scope(scope, parent);
+function createScope(bindings, parent) {
+  return new Scope(bindings, parent);
 };
 
 function* listStar(gs) {
