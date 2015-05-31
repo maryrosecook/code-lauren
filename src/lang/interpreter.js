@@ -9,16 +9,34 @@ function Scope(bindings, parent) {
 };
 
 Scope.prototype = {
-  get: function(identifier) {
-    if (identifier in this.bindings) {
-      return this.bindings[identifier];
+  getLocalBinding: function(k) {
+    return this.bindings[k];
+  },
+
+  getScopedBinding: function(k) {
+    if (k in this.bindings) {
+      return this.getLocalBinding(k);
     } else if (this.parent !== undefined) {
-      return this.parent.get(identifier);
+      return this.parent.getScopedBinding(k);
     }
   },
 
-  setBinding: function(k, v) {
+  setLocalBinding: function(k, v) {
     this.bindings[k] = v;
+  },
+
+  setGlobalBinding: function(k, v) {
+    var scope = this;
+    while(scope !== undefined) {
+      if (scope.bindings[k] !== undefined) {
+        scope.setLocalBinding(k, v);
+        return;
+      } else {
+        scope = scope.parent;
+      }
+    }
+
+    this.setLocalBinding(k, v);
   }
 };
 
@@ -65,7 +83,7 @@ function* interpretTop(ast, env) {
 function* interpretAssignment(ast, env) {
   var name = ast.c[0].c
   var value = yield* trampoline(yield* interpret(ast.c[1], env));
-  env.setBinding(name, value);
+  env.setGlobalBinding(name, value);
   return value;
 };
 
@@ -110,7 +128,7 @@ function* interpret(ast, env) {
   } else if (ast.t === "invocation") {
     return yield* interpretInvocation(ast, env);
   } else if (ast.t === "label") {
-    return env.get(ast.c);
+    return env.getScopedBinding(ast.c);
   } else if (ast.t === "number" || ast.t === "string" || ast.t === "boolean" ) {
     return ast.c;
   }
@@ -118,4 +136,5 @@ function* interpret(ast, env) {
 
 interpret.interpret = interpret;
 interpret.createScope = createScope;
+interpret.trampoline = trampoline;
 module.exports = interpret;
