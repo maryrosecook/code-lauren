@@ -23,6 +23,10 @@ var createStandardLibrary = module.exports = function () {
       return Math.cos(lib.radians(x).next().value);
     },
 
+    tangent: function*(x) {
+      return Math.tan(lib.radians(x).next().value);
+    },
+
     radians: function*(x) {
       return 0.01745 * x;
     },
