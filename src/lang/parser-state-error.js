@@ -39,7 +39,7 @@ function failedToken(code) {
   try {
     pegParseNoTrace(code);
   } catch (e) {
-    return code.slice(e.offset).match(/^[\s]*([^\s]*)/)[1];
+    return code.slice(e.offset);
   }
 
   throw "Looking for failed token but code parsed";
