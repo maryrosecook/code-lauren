@@ -18,9 +18,6 @@ function parserStateError(code) {
   }
 };
 
-// function recordParseFail(code) {
-// };
-
 function isMatchingExample(example, code) {
   if (!isMatchingFailedToken(example, code)) {
     return false;
