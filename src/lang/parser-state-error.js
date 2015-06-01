@@ -19,7 +19,7 @@ function parserStateError(code) {
 };
 
 function isMatchingExample(example, code) {
-  if (!isMatchingFailedToken(example, code)) {
+  if (!isMatchingNextInput(example, code)) {
     return false;
   } else {
     var codeStack = codeToFailedParseStack(code);
@@ -31,11 +31,11 @@ function isMatchingExample(example, code) {
   }
 };
 
-function isMatchingFailedToken(example, code) {
-  return failedToken(code).match(example.failedToken) !== null;
+function isMatchingNextInput(example, code) {
+  return nextInput(code).match(example.nextInput) !== null;
 };
 
-function failedToken(code) {
+function nextInput(code) {
   try {
     pegParseNoTrace(code);
   } catch (e) {

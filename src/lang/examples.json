@@ -3,14 +3,14 @@
     {
       "code":    "a b",
       "stack":   ["do", "do_continue", "nl"],
-      "failedToken":   "[a-zA-Z0-9_\\-]+",
+      "nextInput":   "[a-zA-Z0-9_\\-]+",
       "message": "Expected this to be on a new line"
     },
 
     {
       "code":    "a ()",
       "stack":   ["do", "do_continue", "nl"],
-      "failedToken":   "\\(\\)",
+      "nextInput":   "\\(\\)",
       "message": "There should be no spaces between\nthe name of the action and the ()"
     },
 
@@ -18,7 +18,7 @@
       "code":    "a: ",
       "stack":   ["assignment", "expression", "parenthetical", "invocation",
                   "function", "label", "label_char"],
-      "failedToken":   "$",
+      "nextInput":   "$",
       "message": "Naming a value. You have specified a name, but you also need a value."
     },
 
@@ -26,7 +26,7 @@
       "code":    "a: \n",
       "stack":   ["assignment", "expression", "parenthetical", "invocation",
                   "function", "label", "label_char"],
-      "failedToken":   "\n",
+      "nextInput":   "\n",
       "message": "Naming a value. You have specified a name, but you also need a value."
     }
   ]
