@@ -58,7 +58,7 @@
 	var createEnv = __webpack_require__(6);
 
 	window.addEventListener("load", function () {
-	  var editor = createEditor("draw: { ?x ?y\n  radius: 20\n\n  clear-screen()\n  draw-filled-circle(add(220 x)\n                     add(200 y)\n                     radius\n                     \"blue\")\n}\n\nangle: 0\n\nforever({\n  orbit-radius: 100\n  angle-step: 0.05\n  angle: add(angle angle-step)\n\n  draw(multiply(orbit-radius cosine(angle))\n       multiply(orbit-radius sine(angle)))\n})\n");
+	  var editor = createEditor("draw: { ?x ?y\n  circle-radius: 20\n\n  clear-screen()\n  draw-filled-circle(add(220 x)\n                     add(200 y)\n                     circle-radius\n                     \"blue\")\n}\n\nangle: 0\n\nforever({\n  radius-of-circle-orbit: 100\n  circle-angle-change: 0.05\n\n  angle: add(angle circle-angle-change)\n\n  draw(multiply(radius-of-circle-orbit cosine(angle))\n       multiply(radius-of-circle-orbit sine(angle)))\n})\n");
 	  var annotator = createAnnotator(editor.getSession());
 
 	  var tickStop = start(editor, annotator);
@@ -18940,7 +18940,7 @@
 
 	    try {
 	            var workerSrc = mod.src;
-	    var Blob = __webpack_require__(21);
+	    var Blob = __webpack_require__(26);
 	    var blob = new Blob([ workerSrc ], { type: 'application/javascript' });
 	    var blobUrl = (window.URL || window.webkitURL).createObjectURL(blob);
 
@@ -31685,16 +31685,16 @@
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(22),
-	    objects = __webpack_require__(23);
+	var arrays  = __webpack_require__(21),
+	    objects = __webpack_require__(22);
 
 	var PEG = {
 	  /* PEG.js version (uses semantic versioning). */
 	  VERSION: "0.8.0",
 
-	  GrammarError: __webpack_require__(24),
-	  parser:       __webpack_require__(25),
-	  compiler:     __webpack_require__(26),
+	  GrammarError: __webpack_require__(23),
+	  parser:       __webpack_require__(24),
+	  compiler:     __webpack_require__(25),
 
 	  /*
 	   * Generates a parser from a specified grammar and returns it.
@@ -31749,41 +31749,6 @@
 
 /***/ },
 /* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {module.exports = get_blob()
-
-	function get_blob() {
-	  if(global.Blob) {
-	    try {
-	      new Blob(['asdf'], {type: 'text/plain'})
-	      return Blob
-	    } catch(err) {}
-	  }
-
-	  var Builder = global.WebKitBlobBuilder ||
-	                global.MozBlobBuilder ||
-	                global.MSBlobBuilder
-
-	  return function(parts, bag) {
-	    var builder = new Builder
-	      , endings = bag.endings
-	      , type = bag.type
-
-	    if(endings) for(var i = 0, len = parts.length; i < len; ++i) {
-	      builder.append(parts[i], endings)
-	    } else for(var i = 0, len = parts.length; i < len; ++i) {
-	      builder.append(parts[i])
-	    }
-
-	    return type ? builder.getBlob(type) : builder.getBlob()
-	  }
-	}
-
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* Array utilities. */
@@ -31871,7 +31836,7 @@
 
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* Object utilities. */
@@ -31929,7 +31894,7 @@
 
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var classes = __webpack_require__(29);
@@ -31946,7 +31911,7 @@
 
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = (function() {
@@ -36856,11 +36821,11 @@
 
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(22),
-	    objects = __webpack_require__(23);
+	var arrays  = __webpack_require__(21),
+	    objects = __webpack_require__(22);
 
 	var compiler = {
 	  /*
@@ -36917,6 +36882,41 @@
 
 	module.exports = compiler;
 
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = get_blob()
+
+	function get_blob() {
+	  if(global.Blob) {
+	    try {
+	      new Blob(['asdf'], {type: 'text/plain'})
+	      return Blob
+	    } catch(err) {}
+	  }
+
+	  var Builder = global.WebKitBlobBuilder ||
+	                global.MozBlobBuilder ||
+	                global.MSBlobBuilder
+
+	  return function(parts, bag) {
+	    var builder = new Builder
+	      , endings = bag.endings
+	      , type = bag.type
+
+	    if(endings) for(var i = 0, len = parts.length; i < len; ++i) {
+	      builder.append(parts[i], endings)
+	    } else for(var i = 0, len = parts.length; i < len; ++i) {
+	      builder.append(parts[i])
+	    }
+
+	    return type ? builder.getBlob(type) : builder.getBlob()
+	  }
+	}
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 27 */
@@ -37559,7 +37559,7 @@
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var GrammarError = __webpack_require__(24),
+	var GrammarError = __webpack_require__(23),
 	    asts         = __webpack_require__(80),
 	    visitor      = __webpack_require__(81);
 
@@ -37585,8 +37585,8 @@
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays       = __webpack_require__(22),
-	    GrammarError = __webpack_require__(24),
+	var arrays       = __webpack_require__(21),
+	    GrammarError = __webpack_require__(23),
 	    asts         = __webpack_require__(80),
 	    visitor      = __webpack_require__(81);
 
@@ -37621,7 +37621,7 @@
 /* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(22),
+	var arrays  = __webpack_require__(21),
 	    visitor = __webpack_require__(81);
 
 	/*
@@ -37667,8 +37667,8 @@
 /* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(22),
-	    objects = __webpack_require__(23),
+	var arrays  = __webpack_require__(21),
+	    objects = __webpack_require__(22),
 	    asts    = __webpack_require__(80),
 	    visitor = __webpack_require__(81),
 	    op      = __webpack_require__(82),
@@ -38289,7 +38289,7 @@
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays = __webpack_require__(22),
+	var arrays = __webpack_require__(21),
 	    asts   = __webpack_require__(80),
 	    op     = __webpack_require__(82),
 	    js     = __webpack_require__(83);
@@ -40372,7 +40372,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $          = __webpack_require__(79)
-	  , setUnscope = __webpack_require__(100)
+	  , setUnscope = __webpack_require__(101)
 	  , ITER       = __webpack_require__(88).safe('iter')
 	  , $iter      = __webpack_require__(97)
 	  , step       = $iter.step
@@ -40410,7 +40410,7 @@
 /* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(101)(Array);
+	__webpack_require__(100)(Array);
 
 /***/ },
 /* 58 */
@@ -40444,7 +40444,7 @@
 	    } return O;
 	  }
 	});
-	__webpack_require__(100)('copyWithin');
+	__webpack_require__(101)('copyWithin');
 
 /***/ },
 /* 59 */
@@ -40466,7 +40466,7 @@
 	    return O;
 	  }
 	});
-	__webpack_require__(100)('fill');
+	__webpack_require__(101)('fill');
 
 /***/ },
 /* 60 */
@@ -40477,7 +40477,7 @@
 	  // 22.1.3.8 Array.prototype.find(predicate, thisArg = undefined)
 	  find: __webpack_require__(87)(5)
 	});
-	__webpack_require__(100)('find');
+	__webpack_require__(101)('find');
 
 /***/ },
 /* 61 */
@@ -40488,7 +40488,7 @@
 	  // 22.1.3.9 Array.prototype.findIndex(predicate, thisArg = undefined)
 	  findIndex: __webpack_require__(87)(6)
 	});
-	__webpack_require__(100)('findIndex');
+	__webpack_require__(101)('findIndex');
 
 /***/ },
 /* 62 */
@@ -40523,7 +40523,7 @@
 	    get: __webpack_require__(91)(/^.*\/(\w*)$/, '$1')
 	  });
 	}
-	__webpack_require__(101)(RegExp);
+	__webpack_require__(100)(RegExp);
 
 /***/ },
 /* 63 */
@@ -40685,7 +40685,7 @@
 	// export
 	$def($def.G + $def.W + $def.F * (P != Base), {Promise: P});
 	cof.set(P, PROMISE);
-	__webpack_require__(101)(P);
+	__webpack_require__(100)(P);
 
 	// statics
 	$def($def.S, PROMISE, {
@@ -40975,7 +40975,7 @@
 	$def($def.P, 'Array', {
 	  includes: __webpack_require__(90)(true)
 	});
-	__webpack_require__(100)('includes');
+	__webpack_require__(101)('includes');
 
 /***/ },
 /* 70 */
@@ -41239,7 +41239,7 @@
 /* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays = __webpack_require__(22);
+	var arrays = __webpack_require__(21);
 
 	/* AST utilities. */
 	var asts = {
@@ -41259,8 +41259,8 @@
 /* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var objects = __webpack_require__(23),
-	    arrays  = __webpack_require__(22);
+	var objects = __webpack_require__(22),
+	    arrays  = __webpack_require__(21);
 
 	/* Simple AST node visitor builder. */
 	var visitor = {
@@ -41928,24 +41928,24 @@
 /* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// 22.1.3.31 Array.prototype[@@unscopables]
-	var $           = __webpack_require__(79)
-	  , UNSCOPABLES = __webpack_require__(93)('unscopables');
-	if($.FW && !(UNSCOPABLES in []))$.hide(Array.prototype, UNSCOPABLES, {});
-	module.exports = function(key){
-	  if($.FW)[][UNSCOPABLES][key] = true;
-	};
-
-/***/ },
-/* 101 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var $ = __webpack_require__(79);
 	module.exports = function(C){
 	  if($.DESC && $.FW)$.setDesc(C, __webpack_require__(93)('species'), {
 	    configurable: true,
 	    get: $.that
 	  });
+	};
+
+/***/ },
+/* 101 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 22.1.3.31 Array.prototype[@@unscopables]
+	var $           = __webpack_require__(79)
+	  , UNSCOPABLES = __webpack_require__(93)('unscopables');
+	if($.FW && !(UNSCOPABLES in []))$.hide(Array.prototype, UNSCOPABLES, {});
+	module.exports = function(key){
+	  if($.FW)[][UNSCOPABLES][key] = true;
 	};
 
 /***/ },
@@ -42249,7 +42249,7 @@
 	  }
 
 	  __webpack_require__(84).set(C, NAME);
-	  __webpack_require__(101)(C);
+	  __webpack_require__(100)(C);
 
 	  O[NAME] = C;
 	  $def($def.G + $def.W + $def.F * (C != Base), O);

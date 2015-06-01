@@ -1,20 +1,21 @@
 draw: { ?x ?y
-  radius: 20
+  circle-radius: 20
 
   clear-screen()
   draw-filled-circle(add(220 x)
                      add(200 y)
-                     radius
+                     circle-radius
                      "blue")
 }
 
 angle: 0
 
 forever({
-  orbit-radius: 100
-  angle-step: 0.05
-  angle: add(angle angle-step)
+  radius-of-circle-orbit: 100
+  circle-angle-change: 0.05
 
-  draw(multiply(orbit-radius cosine(angle))
-       multiply(orbit-radius sine(angle)))
+  angle: add(angle circle-angle-change)
+
+  draw(multiply(radius-of-circle-orbit cosine(angle))
+       multiply(radius-of-circle-orbit sine(angle)))
 })
