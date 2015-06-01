@@ -21213,10 +21213,6 @@
 	  throw "Looking for failed token but code parsed";
 	};
 
-	function isWhitespace(c) {
-	  return c.match(/[ \t\r]/);
-	};
-
 	function eventsToTree(_x, _x2) {
 	  var _again = true;
 

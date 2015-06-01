@@ -48,10 +48,6 @@ function failedToken(code) {
   throw "Looking for failed token but code parsed";
 };
 
-function isWhitespace(c) {
-  return c.match(/[ \t\r]/);
-};
-
 function eventsToTree(evs, node) {
   function createNode(ev, parent) {
     return { rule: ev.rule, i: ev.offset, parent: parent, children: [] };
