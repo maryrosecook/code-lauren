@@ -12,6 +12,22 @@
       "stack":   ["do", "do_continue", "nl"],
       "failedToken":   "\\(\\)",
       "message": "There should be no spaces between\nthe name of the action and the ()"
+    },
+
+    {
+      "code":    "a: ",
+      "stack":   ["assignment", "expression", "parenthetical", "invocation",
+                  "function", "label", "label_char"],
+      "failedToken":   "$",
+      "message": "Naming a value. You have specified a name, but you also need a value."
+    },
+
+    {
+      "code":    "a: \n",
+      "stack":   ["assignment", "expression", "parenthetical", "invocation",
+                  "function", "label", "label_char"],
+      "failedToken":   "\n",
+      "message": "Naming a value. You have specified a name, but you also need a value."
     }
   ]
 }

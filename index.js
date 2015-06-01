@@ -46,9 +46,9 @@
 
 	"use strict";
 
-	var _ = __webpack_require__(7);
+	var _ = __webpack_require__(8);
 
-	__webpack_require__(8);
+	__webpack_require__(7);
 
 	var parser = __webpack_require__(1);
 	var interpret = __webpack_require__(2);
@@ -151,7 +151,7 @@
 
 	var peg = __webpack_require__(19);
 
-	var _ = __webpack_require__(7);
+	var _ = __webpack_require__(8);
 	var util = __webpack_require__(9);
 	var parserStateError = __webpack_require__(16);
 
@@ -270,7 +270,7 @@
 	"use strict";
 
 	var marked0$0 = [listStar, trampoline, interpretInvocation, interpretDo, interpretTop, interpretAssignment, interpretConditional, interpret].map(regeneratorRuntime.mark);
-	var _ = __webpack_require__(7);
+	var _ = __webpack_require__(8);
 	var util = __webpack_require__(9);
 
 	var standardLibrary = __webpack_require__(13);
@@ -759,7 +759,7 @@
 	"use strict";
 
 	var $ = __webpack_require__(17);
-	var _ = __webpack_require__(7);
+	var _ = __webpack_require__(8);
 	var range = ace.acequire("ace/range");
 
 	var parser = __webpack_require__(1);
@@ -847,6 +847,13 @@
 
 /***/ },
 /* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(18);
+
+
+/***/ },
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.2
@@ -2388,13 +2395,6 @@
 
 
 /***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(18);
-
-
-/***/ },
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2567,7 +2567,7 @@
 
 	"use strict";
 
-	var _ = __webpack_require__(7);
+	var _ = __webpack_require__(8);
 	var interpreter = __webpack_require__(2);
 
 	var createStandardLibrary = module.exports = function () {
@@ -2847,7 +2847,7 @@
 
 	"use strict";
 
-	var _ = __webpack_require__(7);
+	var _ = __webpack_require__(8);
 
 	var canvasLibrary = module.exports = function (screen) {
 	  return {
@@ -6477,7 +6477,7 @@
 	};
 	init(true);function init(packaged) {
 
-	    options.packaged = packaged || acequire.packaged || module.packaged || (global.define && __webpack_require__(25).packaged);
+	    options.packaged = packaged || acequire.packaged || module.packaged || (global.define && __webpack_require__(20).packaged);
 
 	    if (!global.document)
 	        return "";
@@ -18966,7 +18966,7 @@
 
 	    try {
 	            var workerSrc = mod.src;
-	    var Blob = __webpack_require__(28);
+	    var Blob = __webpack_require__(26);
 	    var blob = new Blob([ workerSrc ], { type: 'application/javascript' });
 	    var blobUrl = (window.URL || window.webkitURL).createObjectURL(blob);
 
@@ -21167,9 +21167,9 @@
 
 	var peg = __webpack_require__(19);
 
-	var _ = __webpack_require__(7);
+	var _ = __webpack_require__(8);
 
-	var examples = JSON.parse("{\n  \"examples\": [\n    {\n      \"code\":    \"a b\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"failedToken\":   \"[a-zA-Z0-9_\\\\-]+\",\n      \"message\": \"Expected this to be on a new line\"\n    },\n\n    {\n      \"code\":    \"a ()\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"failedToken\":   \"\\\\(\\\\)\",\n      \"message\": \"There should be no spaces between\\nthe name of the action and the ()\"\n    }\n  ]\n}\n").examples;
+	var examples = JSON.parse("{\n  \"examples\": [\n    {\n      \"code\":    \"a b\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"failedToken\":   \"[a-zA-Z0-9_\\\\-]+\",\n      \"message\": \"Expected this to be on a new line\"\n    },\n\n    {\n      \"code\":    \"a ()\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"failedToken\":   \"\\\\(\\\\)\",\n      \"message\": \"There should be no spaces between\\nthe name of the action and the ()\"\n    },\n\n    {\n      \"code\":    \"a: \",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"failedToken\":   \"$\",\n      \"message\": \"Naming a value. You have specified a name, but you also need a value.\"\n    },\n\n    {\n      \"code\":    \"a: \\n\",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"failedToken\":   \"\\n\",\n      \"message\": \"Naming a value. You have specified a name, but you also need a value.\"\n    }\n  ]\n}\n").examples;
 
 	var pegParseTrace = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, i: offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), offset); }\n  / __*\n    { return node(\"do\", [], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.i = offset; return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true, trace: true }).parse;
 
@@ -21204,7 +21204,7 @@
 	  try {
 	    pegParseNoTrace(code);
 	  } catch (e) {
-	    return code.slice(e.offset).match(/^[\s]*([^\s]*)/)[1];
+	    return code.slice(e.offset);
 	  }
 
 	  throw "Looking for failed token but code parsed";
@@ -31695,25 +31695,25 @@
 	}
 	global._babelPolyfill = true;
 
-	__webpack_require__(26);
-
 	__webpack_require__(27);
+
+	__webpack_require__(28);
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(20),
-	    objects = __webpack_require__(21);
+	var arrays  = __webpack_require__(21),
+	    objects = __webpack_require__(22);
 
 	var PEG = {
 	  /* PEG.js version (uses semantic versioning). */
 	  VERSION: "0.8.0",
 
-	  GrammarError: __webpack_require__(22),
-	  parser:       __webpack_require__(23),
-	  compiler:     __webpack_require__(24),
+	  GrammarError: __webpack_require__(23),
+	  parser:       __webpack_require__(24),
+	  compiler:     __webpack_require__(25),
 
 	  /*
 	   * Generates a parser from a specified grammar and returns it.
@@ -31761,6 +31761,13 @@
 
 /***/ },
 /* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = function() { throw new Error("define cannot be used indirect"); };
+
+
+/***/ },
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* Array utilities. */
@@ -31848,7 +31855,7 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* Object utilities. */
@@ -31906,7 +31913,7 @@
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var classes = __webpack_require__(29);
@@ -31923,7 +31930,7 @@
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = (function() {
@@ -36833,11 +36840,11 @@
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(20),
-	    objects = __webpack_require__(21);
+	var arrays  = __webpack_require__(21),
+	    objects = __webpack_require__(22);
 
 	var compiler = {
 	  /*
@@ -36896,14 +36903,42 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = function() { throw new Error("define cannot be used indirect"); };
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = get_blob()
 
+	function get_blob() {
+	  if(global.Blob) {
+	    try {
+	      new Blob(['asdf'], {type: 'text/plain'})
+	      return Blob
+	    } catch(err) {}
+	  }
+
+	  var Builder = global.WebKitBlobBuilder ||
+	                global.MozBlobBuilder ||
+	                global.MSBlobBuilder
+
+	  return function(parts, bag) {
+	    var builder = new Builder
+	      , endings = bag.endings
+	      , type = bag.type
+
+	    if(endings) for(var i = 0, len = parts.length; i < len; ++i) {
+	      builder.append(parts[i], endings)
+	    } else for(var i = 0, len = parts.length; i < len; ++i) {
+	      builder.append(parts[i])
+	    }
+
+	    return type ? builder.getBlob(type) : builder.getBlob()
+	  }
+	}
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(35);
@@ -36953,7 +36988,7 @@
 	module.exports = __webpack_require__(79).core;
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -37524,41 +37559,6 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {module.exports = get_blob()
-
-	function get_blob() {
-	  if(global.Blob) {
-	    try {
-	      new Blob(['asdf'], {type: 'text/plain'})
-	      return Blob
-	    } catch(err) {}
-	  }
-
-	  var Builder = global.WebKitBlobBuilder ||
-	                global.MozBlobBuilder ||
-	                global.MSBlobBuilder
-
-	  return function(parts, bag) {
-	    var builder = new Builder
-	      , endings = bag.endings
-	      , type = bag.type
-
-	    if(endings) for(var i = 0, len = parts.length; i < len; ++i) {
-	      builder.append(parts[i], endings)
-	    } else for(var i = 0, len = parts.length; i < len; ++i) {
-	      builder.append(parts[i])
-	    }
-
-	    return type ? builder.getBlob(type) : builder.getBlob()
-	  }
-	}
-
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
 /* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -37578,7 +37578,7 @@
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var GrammarError = __webpack_require__(22),
+	var GrammarError = __webpack_require__(23),
 	    asts         = __webpack_require__(80),
 	    visitor      = __webpack_require__(81);
 
@@ -37604,8 +37604,8 @@
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays       = __webpack_require__(20),
-	    GrammarError = __webpack_require__(22),
+	var arrays       = __webpack_require__(21),
+	    GrammarError = __webpack_require__(23),
 	    asts         = __webpack_require__(80),
 	    visitor      = __webpack_require__(81);
 
@@ -37640,7 +37640,7 @@
 /* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(20),
+	var arrays  = __webpack_require__(21),
 	    visitor = __webpack_require__(81);
 
 	/*
@@ -37686,8 +37686,8 @@
 /* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(20),
-	    objects = __webpack_require__(21),
+	var arrays  = __webpack_require__(21),
+	    objects = __webpack_require__(22),
 	    asts    = __webpack_require__(80),
 	    visitor = __webpack_require__(81),
 	    op      = __webpack_require__(82),
@@ -38308,7 +38308,7 @@
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays = __webpack_require__(20),
+	var arrays = __webpack_require__(21),
 	    asts   = __webpack_require__(80),
 	    op     = __webpack_require__(82),
 	    js     = __webpack_require__(83);
@@ -39748,7 +39748,7 @@
 	  , setTag   = __webpack_require__(84).set
 	  , uid      = __webpack_require__(88)
 	  , $def     = __webpack_require__(85)
-	  , keyOf    = __webpack_require__(92)
+	  , keyOf    = __webpack_require__(93)
 	  , has      = $.has
 	  , hide     = $.hide
 	  , getNames = $.getNames
@@ -39814,7 +39814,7 @@
 	    'hasInstance,isConcatSpreadable,iterator,match,replace,search,' +
 	    'species,split,toPrimitive,toStringTag,unscopables'
 	  ).split(','), function(it){
-	    var sym = __webpack_require__(93)(it);
+	    var sym = __webpack_require__(94)(it);
 	    symbolStatics[it] = Symbol === Base ? sym : wrap(sym);
 	  }
 	);
@@ -39850,7 +39850,7 @@
 
 	// 19.1.3.1 Object.assign(target, source)
 	var $def = __webpack_require__(85);
-	$def($def.S, 'Object', {assign: __webpack_require__(94)});
+	$def($def.S, 'Object', {assign: __webpack_require__(92)});
 
 /***/ },
 /* 38 */
@@ -39881,7 +39881,7 @@
 	var $   = __webpack_require__(79)
 	  , cof = __webpack_require__(84)
 	  , tmp = {};
-	tmp[__webpack_require__(93)('toStringTag')] = 'z';
+	tmp[__webpack_require__(94)('toStringTag')] = 'z';
 	if($.FW && cof(tmp) != 'z')$.hide(Object.prototype, 'toString', function toString(){
 	  return '[object ' + cof.classof(this) + ']';
 	});
@@ -40555,13 +40555,13 @@
 	  , $def    = __webpack_require__(85)
 	  , assert  = __webpack_require__(89)
 	  , $iter   = __webpack_require__(97)
-	  , SPECIES = __webpack_require__(93)('species')
+	  , SPECIES = __webpack_require__(94)('species')
 	  , RECORD  = __webpack_require__(88).safe('record')
 	  , forOf   = $iter.forOf
 	  , PROMISE = 'Promise'
 	  , global  = $.g
 	  , process = global.process
-	  , asap    = process && process.nextTick || __webpack_require__(105).set
+	  , asap    = process && process.nextTick || __webpack_require__(102).set
 	  , P       = global[PROMISE]
 	  , Base    = P
 	  , isFunction     = $.isFunction
@@ -40758,10 +40758,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var strong = __webpack_require__(104);
+	var strong = __webpack_require__(103);
 
 	// 23.1 Map Objects
-	__webpack_require__(103)('Map', {
+	__webpack_require__(104)('Map', {
 	  // 23.1.3.6 Map.prototype.get(key)
 	  get: function get(key){
 	    var entry = strong.getEntry(this, key);
@@ -40778,10 +40778,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var strong = __webpack_require__(104);
+	var strong = __webpack_require__(103);
 
 	// 23.2 Set Objects
-	__webpack_require__(103)('Set', {
+	__webpack_require__(104)('Set', {
 	  // 23.2.3.1 Set.prototype.add(value)
 	  add: function add(value){
 	    return strong.def(this, value = value === 0 ? 0 : value, value);
@@ -40794,7 +40794,7 @@
 
 	'use strict';
 	var $         = __webpack_require__(79)
-	  , weak      = __webpack_require__(102)
+	  , weak      = __webpack_require__(105)
 	  , leakStore = weak.leakStore
 	  , ID        = weak.ID
 	  , WEAK      = weak.WEAK
@@ -40804,7 +40804,7 @@
 	  , tmp       = {};
 
 	// 23.3 WeakMap Objects
-	var WeakMap = __webpack_require__(103)('WeakMap', {
+	var WeakMap = __webpack_require__(104)('WeakMap', {
 	  // 23.3.3.3 WeakMap.prototype.get(key)
 	  get: function get(key){
 	    if(isObject(key)){
@@ -40838,10 +40838,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var weak = __webpack_require__(102);
+	var weak = __webpack_require__(105);
 
 	// 23.4 WeakSet Objects
-	__webpack_require__(103)('WeakSet', {
+	__webpack_require__(104)('WeakSet', {
 	  // 23.4.3.1 WeakSet.prototype.add(value)
 	  add: function add(value){
 	    return weak.def(this, value, true);
@@ -41127,7 +41127,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $def  = __webpack_require__(85)
-	  , $task = __webpack_require__(105);
+	  , $task = __webpack_require__(102);
 	$def($def.G + $def.B, {
 	  setImmediate:   $task.set,
 	  clearImmediate: $task.clear
@@ -41140,7 +41140,7 @@
 	__webpack_require__(56);
 	var $           = __webpack_require__(79)
 	  , Iterators   = __webpack_require__(97).Iterators
-	  , ITERATOR    = __webpack_require__(93)('iterator')
+	  , ITERATOR    = __webpack_require__(94)('iterator')
 	  , ArrayValues = Iterators.Array
 	  , NodeList    = $.g.NodeList;
 	if($.FW && NodeList && !(ITERATOR in NodeList.prototype)){
@@ -41258,7 +41258,7 @@
 /* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays = __webpack_require__(20);
+	var arrays = __webpack_require__(21);
 
 	/* AST utilities. */
 	var asts = {
@@ -41278,8 +41278,8 @@
 /* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var objects = __webpack_require__(21),
-	    arrays  = __webpack_require__(20);
+	var objects = __webpack_require__(22),
+	    arrays  = __webpack_require__(21);
 
 	/* Simple AST node visitor builder. */
 	var visitor = {
@@ -41473,7 +41473,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $        = __webpack_require__(79)
-	  , TAG      = __webpack_require__(93)('toStringTag')
+	  , TAG      = __webpack_require__(94)('toStringTag')
 	  , toString = {}.toString;
 	function cof(it){
 	  return toString.call(it).slice(8, -1);
@@ -41681,31 +41681,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $ = __webpack_require__(79);
-	module.exports = function(object, el){
-	  var O      = $.toObject(object)
-	    , keys   = $.getKeys(O)
-	    , length = keys.length
-	    , index  = 0
-	    , key;
-	  while(length > index)if(O[key = keys[index++]] === el)return key;
-	};
-
-/***/ },
-/* 93 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var global = __webpack_require__(79).g
-	  , store  = {};
-	module.exports = function(name){
-	  return store[name] || (store[name] =
-	    global.Symbol && global.Symbol[name] || __webpack_require__(88).safe('Symbol.' + name));
-	};
-
-/***/ },
-/* 94 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var $ = __webpack_require__(79);
 	// 19.1.2.1 Object.assign(target, source, ...)
 	/*eslint-disable no-unused-vars */
 	module.exports = Object.assign || function assign(target, source){
@@ -41722,6 +41697,31 @@
 	    while(length > j)T[key = keys[j++]] = S[key];
 	  }
 	  return T;
+	};
+
+/***/ },
+/* 93 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(79);
+	module.exports = function(object, el){
+	  var O      = $.toObject(object)
+	    , keys   = $.getKeys(O)
+	    , length = keys.length
+	    , index  = 0
+	    , key;
+	  while(length > index)if(O[key = keys[index++]] === el)return key;
+	};
+
+/***/ },
+/* 94 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var global = __webpack_require__(79).g
+	  , store  = {};
+	module.exports = function(name){
+	  return store[name] || (store[name] =
+	    global.Symbol && global.Symbol[name] || __webpack_require__(88).safe('Symbol.' + name));
 	};
 
 /***/ },
@@ -41787,7 +41787,7 @@
 	  , cof               = __webpack_require__(84)
 	  , $def              = __webpack_require__(85)
 	  , assertObject      = __webpack_require__(89).obj
-	  , SYMBOL_ITERATOR   = __webpack_require__(93)('iterator')
+	  , SYMBOL_ITERATOR   = __webpack_require__(94)('iterator')
 	  , FF_ITERATOR       = '@@iterator'
 	  , Iterators         = {}
 	  , IteratorPrototype = {};
@@ -41923,7 +41923,7 @@
 /* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var SYMBOL_ITERATOR = __webpack_require__(93)('iterator')
+	var SYMBOL_ITERATOR = __webpack_require__(94)('iterator')
 	  , SAFE_CLOSING    = false;
 	try {
 	  var riter = [7][SYMBOL_ITERATOR]();
@@ -41949,7 +41949,7 @@
 
 	// 22.1.3.31 Array.prototype[@@unscopables]
 	var $           = __webpack_require__(79)
-	  , UNSCOPABLES = __webpack_require__(93)('unscopables');
+	  , UNSCOPABLES = __webpack_require__(94)('unscopables');
 	if($.FW && !(UNSCOPABLES in []))$.hide(Array.prototype, UNSCOPABLES, {});
 	module.exports = function(key){
 	  if($.FW)[][UNSCOPABLES][key] = true;
@@ -41961,7 +41961,7 @@
 
 	var $ = __webpack_require__(79);
 	module.exports = function(C){
-	  if($.DESC && $.FW)$.setDesc(C, __webpack_require__(93)('species'), {
+	  if($.DESC && $.FW)$.setDesc(C, __webpack_require__(94)('species'), {
 	    configurable: true,
 	    get: $.that
 	  });
@@ -41972,163 +41972,89 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $         = __webpack_require__(79)
-	  , safe      = __webpack_require__(88).safe
-	  , assert    = __webpack_require__(89)
-	  , forOf     = __webpack_require__(97).forOf
-	  , _has      = $.has
-	  , isObject  = $.isObject
-	  , hide      = $.hide
-	  , isFrozen  = Object.isFrozen || $.core.Object.isFrozen
-	  , id        = 0
-	  , ID        = safe('id')
-	  , WEAK      = safe('weak')
-	  , LEAK      = safe('leak')
-	  , method    = __webpack_require__(87)
-	  , find      = method(5)
-	  , findIndex = method(6);
-	function findFrozen(store, key){
-	  return find.call(store.array, function(it){
-	    return it[0] === key;
-	  });
+	var $      = __webpack_require__(79)
+	  , ctx    = __webpack_require__(98)
+	  , cof    = __webpack_require__(84)
+	  , invoke = __webpack_require__(86)
+	  , global             = $.g
+	  , isFunction         = $.isFunction
+	  , html               = $.html
+	  , document           = global.document
+	  , process            = global.process
+	  , setTask            = global.setImmediate
+	  , clearTask          = global.clearImmediate
+	  , postMessage        = global.postMessage
+	  , addEventListener   = global.addEventListener
+	  , MessageChannel     = global.MessageChannel
+	  , counter            = 0
+	  , queue              = {}
+	  , ONREADYSTATECHANGE = 'onreadystatechange'
+	  , defer, channel, port;
+	function run(){
+	  var id = +this;
+	  if($.has(queue, id)){
+	    var fn = queue[id];
+	    delete queue[id];
+	    fn();
+	  }
 	}
-	// fallback for frozen keys
-	function leakStore(that){
-	  return that[LEAK] || hide(that, LEAK, {
-	    array: [],
-	    get: function(key){
-	      var entry = findFrozen(this, key);
-	      if(entry)return entry[1];
-	    },
-	    has: function(key){
-	      return !!findFrozen(this, key);
-	    },
-	    set: function(key, value){
-	      var entry = findFrozen(this, key);
-	      if(entry)entry[1] = value;
-	      else this.array.push([key, value]);
-	    },
-	    'delete': function(key){
-	      var index = findIndex.call(this.array, function(it){
-	        return it[0] === key;
-	      });
-	      if(~index)this.array.splice(index, 1);
-	      return !!~index;
-	    }
-	  })[LEAK];
+	function listner(event){
+	  run.call(event.data);
 	}
-
+	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
+	if(!isFunction(setTask) || !isFunction(clearTask)){
+	  setTask = function(fn){
+	    var args = [], i = 1;
+	    while(arguments.length > i)args.push(arguments[i++]);
+	    queue[++counter] = function(){
+	      invoke(isFunction(fn) ? fn : Function(fn), args);
+	    };
+	    defer(counter);
+	    return counter;
+	  };
+	  clearTask = function(id){
+	    delete queue[id];
+	  };
+	  // Node.js 0.8-
+	  if(cof(process) == 'process'){
+	    defer = function(id){
+	      process.nextTick(ctx(run, id, 1));
+	    };
+	  // Modern browsers, skip implementation for WebWorkers
+	  // IE8 has postMessage, but it's sync & typeof its postMessage is object
+	  } else if(addEventListener && isFunction(postMessage) && !global.importScripts){
+	    defer = function(id){
+	      postMessage(id, '*');
+	    };
+	    addEventListener('message', listner, false);
+	  // WebWorkers
+	  } else if(isFunction(MessageChannel)){
+	    channel = new MessageChannel;
+	    port    = channel.port2;
+	    channel.port1.onmessage = listner;
+	    defer = ctx(port.postMessage, port, 1);
+	  // IE8-
+	  } else if(document && ONREADYSTATECHANGE in document.createElement('script')){
+	    defer = function(id){
+	      html.appendChild(document.createElement('script'))[ONREADYSTATECHANGE] = function(){
+	        html.removeChild(this);
+	        run.call(id);
+	      };
+	    };
+	  // Rest old browsers
+	  } else {
+	    defer = function(id){
+	      setTimeout(ctx(run, id, 1), 0);
+	    };
+	  }
+	}
 	module.exports = {
-	  getConstructor: function(NAME, IS_MAP, ADDER){
-	    function C(iterable){
-	      $.set(assert.inst(this, C, NAME), ID, id++);
-	      if(iterable != undefined)forOf(iterable, IS_MAP, this[ADDER], this);
-	    }
-	    $.mix(C.prototype, {
-	      // 23.3.3.2 WeakMap.prototype.delete(key)
-	      // 23.4.3.3 WeakSet.prototype.delete(value)
-	      'delete': function(key){
-	        if(!isObject(key))return false;
-	        if(isFrozen(key))return leakStore(this)['delete'](key);
-	        return _has(key, WEAK) && _has(key[WEAK], this[ID]) && delete key[WEAK][this[ID]];
-	      },
-	      // 23.3.3.4 WeakMap.prototype.has(key)
-	      // 23.4.3.4 WeakSet.prototype.has(value)
-	      has: function has(key){
-	        if(!isObject(key))return false;
-	        if(isFrozen(key))return leakStore(this).has(key);
-	        return _has(key, WEAK) && _has(key[WEAK], this[ID]);
-	      }
-	    });
-	    return C;
-	  },
-	  def: function(that, key, value){
-	    if(isFrozen(assert.obj(key))){
-	      leakStore(that).set(key, value);
-	    } else {
-	      _has(key, WEAK) || hide(key, WEAK, {});
-	      key[WEAK][that[ID]] = value;
-	    } return that;
-	  },
-	  leakStore: leakStore,
-	  WEAK: WEAK,
-	  ID: ID
+	  set:   setTask,
+	  clear: clearTask
 	};
 
 /***/ },
 /* 103 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var $     = __webpack_require__(79)
-	  , $def  = __webpack_require__(85)
-	  , $iter = __webpack_require__(97)
-	  , assertInstance = __webpack_require__(89).inst;
-
-	module.exports = function(NAME, methods, common, IS_MAP, isWeak){
-	  var Base  = $.g[NAME]
-	    , C     = Base
-	    , ADDER = IS_MAP ? 'set' : 'add'
-	    , proto = C && C.prototype
-	    , O     = {};
-	  function fixMethod(KEY, CHAIN){
-	    var method = proto[KEY];
-	    if($.FW)proto[KEY] = function(a, b){
-	      var result = method.call(this, a === 0 ? 0 : a, b);
-	      return CHAIN ? this : result;
-	    };
-	  }
-	  if(!$.isFunction(C) || !(isWeak || !$iter.BUGGY && proto.forEach && proto.entries)){
-	    // create collection constructor
-	    C = common.getConstructor(NAME, IS_MAP, ADDER);
-	    $.mix(C.prototype, methods);
-	  } else {
-	    var inst  = new C
-	      , chain = inst[ADDER](isWeak ? {} : -0, 1)
-	      , buggyZero;
-	    // wrap for init collections from iterable
-	    if(!__webpack_require__(99)(function(iter){ new C(iter); })){ // eslint-disable-line no-new
-	      C = function(iterable){
-	        assertInstance(this, C, NAME);
-	        var that = new Base;
-	        if(iterable != undefined)$iter.forOf(iterable, IS_MAP, that[ADDER], that);
-	        return that;
-	      };
-	      C.prototype = proto;
-	      if($.FW)proto.constructor = C;
-	    }
-	    isWeak || inst.forEach(function(val, key){
-	      buggyZero = 1 / key === -Infinity;
-	    });
-	    // fix converting -0 key to +0
-	    if(buggyZero){
-	      fixMethod('delete');
-	      fixMethod('has');
-	      IS_MAP && fixMethod('get');
-	    }
-	    // + fix .add & .set for chaining
-	    if(buggyZero || chain !== inst)fixMethod(ADDER, true);
-	  }
-
-	  __webpack_require__(84).set(C, NAME);
-	  __webpack_require__(101)(C);
-
-	  O[NAME] = C;
-	  $def($def.G + $def.W + $def.F * (C != Base), O);
-
-	  // add .keys, .values, .entries, [@@iterator]
-	  // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
-	  if(!isWeak)$iter.std(
-	    C, NAME,
-	    common.getIterConstructor(), common.next,
-	    IS_MAP ? 'key+value' : 'value' , !IS_MAP, true
-	  );
-
-	  return C;
-	};
-
-/***/ },
-/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -42287,89 +42213,163 @@
 	};
 
 /***/ },
+/* 104 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $     = __webpack_require__(79)
+	  , $def  = __webpack_require__(85)
+	  , $iter = __webpack_require__(97)
+	  , assertInstance = __webpack_require__(89).inst;
+
+	module.exports = function(NAME, methods, common, IS_MAP, isWeak){
+	  var Base  = $.g[NAME]
+	    , C     = Base
+	    , ADDER = IS_MAP ? 'set' : 'add'
+	    , proto = C && C.prototype
+	    , O     = {};
+	  function fixMethod(KEY, CHAIN){
+	    var method = proto[KEY];
+	    if($.FW)proto[KEY] = function(a, b){
+	      var result = method.call(this, a === 0 ? 0 : a, b);
+	      return CHAIN ? this : result;
+	    };
+	  }
+	  if(!$.isFunction(C) || !(isWeak || !$iter.BUGGY && proto.forEach && proto.entries)){
+	    // create collection constructor
+	    C = common.getConstructor(NAME, IS_MAP, ADDER);
+	    $.mix(C.prototype, methods);
+	  } else {
+	    var inst  = new C
+	      , chain = inst[ADDER](isWeak ? {} : -0, 1)
+	      , buggyZero;
+	    // wrap for init collections from iterable
+	    if(!__webpack_require__(99)(function(iter){ new C(iter); })){ // eslint-disable-line no-new
+	      C = function(iterable){
+	        assertInstance(this, C, NAME);
+	        var that = new Base;
+	        if(iterable != undefined)$iter.forOf(iterable, IS_MAP, that[ADDER], that);
+	        return that;
+	      };
+	      C.prototype = proto;
+	      if($.FW)proto.constructor = C;
+	    }
+	    isWeak || inst.forEach(function(val, key){
+	      buggyZero = 1 / key === -Infinity;
+	    });
+	    // fix converting -0 key to +0
+	    if(buggyZero){
+	      fixMethod('delete');
+	      fixMethod('has');
+	      IS_MAP && fixMethod('get');
+	    }
+	    // + fix .add & .set for chaining
+	    if(buggyZero || chain !== inst)fixMethod(ADDER, true);
+	  }
+
+	  __webpack_require__(84).set(C, NAME);
+	  __webpack_require__(101)(C);
+
+	  O[NAME] = C;
+	  $def($def.G + $def.W + $def.F * (C != Base), O);
+
+	  // add .keys, .values, .entries, [@@iterator]
+	  // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
+	  if(!isWeak)$iter.std(
+	    C, NAME,
+	    common.getIterConstructor(), common.next,
+	    IS_MAP ? 'key+value' : 'value' , !IS_MAP, true
+	  );
+
+	  return C;
+	};
+
+/***/ },
 /* 105 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $      = __webpack_require__(79)
-	  , ctx    = __webpack_require__(98)
-	  , cof    = __webpack_require__(84)
-	  , invoke = __webpack_require__(86)
-	  , global             = $.g
-	  , isFunction         = $.isFunction
-	  , html               = $.html
-	  , document           = global.document
-	  , process            = global.process
-	  , setTask            = global.setImmediate
-	  , clearTask          = global.clearImmediate
-	  , postMessage        = global.postMessage
-	  , addEventListener   = global.addEventListener
-	  , MessageChannel     = global.MessageChannel
-	  , counter            = 0
-	  , queue              = {}
-	  , ONREADYSTATECHANGE = 'onreadystatechange'
-	  , defer, channel, port;
-	function run(){
-	  var id = +this;
-	  if($.has(queue, id)){
-	    var fn = queue[id];
-	    delete queue[id];
-	    fn();
-	  }
+	var $         = __webpack_require__(79)
+	  , safe      = __webpack_require__(88).safe
+	  , assert    = __webpack_require__(89)
+	  , forOf     = __webpack_require__(97).forOf
+	  , _has      = $.has
+	  , isObject  = $.isObject
+	  , hide      = $.hide
+	  , isFrozen  = Object.isFrozen || $.core.Object.isFrozen
+	  , id        = 0
+	  , ID        = safe('id')
+	  , WEAK      = safe('weak')
+	  , LEAK      = safe('leak')
+	  , method    = __webpack_require__(87)
+	  , find      = method(5)
+	  , findIndex = method(6);
+	function findFrozen(store, key){
+	  return find.call(store.array, function(it){
+	    return it[0] === key;
+	  });
 	}
-	function listner(event){
-	  run.call(event.data);
+	// fallback for frozen keys
+	function leakStore(that){
+	  return that[LEAK] || hide(that, LEAK, {
+	    array: [],
+	    get: function(key){
+	      var entry = findFrozen(this, key);
+	      if(entry)return entry[1];
+	    },
+	    has: function(key){
+	      return !!findFrozen(this, key);
+	    },
+	    set: function(key, value){
+	      var entry = findFrozen(this, key);
+	      if(entry)entry[1] = value;
+	      else this.array.push([key, value]);
+	    },
+	    'delete': function(key){
+	      var index = findIndex.call(this.array, function(it){
+	        return it[0] === key;
+	      });
+	      if(~index)this.array.splice(index, 1);
+	      return !!~index;
+	    }
+	  })[LEAK];
 	}
-	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
-	if(!isFunction(setTask) || !isFunction(clearTask)){
-	  setTask = function(fn){
-	    var args = [], i = 1;
-	    while(arguments.length > i)args.push(arguments[i++]);
-	    queue[++counter] = function(){
-	      invoke(isFunction(fn) ? fn : Function(fn), args);
-	    };
-	    defer(counter);
-	    return counter;
-	  };
-	  clearTask = function(id){
-	    delete queue[id];
-	  };
-	  // Node.js 0.8-
-	  if(cof(process) == 'process'){
-	    defer = function(id){
-	      process.nextTick(ctx(run, id, 1));
-	    };
-	  // Modern browsers, skip implementation for WebWorkers
-	  // IE8 has postMessage, but it's sync & typeof its postMessage is object
-	  } else if(addEventListener && isFunction(postMessage) && !global.importScripts){
-	    defer = function(id){
-	      postMessage(id, '*');
-	    };
-	    addEventListener('message', listner, false);
-	  // WebWorkers
-	  } else if(isFunction(MessageChannel)){
-	    channel = new MessageChannel;
-	    port    = channel.port2;
-	    channel.port1.onmessage = listner;
-	    defer = ctx(port.postMessage, port, 1);
-	  // IE8-
-	  } else if(document && ONREADYSTATECHANGE in document.createElement('script')){
-	    defer = function(id){
-	      html.appendChild(document.createElement('script'))[ONREADYSTATECHANGE] = function(){
-	        html.removeChild(this);
-	        run.call(id);
-	      };
-	    };
-	  // Rest old browsers
-	  } else {
-	    defer = function(id){
-	      setTimeout(ctx(run, id, 1), 0);
-	    };
-	  }
-	}
+
 	module.exports = {
-	  set:   setTask,
-	  clear: clearTask
+	  getConstructor: function(NAME, IS_MAP, ADDER){
+	    function C(iterable){
+	      $.set(assert.inst(this, C, NAME), ID, id++);
+	      if(iterable != undefined)forOf(iterable, IS_MAP, this[ADDER], this);
+	    }
+	    $.mix(C.prototype, {
+	      // 23.3.3.2 WeakMap.prototype.delete(key)
+	      // 23.4.3.3 WeakSet.prototype.delete(value)
+	      'delete': function(key){
+	        if(!isObject(key))return false;
+	        if(isFrozen(key))return leakStore(this)['delete'](key);
+	        return _has(key, WEAK) && _has(key[WEAK], this[ID]) && delete key[WEAK][this[ID]];
+	      },
+	      // 23.3.3.4 WeakMap.prototype.has(key)
+	      // 23.4.3.4 WeakSet.prototype.has(value)
+	      has: function has(key){
+	        if(!isObject(key))return false;
+	        if(isFrozen(key))return leakStore(this).has(key);
+	        return _has(key, WEAK) && _has(key[WEAK], this[ID]);
+	      }
+	    });
+	    return C;
+	  },
+	  def: function(that, key, value){
+	    if(isFrozen(assert.obj(key))){
+	      leakStore(that).set(key, value);
+	    } else {
+	      _has(key, WEAK) || hide(key, WEAK, {});
+	      key[WEAK][that[ID]] = value;
+	    } return that;
+	  },
+	  leakStore: leakStore,
+	  WEAK: WEAK,
+	  ID: ID
 	};
 
 /***/ },
