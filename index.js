@@ -2624,7 +2624,7 @@
 	      return regeneratorRuntime.wrap(function sine$(context$2$0) {
 	        while (1) switch (context$2$0.prev = context$2$0.next) {
 	          case 0:
-	            return context$2$0.abrupt("return", Math.sin(x));
+	            return context$2$0.abrupt("return", Math.sin(lib.radians(x).next().value));
 
 	          case 1:
 	          case "end":
@@ -2637,7 +2637,7 @@
 	      return regeneratorRuntime.wrap(function cosine$(context$2$0) {
 	        while (1) switch (context$2$0.prev = context$2$0.next) {
 	          case 0:
-	            return context$2$0.abrupt("return", Math.cos(x));
+	            return context$2$0.abrupt("return", Math.cos(lib.radians(x).next().value));
 
 	          case 1:
 	          case "end":
@@ -2657,6 +2657,19 @@
 	            return context$2$0.stop();
 	        }
 	      }, radians, this);
+	    }),
+
+	    degrees: regeneratorRuntime.mark(function degrees(x) {
+	      return regeneratorRuntime.wrap(function degrees$(context$2$0) {
+	        while (1) switch (context$2$0.prev = context$2$0.next) {
+	          case 0:
+	            return context$2$0.abrupt("return", x / 0.01745);
+
+	          case 1:
+	          case "end":
+	            return context$2$0.stop();
+	        }
+	      }, degrees, this);
 	    }),
 
 	    "new-dictionary": regeneratorRuntime.mark(function newDictionary() {
@@ -2727,10 +2740,10 @@
 	            return context$2$0.abrupt("return", true);
 
 	          case 9:
-	            return context$2$0.delegateYield(lib.equals.apply(null, args.slice(1)), "t22", 10);
+	            return context$2$0.delegateYield(lib.equals.apply(null, args.slice(1)), "t73", 10);
 
 	          case 10:
-	            return context$2$0.abrupt("return", context$2$0.t22);
+	            return context$2$0.abrupt("return", context$2$0.t73);
 
 	          case 11:
 	          case "end":
@@ -2795,10 +2808,10 @@
 	              break;
 	            }
 
-	            return context$2$0.delegateYield(fn(), "t23", 2);
+	            return context$2$0.delegateYield(fn(), "t74", 2);
 
 	          case 2:
-	            return context$2$0.delegateYield(__webpack_require__(2).trampoline(context$2$0.t23), "t24", 3);
+	            return context$2$0.delegateYield(__webpack_require__(2).trampoline(context$2$0.t74), "t75", 3);
 
 	          case 3:
 	            context$2$0.next = 0;
