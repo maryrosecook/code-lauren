@@ -21169,7 +21169,7 @@
 
 	var _ = __webpack_require__(8);
 
-	var examples = JSON.parse("{\n  \"examples\": [\n    {\n      \"code\":    \"a b\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"nextInput\":   \"[a-zA-Z0-9_\\\\-]+\",\n      \"message\": \"Expected this to be on a new line\"\n    },\n\n    {\n      \"code\":    \"a ()\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"nextInput\":   \"\\\\(\\\\)\",\n      \"message\": \"There should be no spaces between\\nthe name of the action and the ()\"\n    },\n\n    {\n      \"code\":    \"a: \",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"nextInput\":   \"$\",\n      \"message\": \"Naming a value. You have specified a name, but you also need a value.\"\n    },\n\n    {\n      \"code\":    \"a: \\n\",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"nextInput\":   \"\\n\",\n      \"message\": \"Naming a value. You have specified a name, but you also need a value.\"\n    }\n  ]\n}\n").examples;
+	var examples = JSON.parse("{\n  \"examples\": [\n    {\n      \"code\":    \"a b\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"nextInput\":   \"[a-zA-Z0-9_\\\\-]+\",\n      \"message\": \"Expected this to be on a new line\"\n    },\n\n    {\n      \"code\":    \"a ()\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"nextInput\":   \"\\\\(\\\\)\",\n      \"message\": \"There should be no spaces between\\nthe name of the action and the ()\"\n    },\n\n    {\n      \"code\":    \"a: \",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"nextInput\":   \"$\",\n      \"message\": \"You have specified a name, but you also need a value\"\n    },\n\n    {\n      \"code\":    \"a: \\n\",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"nextInput\":   \"\\n\",\n      \"message\": \"You have specified a name, but you also need a value\"\n    }\n  ]\n}\n").examples;
 
 	var pegParseTrace = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, i: offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), offset); }\n  / __*\n    { return node(\"do\", [], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.i = offset; return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true, trace: true }).parse;
 
@@ -39748,7 +39748,7 @@
 	  , setTag   = __webpack_require__(84).set
 	  , uid      = __webpack_require__(88)
 	  , $def     = __webpack_require__(85)
-	  , keyOf    = __webpack_require__(93)
+	  , keyOf    = __webpack_require__(92)
 	  , has      = $.has
 	  , hide     = $.hide
 	  , getNames = $.getNames
@@ -39814,7 +39814,7 @@
 	    'hasInstance,isConcatSpreadable,iterator,match,replace,search,' +
 	    'species,split,toPrimitive,toStringTag,unscopables'
 	  ).split(','), function(it){
-	    var sym = __webpack_require__(94)(it);
+	    var sym = __webpack_require__(93)(it);
 	    symbolStatics[it] = Symbol === Base ? sym : wrap(sym);
 	  }
 	);
@@ -39850,7 +39850,7 @@
 
 	// 19.1.3.1 Object.assign(target, source)
 	var $def = __webpack_require__(85);
-	$def($def.S, 'Object', {assign: __webpack_require__(92)});
+	$def($def.S, 'Object', {assign: __webpack_require__(94)});
 
 /***/ },
 /* 38 */
@@ -39881,7 +39881,7 @@
 	var $   = __webpack_require__(79)
 	  , cof = __webpack_require__(84)
 	  , tmp = {};
-	tmp[__webpack_require__(94)('toStringTag')] = 'z';
+	tmp[__webpack_require__(93)('toStringTag')] = 'z';
 	if($.FW && cof(tmp) != 'z')$.hide(Object.prototype, 'toString', function toString(){
 	  return '[object ' + cof.classof(this) + ']';
 	});
@@ -40555,7 +40555,7 @@
 	  , $def    = __webpack_require__(85)
 	  , assert  = __webpack_require__(89)
 	  , $iter   = __webpack_require__(97)
-	  , SPECIES = __webpack_require__(94)('species')
+	  , SPECIES = __webpack_require__(93)('species')
 	  , RECORD  = __webpack_require__(88).safe('record')
 	  , forOf   = $iter.forOf
 	  , PROMISE = 'Promise'
@@ -41140,7 +41140,7 @@
 	__webpack_require__(56);
 	var $           = __webpack_require__(79)
 	  , Iterators   = __webpack_require__(97).Iterators
-	  , ITERATOR    = __webpack_require__(94)('iterator')
+	  , ITERATOR    = __webpack_require__(93)('iterator')
 	  , ArrayValues = Iterators.Array
 	  , NodeList    = $.g.NodeList;
 	if($.FW && NodeList && !(ITERATOR in NodeList.prototype)){
@@ -41473,7 +41473,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $        = __webpack_require__(79)
-	  , TAG      = __webpack_require__(94)('toStringTag')
+	  , TAG      = __webpack_require__(93)('toStringTag')
 	  , toString = {}.toString;
 	function cof(it){
 	  return toString.call(it).slice(8, -1);
@@ -41681,6 +41681,31 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $ = __webpack_require__(79);
+	module.exports = function(object, el){
+	  var O      = $.toObject(object)
+	    , keys   = $.getKeys(O)
+	    , length = keys.length
+	    , index  = 0
+	    , key;
+	  while(length > index)if(O[key = keys[index++]] === el)return key;
+	};
+
+/***/ },
+/* 93 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var global = __webpack_require__(79).g
+	  , store  = {};
+	module.exports = function(name){
+	  return store[name] || (store[name] =
+	    global.Symbol && global.Symbol[name] || __webpack_require__(88).safe('Symbol.' + name));
+	};
+
+/***/ },
+/* 94 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(79);
 	// 19.1.2.1 Object.assign(target, source, ...)
 	/*eslint-disable no-unused-vars */
 	module.exports = Object.assign || function assign(target, source){
@@ -41697,31 +41722,6 @@
 	    while(length > j)T[key = keys[j++]] = S[key];
 	  }
 	  return T;
-	};
-
-/***/ },
-/* 93 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var $ = __webpack_require__(79);
-	module.exports = function(object, el){
-	  var O      = $.toObject(object)
-	    , keys   = $.getKeys(O)
-	    , length = keys.length
-	    , index  = 0
-	    , key;
-	  while(length > index)if(O[key = keys[index++]] === el)return key;
-	};
-
-/***/ },
-/* 94 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var global = __webpack_require__(79).g
-	  , store  = {};
-	module.exports = function(name){
-	  return store[name] || (store[name] =
-	    global.Symbol && global.Symbol[name] || __webpack_require__(88).safe('Symbol.' + name));
 	};
 
 /***/ },
@@ -41787,7 +41787,7 @@
 	  , cof               = __webpack_require__(84)
 	  , $def              = __webpack_require__(85)
 	  , assertObject      = __webpack_require__(89).obj
-	  , SYMBOL_ITERATOR   = __webpack_require__(94)('iterator')
+	  , SYMBOL_ITERATOR   = __webpack_require__(93)('iterator')
 	  , FF_ITERATOR       = '@@iterator'
 	  , Iterators         = {}
 	  , IteratorPrototype = {};
@@ -41923,7 +41923,7 @@
 /* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var SYMBOL_ITERATOR = __webpack_require__(94)('iterator')
+	var SYMBOL_ITERATOR = __webpack_require__(93)('iterator')
 	  , SAFE_CLOSING    = false;
 	try {
 	  var riter = [7][SYMBOL_ITERATOR]();
@@ -41949,7 +41949,7 @@
 
 	// 22.1.3.31 Array.prototype[@@unscopables]
 	var $           = __webpack_require__(79)
-	  , UNSCOPABLES = __webpack_require__(94)('unscopables');
+	  , UNSCOPABLES = __webpack_require__(93)('unscopables');
 	if($.FW && !(UNSCOPABLES in []))$.hide(Array.prototype, UNSCOPABLES, {});
 	module.exports = function(key){
 	  if($.FW)[][UNSCOPABLES][key] = true;
@@ -41961,7 +41961,7 @@
 
 	var $ = __webpack_require__(79);
 	module.exports = function(C){
-	  if($.DESC && $.FW)$.setDesc(C, __webpack_require__(94)('species'), {
+	  if($.DESC && $.FW)$.setDesc(C, __webpack_require__(93)('species'), {
 	    configurable: true,
 	    get: $.that
 	  });

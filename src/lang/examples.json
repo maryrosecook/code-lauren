@@ -19,7 +19,7 @@
       "stack":   ["assignment", "expression", "parenthetical", "invocation",
                   "function", "label", "label_char"],
       "nextInput":   "$",
-      "message": "Naming a value. You have specified a name, but you also need a value."
+      "message": "You have specified a name, but you also need a value"
     },
 
     {
@@ -27,7 +27,7 @@
       "stack":   ["assignment", "expression", "parenthetical", "invocation",
                   "function", "label", "label_char"],
       "nextInput":   "\n",
-      "message": "Naming a value. You have specified a name, but you also need a value."
+      "message": "You have specified a name, but you also need a value"
     }
   ]
 }
