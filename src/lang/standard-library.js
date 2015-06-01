@@ -16,11 +16,11 @@ var createStandardLibrary = module.exports = function () {
     },
 
     sine: function*(x) {
-      return Math.sin(x);
+      return Math.sin(lib.radians(x).next().value);
     },
 
     cosine: function*(x) {
-      return Math.cos(x);
+      return Math.cos(lib.radians(x).next().value);
     },
 
     radians: function*(x) {
