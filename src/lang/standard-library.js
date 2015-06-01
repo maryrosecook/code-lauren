@@ -27,6 +27,10 @@ var createStandardLibrary = module.exports = function () {
       return 0.01745 * x;
     },
 
+    degrees: function*(x) {
+      return x / 0.01745;
+    },
+
     "new-dictionary": function*() {
       return _.object(_.filter(arguments, function(_, i) { return i % 2 === 0; }),
                       _.filter(arguments, function(_, i) { return i % 2 === 1; }));
