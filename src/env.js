@@ -2,7 +2,7 @@ var $ = require('jquery');
 
 function fillWindowWithScreen(screen) {
   screen.canvas.width = $(document).width();
-  screen.canvas.height = $(document).height() - 3;
+  screen.canvas.height = $(document).height();
 };
 
 var createEnv = module.exports = function(screen) {
