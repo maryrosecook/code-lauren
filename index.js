@@ -58,7 +58,7 @@
 	var createEnv = __webpack_require__(6);
 
 	window.addEventListener("load", function () {
-	  var editor = createEditor("draw: { ?x ?y\n  circle-radius: 20\n\n  clear-screen()\n  draw-filled-circle(add(220 x)\n                     add(200 y)\n                     circle-radius\n                     \"blue\")\n}\n\nangle: 0\n\nforever({\n  radius-of-circle-orbit: 100\n  circle-angle-change: 3\n\n  angle: add(angle circle-angle-change)\n\n  draw(multiply(radius-of-circle-orbit cosine(angle))\n       multiply(radius-of-circle-orbit sine(angle)))\n})\n");
+	  var editor = createEditor("draw: { ?x ?y\n  circle-radius: 20\n\n  clear-screen()\n  draw-filled-circle(add(220 x)\n                     add(200 y)\n                     circle-radius\n                     \"blue\")\n}\n\nangle: 0\n\nforever({\n  radius-of-circle-orbit: 100\n  circle-angle-change: 0.1\n\n  angle: add(angle circle-angle-change)\n\n  draw(multiply(radius-of-circle-orbit cosine(angle))\n       multiply(radius-of-circle-orbit sine(angle)))\n})\n");
 	  var annotator = createAnnotator(editor.getSession());
 
 	  var tickStop = start(editor, annotator);
@@ -107,6 +107,10 @@
 	  }
 	};
 
+	function timeToYieldToEventLoop(lastYield) {
+	  return new Date().getTime() - lastYield > 8;
+	};
+
 	function start(editor, annotator) {
 	  var code = editor.getValue();
 	  var screen = document.getElementById("screen").getContext("2d");
@@ -115,15 +119,21 @@
 	  annotator.clear();
 
 	  try {
-	    var ast = parse(code, annotator);
-
-	    var g = r(ast, env);
+	    var g = r(parse(code, annotator), env);
+	    var lastEventLoopYield = new Date().getTime();
 
 	    var going = true;
 	    (function tick() {
 	      if (going) {
 	        step(g);
-	        requestAnimationFrame(tick);
+	        if (timeToYieldToEventLoop(lastEventLoopYield)) {
+	          requestAnimationFrame(function () {
+	            lastEventLoopYield = new Date().getTime();
+	            tick();
+	          });
+	        } else {
+	          tick();
+	        }
 	      }
 	    })();
 
@@ -540,19 +550,15 @@
 	    return regeneratorRuntime.wrap(function callee$1$0$(context$2$0) {
 	      while (1) switch (context$2$0.prev = context$2$0.next) {
 	        case 0:
-	          context$2$0.next = 2;
-	          return null;
-
-	        case 2:
 	          lambdaArguments = args$2$0;
 	          lambdaParameters = _.pluck(ast.c[0], "c");
 	          lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
-	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t15", 6);
+	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t15", 4);
 
-	        case 6:
+	        case 4:
 	          return context$2$0.abrupt("return", context$2$0.t15);
 
-	        case 7:
+	        case 5:
 	        case "end":
 	          return context$2$0.stop();
 	      }
@@ -564,104 +570,108 @@
 	  return regeneratorRuntime.wrap(function interpret$(context$1$0) {
 	    while (1) switch (context$1$0.prev = context$1$0.next) {
 	      case 0:
+	        context$1$0.next = 2;
+	        return null;
+
+	      case 2:
 	        if (!(ast === undefined)) {
-	          context$1$0.next = 4;
+	          context$1$0.next = 6;
 	          break;
 	        }
 
 	        return context$1$0.abrupt("return");
 
-	      case 4:
+	      case 6:
 	        if (!(env === undefined)) {
-	          context$1$0.next = 9;
+	          context$1$0.next = 11;
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpret(ast, createScope(standardLibrary())), "t16", 6);
+	        return context$1$0.delegateYield(interpret(ast, createScope(standardLibrary())), "t16", 8);
 
-	      case 6:
+	      case 8:
 	        return context$1$0.abrupt("return", context$1$0.t16);
 
-	      case 9:
+	      case 11:
 	        if (!(ast.t === "top")) {
-	          context$1$0.next = 14;
+	          context$1$0.next = 16;
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretTop(ast, env), "t17", 11);
+	        return context$1$0.delegateYield(interpretTop(ast, env), "t17", 13);
 
-	      case 11:
+	      case 13:
 	        return context$1$0.abrupt("return", context$1$0.t17);
 
-	      case 14:
+	      case 16:
 	        if (!(ast.t === "lambda")) {
-	          context$1$0.next = 18;
+	          context$1$0.next = 20;
 	          break;
 	        }
 
 	        return context$1$0.abrupt("return", interpretLambdaDef(ast, env));
 
-	      case 18:
+	      case 20:
 	        if (!(ast.t === "assignment")) {
-	          context$1$0.next = 23;
+	          context$1$0.next = 25;
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t18", 20);
+	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t18", 22);
 
-	      case 20:
+	      case 22:
 	        return context$1$0.abrupt("return", context$1$0.t18);
 
-	      case 23:
+	      case 25:
 	        if (!(ast.t === "conditional")) {
-	          context$1$0.next = 28;
+	          context$1$0.next = 30;
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretConditional(ast, env), "t19", 25);
+	        return context$1$0.delegateYield(interpretConditional(ast, env), "t19", 27);
 
-	      case 25:
+	      case 27:
 	        return context$1$0.abrupt("return", context$1$0.t19);
 
-	      case 28:
+	      case 30:
 	        if (!(ast.t === "do")) {
-	          context$1$0.next = 33;
+	          context$1$0.next = 35;
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretDo(ast, env), "t20", 30);
+	        return context$1$0.delegateYield(interpretDo(ast, env), "t20", 32);
 
-	      case 30:
+	      case 32:
 	        return context$1$0.abrupt("return", context$1$0.t20);
 
-	      case 33:
+	      case 35:
 	        if (!(ast.t === "invocation")) {
-	          context$1$0.next = 38;
+	          context$1$0.next = 40;
 	          break;
 	        }
 
-	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t21", 35);
+	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t21", 37);
 
-	      case 35:
+	      case 37:
 	        return context$1$0.abrupt("return", context$1$0.t21);
 
-	      case 38:
+	      case 40:
 	        if (!(ast.t === "label")) {
-	          context$1$0.next = 42;
+	          context$1$0.next = 44;
 	          break;
 	        }
 
 	        return context$1$0.abrupt("return", env.getScopedBinding(ast.c));
 
-	      case 42:
+	      case 44:
 	        if (!(ast.t === "number" || ast.t === "string" || ast.t === "boolean")) {
-	          context$1$0.next = 44;
+	          context$1$0.next = 46;
 	          break;
 	        }
 
 	        return context$1$0.abrupt("return", ast.c);
 
-	      case 44:
+	      case 46:
 	      case "end":
 	        return context$1$0.stop();
 	    }
@@ -821,7 +831,7 @@
 
 	function fillWindowWithScreen(screen) {
 	  screen.canvas.width = $(document).width();
-	  screen.canvas.height = $(document).height() - 3;
+	  screen.canvas.height = $(document).height();
 	};
 
 	var createEnv = module.exports = function (screen) {
@@ -2850,16 +2860,54 @@
 	var _ = __webpack_require__(8);
 
 	var canvasLibrary = module.exports = function (screen) {
+	  var marked1$0 = [runCachedOperations].map(regeneratorRuntime.mark);
+
+	  var drawOperations = [];
+
+	  function runCachedOperations() {
+	    var i;
+	    return regeneratorRuntime.wrap(function runCachedOperations$(context$2$0) {
+	      while (1) switch (context$2$0.prev = context$2$0.next) {
+	        case 0:
+	          i = 0;
+
+	        case 1:
+	          if (!(i < drawOperations.length)) {
+	            context$2$0.next = 6;
+	            break;
+	          }
+
+	          return context$2$0.delegateYield(drawOperations[i](), "t87", 3);
+
+	        case 3:
+	          i++;
+	          context$2$0.next = 1;
+	          break;
+
+	        case 6:
+
+	          drawOperations = [];
+
+	        case 7:
+	        case "end":
+	          return context$2$0.stop();
+	      }
+	    }, marked1$0[0], this);
+	  };
+
 	  return {
 	    "write-text": regeneratorRuntime.mark(function writeText(str, x, y, color) {
 	      return regeneratorRuntime.wrap(function writeText$(context$2$0) {
 	        while (1) switch (context$2$0.prev = context$2$0.next) {
 	          case 0:
+	            return context$2$0.delegateYield(runCachedOperations(), "t88", 1);
+
+	          case 1:
 	            screen.font = "20px Georgia";
 	            screen.fillStyle = color;
 	            screen.fillText(str, x, y);
 
-	          case 3:
+	          case 4:
 	          case "end":
 	            return context$2$0.stop();
 	        }
@@ -2870,7 +2918,18 @@
 	      return regeneratorRuntime.wrap(function clearScreen$(context$2$0) {
 	        while (1) switch (context$2$0.prev = context$2$0.next) {
 	          case 0:
-	            screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
+	            drawOperations.push(regeneratorRuntime.mark(function callee$2$0() {
+	              return regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
+	                while (1) switch (context$3$0.prev = context$3$0.next) {
+	                  case 0:
+	                    screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
+
+	                  case 1:
+	                  case "end":
+	                    return context$3$0.stop();
+	                }
+	              }, callee$2$0, this);
+	            }));
 
 	          case 1:
 	          case "end":
@@ -2883,13 +2942,16 @@
 	      return regeneratorRuntime.wrap(function drawUnfilledCircle$(context$2$0) {
 	        while (1) switch (context$2$0.prev = context$2$0.next) {
 	          case 0:
+	            return context$2$0.delegateYield(runCachedOperations(), "t89", 1);
+
+	          case 1:
 	            screen.beginPath();
 	            screen.arc(x, y, radius, 0, Math.PI * 2, true);
 	            screen.closePath();
 	            screen.strokeStyle = color;
 	            screen.stroke();
 
-	          case 5:
+	          case 6:
 	          case "end":
 	            return context$2$0.stop();
 	        }
@@ -2900,13 +2962,16 @@
 	      return regeneratorRuntime.wrap(function drawFilledCircle$(context$2$0) {
 	        while (1) switch (context$2$0.prev = context$2$0.next) {
 	          case 0:
+	            return context$2$0.delegateYield(runCachedOperations(), "t90", 1);
+
+	          case 1:
 	            screen.beginPath();
 	            screen.arc(x, y, radius, 0, Math.PI * 2, true);
 	            screen.closePath();
 	            screen.fillStyle = color;
 	            screen.fill();
 
-	          case 5:
+	          case 6:
 	          case "end":
 	            return context$2$0.stop();
 	        }
@@ -2917,10 +2982,13 @@
 	      return regeneratorRuntime.wrap(function drawUnfilledRectangle$(context$2$0) {
 	        while (1) switch (context$2$0.prev = context$2$0.next) {
 	          case 0:
+	            return context$2$0.delegateYield(runCachedOperations(), "t91", 1);
+
+	          case 1:
 	            screen.strokeStyle = color;
 	            screen.strokeRect(x, y, width, height);
 
-	          case 2:
+	          case 3:
 	          case "end":
 	            return context$2$0.stop();
 	        }
@@ -2931,10 +2999,13 @@
 	      return regeneratorRuntime.wrap(function drawFilledRectangle$(context$2$0) {
 	        while (1) switch (context$2$0.prev = context$2$0.next) {
 	          case 0:
+	            return context$2$0.delegateYield(runCachedOperations(), "t92", 1);
+
+	          case 1:
 	            screen.fillStyle = color;
 	            screen.fillRect(x, y, width, height);
 
-	          case 2:
+	          case 3:
 	          case "end":
 	            return context$2$0.stop();
 	        }
@@ -31695,9 +31766,9 @@
 	}
 	global._babelPolyfill = true;
 
-	__webpack_require__(27);
-
 	__webpack_require__(28);
+
+	__webpack_require__(27);
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
@@ -36941,56 +37012,6 @@
 /* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(35);
-	__webpack_require__(36);
-	__webpack_require__(37);
-	__webpack_require__(38);
-	__webpack_require__(39);
-	__webpack_require__(40);
-	__webpack_require__(41);
-	__webpack_require__(42);
-	__webpack_require__(43);
-	__webpack_require__(44);
-	__webpack_require__(45);
-	__webpack_require__(46);
-	__webpack_require__(47);
-	__webpack_require__(48);
-	__webpack_require__(49);
-	__webpack_require__(50);
-	__webpack_require__(51);
-	__webpack_require__(52);
-	__webpack_require__(53);
-	__webpack_require__(54);
-	__webpack_require__(55);
-	__webpack_require__(56);
-	__webpack_require__(57);
-	__webpack_require__(58);
-	__webpack_require__(59);
-	__webpack_require__(60);
-	__webpack_require__(61);
-	__webpack_require__(62);
-	__webpack_require__(63);
-	__webpack_require__(64);
-	__webpack_require__(65);
-	__webpack_require__(66);
-	__webpack_require__(67);
-	__webpack_require__(68);
-	__webpack_require__(69);
-	__webpack_require__(70);
-	__webpack_require__(71);
-	__webpack_require__(72);
-	__webpack_require__(73);
-	__webpack_require__(74);
-	__webpack_require__(75);
-	__webpack_require__(76);
-	__webpack_require__(77);
-	__webpack_require__(78);
-	module.exports = __webpack_require__(79).core;
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Copyright (c) 2014, Facebook, Inc.
 	 * All rights reserved.
@@ -37557,6 +37578,56 @@
 	);
 
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(35);
+	__webpack_require__(36);
+	__webpack_require__(37);
+	__webpack_require__(38);
+	__webpack_require__(39);
+	__webpack_require__(40);
+	__webpack_require__(41);
+	__webpack_require__(42);
+	__webpack_require__(43);
+	__webpack_require__(44);
+	__webpack_require__(45);
+	__webpack_require__(46);
+	__webpack_require__(47);
+	__webpack_require__(48);
+	__webpack_require__(49);
+	__webpack_require__(50);
+	__webpack_require__(51);
+	__webpack_require__(52);
+	__webpack_require__(53);
+	__webpack_require__(54);
+	__webpack_require__(55);
+	__webpack_require__(56);
+	__webpack_require__(57);
+	__webpack_require__(58);
+	__webpack_require__(59);
+	__webpack_require__(60);
+	__webpack_require__(61);
+	__webpack_require__(62);
+	__webpack_require__(63);
+	__webpack_require__(64);
+	__webpack_require__(65);
+	__webpack_require__(66);
+	__webpack_require__(67);
+	__webpack_require__(68);
+	__webpack_require__(69);
+	__webpack_require__(70);
+	__webpack_require__(71);
+	__webpack_require__(72);
+	__webpack_require__(73);
+	__webpack_require__(74);
+	__webpack_require__(75);
+	__webpack_require__(76);
+	__webpack_require__(77);
+	__webpack_require__(78);
+	module.exports = __webpack_require__(79).core;
 
 /***/ },
 /* 29 */
@@ -40561,7 +40632,7 @@
 	  , PROMISE = 'Promise'
 	  , global  = $.g
 	  , process = global.process
-	  , asap    = process && process.nextTick || __webpack_require__(104).set
+	  , asap    = process && process.nextTick || __webpack_require__(102).set
 	  , P       = global[PROMISE]
 	  , Base    = P
 	  , isFunction     = $.isFunction
@@ -40758,10 +40829,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var strong = __webpack_require__(102);
+	var strong = __webpack_require__(105);
 
 	// 23.1 Map Objects
-	__webpack_require__(103)('Map', {
+	__webpack_require__(104)('Map', {
 	  // 23.1.3.6 Map.prototype.get(key)
 	  get: function get(key){
 	    var entry = strong.getEntry(this, key);
@@ -40778,10 +40849,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var strong = __webpack_require__(102);
+	var strong = __webpack_require__(105);
 
 	// 23.2 Set Objects
-	__webpack_require__(103)('Set', {
+	__webpack_require__(104)('Set', {
 	  // 23.2.3.1 Set.prototype.add(value)
 	  add: function add(value){
 	    return strong.def(this, value = value === 0 ? 0 : value, value);
@@ -40794,7 +40865,7 @@
 
 	'use strict';
 	var $         = __webpack_require__(79)
-	  , weak      = __webpack_require__(105)
+	  , weak      = __webpack_require__(103)
 	  , leakStore = weak.leakStore
 	  , ID        = weak.ID
 	  , WEAK      = weak.WEAK
@@ -40804,7 +40875,7 @@
 	  , tmp       = {};
 
 	// 23.3 WeakMap Objects
-	var WeakMap = __webpack_require__(103)('WeakMap', {
+	var WeakMap = __webpack_require__(104)('WeakMap', {
 	  // 23.3.3.3 WeakMap.prototype.get(key)
 	  get: function get(key){
 	    if(isObject(key)){
@@ -40838,10 +40909,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var weak = __webpack_require__(105);
+	var weak = __webpack_require__(103);
 
 	// 23.4 WeakSet Objects
-	__webpack_require__(103)('WeakSet', {
+	__webpack_require__(104)('WeakSet', {
 	  // 23.4.3.1 WeakSet.prototype.add(value)
 	  add: function add(value){
 	    return weak.def(this, value, true);
@@ -41127,7 +41198,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $def  = __webpack_require__(86)
-	  , $task = __webpack_require__(104);
+	  , $task = __webpack_require__(102);
 	$def($def.G + $def.B, {
 	  setImmediate:   $task.set,
 	  clearImmediate: $task.clear
@@ -41972,6 +42043,252 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+	var $      = __webpack_require__(79)
+	  , ctx    = __webpack_require__(98)
+	  , cof    = __webpack_require__(84)
+	  , invoke = __webpack_require__(89)
+	  , global             = $.g
+	  , isFunction         = $.isFunction
+	  , html               = $.html
+	  , document           = global.document
+	  , process            = global.process
+	  , setTask            = global.setImmediate
+	  , clearTask          = global.clearImmediate
+	  , postMessage        = global.postMessage
+	  , addEventListener   = global.addEventListener
+	  , MessageChannel     = global.MessageChannel
+	  , counter            = 0
+	  , queue              = {}
+	  , ONREADYSTATECHANGE = 'onreadystatechange'
+	  , defer, channel, port;
+	function run(){
+	  var id = +this;
+	  if($.has(queue, id)){
+	    var fn = queue[id];
+	    delete queue[id];
+	    fn();
+	  }
+	}
+	function listner(event){
+	  run.call(event.data);
+	}
+	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
+	if(!isFunction(setTask) || !isFunction(clearTask)){
+	  setTask = function(fn){
+	    var args = [], i = 1;
+	    while(arguments.length > i)args.push(arguments[i++]);
+	    queue[++counter] = function(){
+	      invoke(isFunction(fn) ? fn : Function(fn), args);
+	    };
+	    defer(counter);
+	    return counter;
+	  };
+	  clearTask = function(id){
+	    delete queue[id];
+	  };
+	  // Node.js 0.8-
+	  if(cof(process) == 'process'){
+	    defer = function(id){
+	      process.nextTick(ctx(run, id, 1));
+	    };
+	  // Modern browsers, skip implementation for WebWorkers
+	  // IE8 has postMessage, but it's sync & typeof its postMessage is object
+	  } else if(addEventListener && isFunction(postMessage) && !global.importScripts){
+	    defer = function(id){
+	      postMessage(id, '*');
+	    };
+	    addEventListener('message', listner, false);
+	  // WebWorkers
+	  } else if(isFunction(MessageChannel)){
+	    channel = new MessageChannel;
+	    port    = channel.port2;
+	    channel.port1.onmessage = listner;
+	    defer = ctx(port.postMessage, port, 1);
+	  // IE8-
+	  } else if(document && ONREADYSTATECHANGE in document.createElement('script')){
+	    defer = function(id){
+	      html.appendChild(document.createElement('script'))[ONREADYSTATECHANGE] = function(){
+	        html.removeChild(this);
+	        run.call(id);
+	      };
+	    };
+	  // Rest old browsers
+	  } else {
+	    defer = function(id){
+	      setTimeout(ctx(run, id, 1), 0);
+	    };
+	  }
+	}
+	module.exports = {
+	  set:   setTask,
+	  clear: clearTask
+	};
+
+/***/ },
+/* 103 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $         = __webpack_require__(79)
+	  , safe      = __webpack_require__(85).safe
+	  , assert    = __webpack_require__(91)
+	  , forOf     = __webpack_require__(97).forOf
+	  , _has      = $.has
+	  , isObject  = $.isObject
+	  , hide      = $.hide
+	  , isFrozen  = Object.isFrozen || $.core.Object.isFrozen
+	  , id        = 0
+	  , ID        = safe('id')
+	  , WEAK      = safe('weak')
+	  , LEAK      = safe('leak')
+	  , method    = __webpack_require__(90)
+	  , find      = method(5)
+	  , findIndex = method(6);
+	function findFrozen(store, key){
+	  return find.call(store.array, function(it){
+	    return it[0] === key;
+	  });
+	}
+	// fallback for frozen keys
+	function leakStore(that){
+	  return that[LEAK] || hide(that, LEAK, {
+	    array: [],
+	    get: function(key){
+	      var entry = findFrozen(this, key);
+	      if(entry)return entry[1];
+	    },
+	    has: function(key){
+	      return !!findFrozen(this, key);
+	    },
+	    set: function(key, value){
+	      var entry = findFrozen(this, key);
+	      if(entry)entry[1] = value;
+	      else this.array.push([key, value]);
+	    },
+	    'delete': function(key){
+	      var index = findIndex.call(this.array, function(it){
+	        return it[0] === key;
+	      });
+	      if(~index)this.array.splice(index, 1);
+	      return !!~index;
+	    }
+	  })[LEAK];
+	}
+
+	module.exports = {
+	  getConstructor: function(NAME, IS_MAP, ADDER){
+	    function C(iterable){
+	      $.set(assert.inst(this, C, NAME), ID, id++);
+	      if(iterable != undefined)forOf(iterable, IS_MAP, this[ADDER], this);
+	    }
+	    $.mix(C.prototype, {
+	      // 23.3.3.2 WeakMap.prototype.delete(key)
+	      // 23.4.3.3 WeakSet.prototype.delete(value)
+	      'delete': function(key){
+	        if(!isObject(key))return false;
+	        if(isFrozen(key))return leakStore(this)['delete'](key);
+	        return _has(key, WEAK) && _has(key[WEAK], this[ID]) && delete key[WEAK][this[ID]];
+	      },
+	      // 23.3.3.4 WeakMap.prototype.has(key)
+	      // 23.4.3.4 WeakSet.prototype.has(value)
+	      has: function has(key){
+	        if(!isObject(key))return false;
+	        if(isFrozen(key))return leakStore(this).has(key);
+	        return _has(key, WEAK) && _has(key[WEAK], this[ID]);
+	      }
+	    });
+	    return C;
+	  },
+	  def: function(that, key, value){
+	    if(isFrozen(assert.obj(key))){
+	      leakStore(that).set(key, value);
+	    } else {
+	      _has(key, WEAK) || hide(key, WEAK, {});
+	      key[WEAK][that[ID]] = value;
+	    } return that;
+	  },
+	  leakStore: leakStore,
+	  WEAK: WEAK,
+	  ID: ID
+	};
+
+/***/ },
+/* 104 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $     = __webpack_require__(79)
+	  , $def  = __webpack_require__(86)
+	  , $iter = __webpack_require__(97)
+	  , assertInstance = __webpack_require__(91).inst;
+
+	module.exports = function(NAME, methods, common, IS_MAP, isWeak){
+	  var Base  = $.g[NAME]
+	    , C     = Base
+	    , ADDER = IS_MAP ? 'set' : 'add'
+	    , proto = C && C.prototype
+	    , O     = {};
+	  function fixMethod(KEY, CHAIN){
+	    var method = proto[KEY];
+	    if($.FW)proto[KEY] = function(a, b){
+	      var result = method.call(this, a === 0 ? 0 : a, b);
+	      return CHAIN ? this : result;
+	    };
+	  }
+	  if(!$.isFunction(C) || !(isWeak || !$iter.BUGGY && proto.forEach && proto.entries)){
+	    // create collection constructor
+	    C = common.getConstructor(NAME, IS_MAP, ADDER);
+	    $.mix(C.prototype, methods);
+	  } else {
+	    var inst  = new C
+	      , chain = inst[ADDER](isWeak ? {} : -0, 1)
+	      , buggyZero;
+	    // wrap for init collections from iterable
+	    if(!__webpack_require__(99)(function(iter){ new C(iter); })){ // eslint-disable-line no-new
+	      C = function(iterable){
+	        assertInstance(this, C, NAME);
+	        var that = new Base;
+	        if(iterable != undefined)$iter.forOf(iterable, IS_MAP, that[ADDER], that);
+	        return that;
+	      };
+	      C.prototype = proto;
+	      if($.FW)proto.constructor = C;
+	    }
+	    isWeak || inst.forEach(function(val, key){
+	      buggyZero = 1 / key === -Infinity;
+	    });
+	    // fix converting -0 key to +0
+	    if(buggyZero){
+	      fixMethod('delete');
+	      fixMethod('has');
+	      IS_MAP && fixMethod('get');
+	    }
+	    // + fix .add & .set for chaining
+	    if(buggyZero || chain !== inst)fixMethod(ADDER, true);
+	  }
+
+	  __webpack_require__(84).set(C, NAME);
+	  __webpack_require__(101)(C);
+
+	  O[NAME] = C;
+	  $def($def.G + $def.W + $def.F * (C != Base), O);
+
+	  // add .keys, .values, .entries, [@@iterator]
+	  // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
+	  if(!isWeak)$iter.std(
+	    C, NAME,
+	    common.getIterConstructor(), common.next,
+	    IS_MAP ? 'key+value' : 'value' , !IS_MAP, true
+	  );
+
+	  return C;
+	};
+
+/***/ },
+/* 105 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
 	var $        = __webpack_require__(79)
 	  , ctx      = __webpack_require__(98)
 	  , safe     = __webpack_require__(85).safe
@@ -42124,252 +42441,6 @@
 	    if(kind == 'value')return step(0, entry.v);
 	    return step(0, [entry.k, entry.v]);
 	  }
-	};
-
-/***/ },
-/* 103 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var $     = __webpack_require__(79)
-	  , $def  = __webpack_require__(86)
-	  , $iter = __webpack_require__(97)
-	  , assertInstance = __webpack_require__(91).inst;
-
-	module.exports = function(NAME, methods, common, IS_MAP, isWeak){
-	  var Base  = $.g[NAME]
-	    , C     = Base
-	    , ADDER = IS_MAP ? 'set' : 'add'
-	    , proto = C && C.prototype
-	    , O     = {};
-	  function fixMethod(KEY, CHAIN){
-	    var method = proto[KEY];
-	    if($.FW)proto[KEY] = function(a, b){
-	      var result = method.call(this, a === 0 ? 0 : a, b);
-	      return CHAIN ? this : result;
-	    };
-	  }
-	  if(!$.isFunction(C) || !(isWeak || !$iter.BUGGY && proto.forEach && proto.entries)){
-	    // create collection constructor
-	    C = common.getConstructor(NAME, IS_MAP, ADDER);
-	    $.mix(C.prototype, methods);
-	  } else {
-	    var inst  = new C
-	      , chain = inst[ADDER](isWeak ? {} : -0, 1)
-	      , buggyZero;
-	    // wrap for init collections from iterable
-	    if(!__webpack_require__(99)(function(iter){ new C(iter); })){ // eslint-disable-line no-new
-	      C = function(iterable){
-	        assertInstance(this, C, NAME);
-	        var that = new Base;
-	        if(iterable != undefined)$iter.forOf(iterable, IS_MAP, that[ADDER], that);
-	        return that;
-	      };
-	      C.prototype = proto;
-	      if($.FW)proto.constructor = C;
-	    }
-	    isWeak || inst.forEach(function(val, key){
-	      buggyZero = 1 / key === -Infinity;
-	    });
-	    // fix converting -0 key to +0
-	    if(buggyZero){
-	      fixMethod('delete');
-	      fixMethod('has');
-	      IS_MAP && fixMethod('get');
-	    }
-	    // + fix .add & .set for chaining
-	    if(buggyZero || chain !== inst)fixMethod(ADDER, true);
-	  }
-
-	  __webpack_require__(84).set(C, NAME);
-	  __webpack_require__(101)(C);
-
-	  O[NAME] = C;
-	  $def($def.G + $def.W + $def.F * (C != Base), O);
-
-	  // add .keys, .values, .entries, [@@iterator]
-	  // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
-	  if(!isWeak)$iter.std(
-	    C, NAME,
-	    common.getIterConstructor(), common.next,
-	    IS_MAP ? 'key+value' : 'value' , !IS_MAP, true
-	  );
-
-	  return C;
-	};
-
-/***/ },
-/* 104 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var $      = __webpack_require__(79)
-	  , ctx    = __webpack_require__(98)
-	  , cof    = __webpack_require__(84)
-	  , invoke = __webpack_require__(89)
-	  , global             = $.g
-	  , isFunction         = $.isFunction
-	  , html               = $.html
-	  , document           = global.document
-	  , process            = global.process
-	  , setTask            = global.setImmediate
-	  , clearTask          = global.clearImmediate
-	  , postMessage        = global.postMessage
-	  , addEventListener   = global.addEventListener
-	  , MessageChannel     = global.MessageChannel
-	  , counter            = 0
-	  , queue              = {}
-	  , ONREADYSTATECHANGE = 'onreadystatechange'
-	  , defer, channel, port;
-	function run(){
-	  var id = +this;
-	  if($.has(queue, id)){
-	    var fn = queue[id];
-	    delete queue[id];
-	    fn();
-	  }
-	}
-	function listner(event){
-	  run.call(event.data);
-	}
-	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
-	if(!isFunction(setTask) || !isFunction(clearTask)){
-	  setTask = function(fn){
-	    var args = [], i = 1;
-	    while(arguments.length > i)args.push(arguments[i++]);
-	    queue[++counter] = function(){
-	      invoke(isFunction(fn) ? fn : Function(fn), args);
-	    };
-	    defer(counter);
-	    return counter;
-	  };
-	  clearTask = function(id){
-	    delete queue[id];
-	  };
-	  // Node.js 0.8-
-	  if(cof(process) == 'process'){
-	    defer = function(id){
-	      process.nextTick(ctx(run, id, 1));
-	    };
-	  // Modern browsers, skip implementation for WebWorkers
-	  // IE8 has postMessage, but it's sync & typeof its postMessage is object
-	  } else if(addEventListener && isFunction(postMessage) && !global.importScripts){
-	    defer = function(id){
-	      postMessage(id, '*');
-	    };
-	    addEventListener('message', listner, false);
-	  // WebWorkers
-	  } else if(isFunction(MessageChannel)){
-	    channel = new MessageChannel;
-	    port    = channel.port2;
-	    channel.port1.onmessage = listner;
-	    defer = ctx(port.postMessage, port, 1);
-	  // IE8-
-	  } else if(document && ONREADYSTATECHANGE in document.createElement('script')){
-	    defer = function(id){
-	      html.appendChild(document.createElement('script'))[ONREADYSTATECHANGE] = function(){
-	        html.removeChild(this);
-	        run.call(id);
-	      };
-	    };
-	  // Rest old browsers
-	  } else {
-	    defer = function(id){
-	      setTimeout(ctx(run, id, 1), 0);
-	    };
-	  }
-	}
-	module.exports = {
-	  set:   setTask,
-	  clear: clearTask
-	};
-
-/***/ },
-/* 105 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var $         = __webpack_require__(79)
-	  , safe      = __webpack_require__(85).safe
-	  , assert    = __webpack_require__(91)
-	  , forOf     = __webpack_require__(97).forOf
-	  , _has      = $.has
-	  , isObject  = $.isObject
-	  , hide      = $.hide
-	  , isFrozen  = Object.isFrozen || $.core.Object.isFrozen
-	  , id        = 0
-	  , ID        = safe('id')
-	  , WEAK      = safe('weak')
-	  , LEAK      = safe('leak')
-	  , method    = __webpack_require__(90)
-	  , find      = method(5)
-	  , findIndex = method(6);
-	function findFrozen(store, key){
-	  return find.call(store.array, function(it){
-	    return it[0] === key;
-	  });
-	}
-	// fallback for frozen keys
-	function leakStore(that){
-	  return that[LEAK] || hide(that, LEAK, {
-	    array: [],
-	    get: function(key){
-	      var entry = findFrozen(this, key);
-	      if(entry)return entry[1];
-	    },
-	    has: function(key){
-	      return !!findFrozen(this, key);
-	    },
-	    set: function(key, value){
-	      var entry = findFrozen(this, key);
-	      if(entry)entry[1] = value;
-	      else this.array.push([key, value]);
-	    },
-	    'delete': function(key){
-	      var index = findIndex.call(this.array, function(it){
-	        return it[0] === key;
-	      });
-	      if(~index)this.array.splice(index, 1);
-	      return !!~index;
-	    }
-	  })[LEAK];
-	}
-
-	module.exports = {
-	  getConstructor: function(NAME, IS_MAP, ADDER){
-	    function C(iterable){
-	      $.set(assert.inst(this, C, NAME), ID, id++);
-	      if(iterable != undefined)forOf(iterable, IS_MAP, this[ADDER], this);
-	    }
-	    $.mix(C.prototype, {
-	      // 23.3.3.2 WeakMap.prototype.delete(key)
-	      // 23.4.3.3 WeakSet.prototype.delete(value)
-	      'delete': function(key){
-	        if(!isObject(key))return false;
-	        if(isFrozen(key))return leakStore(this)['delete'](key);
-	        return _has(key, WEAK) && _has(key[WEAK], this[ID]) && delete key[WEAK][this[ID]];
-	      },
-	      // 23.3.3.4 WeakMap.prototype.has(key)
-	      // 23.4.3.4 WeakSet.prototype.has(value)
-	      has: function has(key){
-	        if(!isObject(key))return false;
-	        if(isFrozen(key))return leakStore(this).has(key);
-	        return _has(key, WEAK) && _has(key[WEAK], this[ID]);
-	      }
-	    });
-	    return C;
-	  },
-	  def: function(that, key, value){
-	    if(isFrozen(assert.obj(key))){
-	      leakStore(that).set(key, value);
-	    } else {
-	      _has(key, WEAK) || hide(key, WEAK, {});
-	      key[WEAK][that[ID]] = value;
-	    } return that;
-	  },
-	  leakStore: leakStore,
-	  WEAK: WEAK,
-	  ID: ID
 	};
 
 /***/ },
