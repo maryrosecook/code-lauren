@@ -60,6 +60,10 @@ function parse(code, annotator) {
   }
 };
 
+function timeToYieldToEventLoop(lastYield) {
+  return new Date().getTime() - lastYield > 8;
+};
+
 function start(editor, annotator) {
   var code = editor.getValue();
   var screen = document.getElementById("screen").getContext("2d");
@@ -68,15 +72,21 @@ function start(editor, annotator) {
   annotator.clear();
 
   try {
-    var ast = parse(code, annotator);
-
-    var g = r(ast, env);
+    var g = r(parse(code, annotator), env);
+    var lastEventLoopYield = new Date().getTime();
 
     var going = true;
     (function tick() {
       if (going) {
         step(g);
-        requestAnimationFrame(tick);
+        if (timeToYieldToEventLoop(lastEventLoopYield)) {
+          requestAnimationFrame(function() {
+            lastEventLoopYield = new Date().getTime();
+            tick();
+          });
+        } else {
+          tick();
+        }
       }
     })();
 

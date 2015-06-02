@@ -100,8 +100,6 @@ function* interpretConditional(ast, env) {
 
 function interpretLambdaDef(ast, env) {
   return function* () {
-    yield null; // allows the program to be stepped, rather than only invoked in one go
-
     var lambdaArguments = arguments;
     var lambdaParameters = _.pluck(ast.c[0], "c");
     var lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
@@ -111,6 +109,8 @@ function interpretLambdaDef(ast, env) {
 };
 
 function* interpret(ast, env) {
+  yield null; // allows the program to be stepped, rather than only invoked in one go
+
   if (ast === undefined) {
     return;
   } else if (env === undefined) {
