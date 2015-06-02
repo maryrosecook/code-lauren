@@ -425,7 +425,12 @@ describe("parser", function() {
       expect(function() {
         parse("a: \n");
       }).toThrow("You have specified a name, but you also need a value");
-      }).toThrow("Naming a value. You have specified a name, but you also need a value.");
+    });
+
+    it("should expect missing label followed in assignment", function() {
+      expect(function() {
+        parse(": 1");
+      }).toThrow("You have specified a value, but you also need a label");
     });
   });
 });

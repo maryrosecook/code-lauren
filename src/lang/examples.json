@@ -28,6 +28,14 @@
                   "function", "label", "label_char"],
       "nextInput":   "\n",
       "message": "You have specified a name, but you also need a value"
+    },
+
+    {
+      "code":    ": 1",
+      "stack":   ["do", "expression", "parenthetical", "invocation", "function",
+                  "label", "label_char"],
+      "nextInput":   ":",
+      "message": "You have specified a value, but you also need a label"
     }
   ]
 }
