@@ -418,12 +418,13 @@ describe("parser", function() {
     it("should expect missing value in assignment at end of input", function() {
       expect(function() {
         parse("a: ");
-      }).toThrow("Naming a value. You have specified a name, but you also need a value.");
+      }).toThrow("You have specified a name, but you also need a value");
     });
 
     it("should expect missing value in assignment followed by newline", function() {
       expect(function() {
         parse("a: \n");
+      }).toThrow("You have specified a name, but you also need a value");
       }).toThrow("Naming a value. You have specified a name, but you also need a value.");
     });
   });
