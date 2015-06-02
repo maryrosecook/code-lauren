@@ -432,5 +432,12 @@ describe("parser", function() {
         parse(": 1");
       }).toThrow("You have specified a value, but you also need a label");
     });
+
+    it("should expect missing label followed in assignment after parsed expr", function() {
+      // regression test
+      expect(function() {
+        parse("a: 1\n: 1");
+      }).toThrow("You have specified a value, but you also need a label");
+    });
   });
 });

@@ -32,7 +32,7 @@
 
     {
       "code":    ": 1",
-      "stack":   ["do", "expression", "parenthetical", "invocation", "function",
+      "stack":   ["expression", "parenthetical", "invocation", "function",
                   "label", "label_char"],
       "nextInput":   ":",
       "message": "You have specified a value, but you also need a label"
