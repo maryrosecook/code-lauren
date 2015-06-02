@@ -225,20 +225,6 @@ describe("interpreter", function() {
       expect(callCount).toEqual(6);
     });
 
-    it("should allow recursion > 18000 times because of trampolining", function() {
-      expect(function() {
-        var lib = standardLibrary();
-        lib.done = function*(n) {
-          if (n > 18000) {
-            throw "Made it to 18000";
-          }
-        };
-
-        var env = i.createScope(lib);
-        c(r(p('b: { ?n done(n)\nb(add(n 1)) }\nb(0)'), env));
-      }).toThrow("Made it to 18000");
-    });
-
     it("should trampoline a program where there is an if in the tail position", function() {
       expect(c(r(p('countto: { ?x if greater-than(x 0) { countto(subtract(x 1) y) } else { "done"} }\ncountto(20000)')))).toEqual("done");
     });
