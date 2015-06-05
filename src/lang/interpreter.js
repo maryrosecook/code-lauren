@@ -83,7 +83,7 @@ function* interpretTop(ast, env) {
 function* interpretAssignment(ast, env) {
   var name = ast.c[0].c
   var value = yield* trampoline(yield* interpret(ast.c[1], env));
-  env.setGlobalBinding(name, value);
+  env.setGlobalBinding(name, value); // todo change this to create new scope?
   return value;
 };
 
