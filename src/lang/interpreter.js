@@ -111,7 +111,7 @@ function interpretLambdaDef(ast, env) {
 function* interpret(ast, env) {
   yield null; // allows the program to be stepped, rather than only invoked in one go
 
-  if (ast === undefined) {
+  if (ast === undefined) { // for empty do block
     return;
   } else if (env === undefined) {
     return yield* interpret(ast, createScope(standardLibrary()));
