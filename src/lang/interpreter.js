@@ -1,51 +1,11 @@
 var _ = require("underscore");
+
 var util = require("../util");
-
 var standardLibrary = require("./standard-library");
-
-function Scope(bindings, parent) {
-  this.bindings = bindings;
-  this.parent = parent;
-};
-
-Scope.prototype = {
-  getLocalBinding: function(k) {
-    return this.bindings[k];
-  },
-
-  getScopedBinding: function(k) {
-    if (k in this.bindings) {
-      return this.getLocalBinding(k);
-    } else if (this.parent !== undefined) {
-      return this.parent.getScopedBinding(k);
-    }
-  },
-
-  setLocalBinding: function(k, v) {
-    this.bindings[k] = v;
-  },
-
-  setGlobalBinding: function(k, v) {
-    var scope = this;
-    while(scope !== undefined) {
-      if (scope.bindings[k] !== undefined) {
-        scope.setLocalBinding(k, v);
-        return;
-      } else {
-        scope = scope.parent;
-      }
-    }
-
-    this.setLocalBinding(k, v);
-  }
-};
+var scope = require("./scope");
 
 function Thunk(gFn) {
   this.g = gFn();
-};
-
-function createScope(bindings, parent) {
-  return new Scope(bindings, parent);
 };
 
 function* listStar(gs) {
@@ -102,7 +62,7 @@ function interpretLambdaDef(ast, env) {
   return function* () {
     var lambdaArguments = arguments;
     var lambdaParameters = _.pluck(ast.c[0], "c");
-    var lambdaScope = createScope(_.object(lambdaParameters, lambdaArguments), env);
+    var lambdaScope = scope(_.object(lambdaParameters, lambdaArguments), env);
 
     return yield* interpret(ast.c[1], lambdaScope);
   };
@@ -114,7 +74,7 @@ function* interpret(ast, env) {
   if (ast === undefined) { // for empty do block
     return;
   } else if (env === undefined) {
-    return yield* interpret(ast, createScope(standardLibrary()));
+    return yield* interpret(ast, scope(standardLibrary()));
   } else if (ast.t === "top") {
     return yield* interpretTop(ast, env);
   } else if (ast.t === "lambda") {
@@ -135,6 +95,5 @@ function* interpret(ast, env) {
 };
 
 interpret.interpret = interpret;
-interpret.createScope = createScope;
 interpret.trampoline = trampoline;
 module.exports = interpret;

@@ -5,6 +5,7 @@ require("babel-core/polyfill");
 
 var parser = require("./lang/parser");
 var interpret = require("./lang/interpreter");
+var scope = require("./lang/scope");
 var r = require("./runner");
 var createEditor = require("./editor");
 var createAnnotator = require("./annotator");
@@ -67,7 +68,7 @@ function timeToYieldToEventLoop(lastYield) {
 function start(editor, annotator) {
   var code = editor.getValue();
   var screen = document.getElementById("screen").getContext("2d");
-  var env = interpret.createScope(createEnv(screen));
+  var env = scope(createEnv(screen));
 
   annotator.clear();
 

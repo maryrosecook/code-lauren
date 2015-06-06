@@ -1,4 +1,5 @@
 var i = require("../src/lang/interpreter");
+var scope = require("../src/lang/scope");
 var standardLibrary = require("../src/lang/standard-library");
 
 var p = require("../src/lang/parser");
@@ -111,7 +112,7 @@ describe("interpreter", function() {
         callCount += 1;
       };
 
-      var env = i.createScope(lib);
+      var env = scope(lib);
 
       c(r(p("called()\ncalled()"), env));
       expect(callCount).toEqual(2);
@@ -124,7 +125,7 @@ describe("interpreter", function() {
         callCount += 1;
       };
 
-      var env = i.createScope(lib);
+      var env = scope(lib);
 
       c(r(p("{ called()\ncalled() }()"), env));
       expect(callCount).toEqual(2);
@@ -148,7 +149,7 @@ describe("interpreter", function() {
         callCount = 1;
       };
 
-      var env = i.createScope(lib);
+      var env = scope(lib);
 
       c(r(p('pass(name)\nname: "Lauren"'), env));
       expect(callCount).toEqual(1);
@@ -166,7 +167,7 @@ describe("interpreter", function() {
         callCount = 1;
       };
 
-      var env = i.createScope(lib);
+      var env = scope(lib);
 
       c(r(p('{ pass(name)\nname: "Lauren" }()'), env));
       expect(callCount).toEqual(1);
@@ -219,7 +220,7 @@ describe("interpreter", function() {
         callCount += 1;
       };
 
-      var env = i.createScope(lib);
+      var env = scope(lib);
 
       c(r(p('b: { ?x called()\nif less-than(x 5) { b(add(x 1)) } }\nb(0)'), env));
       expect(callCount).toEqual(6);
