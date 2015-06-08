@@ -2,6 +2,8 @@
 
 A programming environment for beginners.
 
+See it live [here](http://lauren.maryrosecook.com/).
+
 ## Contact
 
 Mary Rose Cook - http://maryrosecook.com
