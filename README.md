@@ -1,6 +1,6 @@
 # Lauren
 
-A programming environment for beginners.
+A programming environment for beginners. See it live [here](http://lauren.maryrosecook.com/).
 
 ## Contact
 
