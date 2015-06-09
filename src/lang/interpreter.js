@@ -89,7 +89,9 @@ function* interpret(ast, env) {
     return yield* interpretInvocation(ast, env);
   } else if (ast.t === "label") {
     return env.getScopedBinding(ast.c);
-  } else if (ast.t === "number" || ast.t === "string" || ast.t === "boolean" ) {
+  } else if (ast.t === "return") {
+    return yield* interpret(ast.c, env);
+  } else if (ast.t === "number" || ast.t === "string" || ast.t === "boolean") {
     return ast.c;
   }
 };

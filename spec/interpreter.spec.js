@@ -42,6 +42,9 @@ describe("interpreter", function() {
       expect(step(g)).toEqual(null);
       expect(step(g)).toEqual(null);
       expect(step(g)).toEqual(null);
+      expect(step(g)).toEqual(null);
+      expect(step(g)).toEqual(null);
+      expect(step(g)).toEqual(null);
       expect(step(g)).toEqual(1);
     });
   });

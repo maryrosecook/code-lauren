@@ -22,6 +22,12 @@
       return f;
     }
   }
+
+  function wrapLastDoExpressionInReturn(expressions) {
+    var initial = expressions.slice(0, expressions.length - 1);
+    var last = expressions[expressions.length - 1];
+    return initial.concat(node("return", last, last.offset));
+  }
 }
 
 start
@@ -32,9 +38,9 @@ top
 
 do
   = __* first:expression _* rest:do_continue* __*
-    { return node("do", [first].concat(rest), offset); }
+    { return node("do", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }
   / __*
-    { return node("do", [], offset); }
+    { return node("do", [node("return", undefined, offset)], offset); }
 
 do_continue
   = _* nl __* all:expression _*
