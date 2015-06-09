@@ -2,19 +2,6 @@ var parse = require("../src/lang/parser.js");
 var _ = require("underscore");
 var util = require("../src/util");
 
-function getNodeAt(node, keys) {
-  var nextKey = keys[0];
-  if (keys.length === 0) {
-    return node;
-  } else if (_.isArray(node) && nextKey in node) {
-    return getNodeAt(node[nextKey], _.rest(keys));
-  } else if (_.isObject(node) && node.t === nextKey) {
-    return getNodeAt(node.c, _.rest(keys));
-  } else {
-    throw "Couldn't find node with key " + nextKey;
-  }
-};
-
 describe("parser", function() {
   describe("atoms", function() {
     it("should parse an int", function() {

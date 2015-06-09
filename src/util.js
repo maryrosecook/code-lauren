@@ -1,3 +1,5 @@
+var _ = require("underscore");
+
 var util = module.exports = {
   pp: function(str) {
     console.log(JSON.stringify(str, null, 2));
@@ -28,5 +30,18 @@ var util = module.exports = {
       o[p] = (def instanceof Function ? def() : def);
       return o;
     }, {});
+  },
+
+  getNodeAt: function(node, keys) {
+    var nextKey = keys[0];
+    if (keys.length === 0) {
+      return node;
+    } else if (_.isArray(node) && nextKey in node) {
+      return util.getNodeAt(node[nextKey], _.rest(keys));
+    } else if (_.isObject(node) && node.t === nextKey) {
+      return util.getNodeAt(node.c, _.rest(keys));
+    } else {
+      throw "Couldn't find node with key " + nextKey;
+    }
   }
 };
