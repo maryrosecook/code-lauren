@@ -43,5 +43,11 @@ var util = module.exports = {
     } else {
       throw "Couldn't find node with key " + nextKey;
     }
+  },
+
+  mapCat: function(list, fn) {
+    return list.reduce(function (acc, x) {
+      return acc.concat(fn(x));
+    }, []);
   }
 };
