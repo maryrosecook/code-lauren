@@ -1,5 +1,5 @@
 var p = require("../src/lang/parser");
-var c = require("../src/lang/bytecode-compiler");
+var c = require("../src/lang/compiler");
 var util = require("../src/util");
 
 // just removes ast attribute values from fn objects for easier expectation writing
