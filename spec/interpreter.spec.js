@@ -7,7 +7,7 @@ var r = require("../src/runner");
 var c = r.complete;
 var step = r.step;
 
-describe("interpreter", function() {
+xdescribe("interpreter", function() {
   describe("env", function() {
     it("should be able to interpret if no env passed in", function() {
       expect(c(r(p("1")))).toEqual(1);
