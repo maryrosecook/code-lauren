@@ -6,7 +6,7 @@ var createScope = require("../src/lang/scope");
 
 var util = require("../src/util");
 
-ddescribe("bytecode interpreter", function() {
+describe("bytecode interpreter", function() {
   describe("top level", function() {
     it("should return undefined from an empty program", function() {
       expect(v(c(p(""))).stack.pop()).toBeUndefined();
