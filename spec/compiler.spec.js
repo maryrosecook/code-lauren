@@ -36,6 +36,16 @@ describe("bytecode compiler", function() {
     });
   });
 
+  describe("assignments", function() {
+    it("should compile an assignment", function() {
+      expect(c(p("a: 1")))
+        .toEqual([["push", 1],
+                  ["set_env", "a"],
+                  ["pop"],
+                  ["return"]]);
+    });
+  });
+
   describe("lambdas", function() {
     it("should compile an empty lambda", function() {
       expect(c(util.getNodeAt(p("{}"), ["top", "do", 0, "return"]))[0][1].bc)
@@ -59,7 +69,7 @@ describe("bytecode compiler", function() {
 
     it("should compile lambda that contains an invocation on no arguments", function() {
       expect(c(util.getNodeAt(p("{ a() }"), ["top", "do", 0, "return"]))[0][1].bc)
-        .toEqual([["load_name", "a"],
+        .toEqual([["get_env", "a"],
                   ["invoke"],
                   ["return"]]);
     });

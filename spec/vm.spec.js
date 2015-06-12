@@ -29,10 +29,16 @@ ddescribe("bytecode interpreter", function() {
 
   // });
 
-  describe("labels", function() {
-    xit("should return value bound to label at end of program", function() {
-      var scope = createScope(standardLibrary());
-      expect(v(c(p("a")), scope())).toBeUndefined();
+  describe("assignment", function() {
+    it("should assign literal to env at top level", function() {
+      var env = v(c(p("a: 1"))).env;
+      expect(env.getLocalBinding("a")).toEqual(1);
+    });
+
+    it("should assign literal to env at top level", function() {
+      var fn = v(c(p("a: { 1 }"))).env.getLocalBinding("a");
+      expect(fn.bc).toEqual([["push", 1], ["return"]]);
+      expect(fn.ast).toBeDefined();
     });
 
   });

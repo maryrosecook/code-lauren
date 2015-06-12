@@ -22,6 +22,9 @@ function runInvoke(ins, p) {
   var fn = p.stack.pop();
 
   console.log(fn);
+function runSetEnv(ins, p) {
+  p.env.setGlobalBinding(ins[1], p.stack.pop());
+  return run(p);
 };
 
 function run(p) {
@@ -32,6 +35,8 @@ function run(p) {
     return runPush(ins, p);
   } else if (ins[0] === "pop") {
     return runPop(ins, p);
+  } else if (ins[0] === "set_env") {
+    return runSetEnv(ins, p);
   } else if (ins[0] === "return") {
     return run(p);
   }

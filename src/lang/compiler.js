@@ -7,7 +7,7 @@ function compileLiteral(a) {
 };
 
 function compileLabel(a) {
-  return [["load_name", a.c]];
+  return [["get_env", a.c]];
 };
 
 function compileUndefined() {
@@ -42,6 +42,11 @@ function compileReturn(a) {
   return compile(a.c).concat([["return"]]);
 };
 
+function compileAssignment(a) {
+  return compile(a.c[1]).concat([["set_env", a.c[0].c],
+                                 ["pop"]]);
+};
+
 function compile(a) {
   if (a === undefined) {
     return compileUndefined();
@@ -55,6 +60,8 @@ function compile(a) {
     return compileInvocation(a);
   } else if (a.t === "return") {
     return compileReturn(a);
+  } else if (a.t === "assignment") {
+    return compileAssignment(a);
   } else if (a.t === "label") {
     return compileLabel(a);
   } else if (a.t === "number" || a.t === "string" || a.t === "boolean") {
