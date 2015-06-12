@@ -39,6 +39,8 @@ function run(p) {
     return runSetEnv(ins, p);
   } else if (ins[0] === "return") {
     return run(p);
+  } else {
+    throw new Error("I don't know how to run this instruction: " + ins[0]);
   }
 };
 
