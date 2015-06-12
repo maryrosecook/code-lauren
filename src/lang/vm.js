@@ -36,7 +36,7 @@ function run(p) {
   } else if (ins[0] === "return") {
     return run(p);
   } else {
-    throw new Error("I don't know how to run this instruction: " + ins[0]);
+    throw new Error("I don't know how to run this instruction: " + ins);
   }
 };
 
