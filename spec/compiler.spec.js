@@ -5,7 +5,7 @@ var util = require("../src/util");
 // just removes ast attribute values from fn objects for easier expectation writing
 function stripFnAsts(bc) {
   bc.forEach(function(instruction) {
-    if (instruction[0] === "push" && typeof instruction[1] === 'object') {
+    if (instruction[0] === "push_lambda") {
       delete instruction[1].ast;
     }
   });
@@ -70,7 +70,16 @@ describe("bytecode compiler", function() {
     it("should compile lambda that contains an invocation on no arguments", function() {
       expect(c(util.getNodeAt(p("{ a() }"), ["top", "do", 0, "return"]))[0][1].bc)
         .toEqual([["get_env", "a"],
-                  ["invoke"],
+                  ["invoke", 0],
+                  ["return"]]);
+    });
+
+    it("should compile lambda that contains an invocation with some arguments", function() {
+      expect(c(util.getNodeAt(p("{ a(1 2) }"), ["top", "do", 0, "return"]))[0][1].bc)
+        .toEqual([["push", 1],
+                  ["push", 2],
+                  ["get_env", "a"],
+                  ["invoke", 2],
                   ["return"]]);
     });
 
@@ -78,8 +87,8 @@ describe("bytecode compiler", function() {
       var code = stripFnAsts(c(util.getNodeAt(p("{ {}() }"),
                                               ["top", "do", 0, "return"]))[0][1].bc);
 
-      expect(code).toEqual([["push", { bc: [["push", undefined], ["return"]] }],
-                            ["invoke"],
+      expect(code).toEqual([["push_lambda", { bc: [["push", undefined], ["return"]] }],
+                            ["invoke", 0],
                             ["return"]]);
     });
   });

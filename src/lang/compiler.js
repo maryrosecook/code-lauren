@@ -30,12 +30,16 @@ function compileDo(a) {
 };
 
 function compileInvocation(a) {
-  var compiledFn = compile(util.getNodeAt(a, ["invocation", 0]));
-  return compiledFn.concat([["invoke"]]);
+  var aInvocation = util.getNodeAt(a, ["invocation"]);
+  var aArgs = aInvocation.slice(1);
+  var compiledArgs = util.mapCat(aArgs, compile);
+  var compiledFn = compile(aInvocation[0]);
+  var code = compiledArgs.concat(compiledFn, [["invoke", aArgs.length]]);
+  return code;
 };
 
 function compileLambdaDef(a) {
-  return [["push", { bc: compile(util.getNodeAt(a, ["lambda", 1])), ast: a }]];
+  return [["push_lambda", { bc: compile(util.getNodeAt(a, ["lambda", 1])), ast: a }]];
 };
 
 function compileReturn(a) {
