@@ -1,6 +1,7 @@
 var p = require("../src/lang/parser");
 var c = require("../src/lang/compiler");
 var v = require("../src/lang/vm");
+
 var standardLibrary = require("../src/lang/standard-library");
 var createScope = require("../src/lang/scope");
 
@@ -89,6 +90,44 @@ describe("bytecode interpreter", function() {
       expect(fn.bc).toEqual([["push", 1],
                              ["return"]]);
       expect(fn.ast).toBeDefined();
+    });
+  });
+
+  describe("conditionals", function() {
+    it("should return first branch if true", function() {
+      expect(v(c(p("if true { 1 }"))).stack.pop()).toEqual(1);
+    });
+
+    it("should return else if if is true", function() {
+      expect(v(c(p("if false { 1 } else { 2 }"))).stack.pop()).toEqual(2);
+    });
+
+    it("should return undefined if false and no second branch", function() {
+      expect(v(c(p("if false { 1 }"))).stack.pop()).toBeUndefined();
+    });
+
+    it("should allow s-expression in branch", function() {
+      expect(v(c(p('if true { print("hi") }'))).stack.pop()).toEqual("hi\n");
+    });
+
+    it("should return else if branch if condition true and if condition false", function() {
+      expect(v(c(p('if false { 1 } elseif true { 2 }'))).stack.pop()).toEqual(2);
+    });
+
+    it("should return if branch if condition true and else if condition true", function() {
+      expect(v(c(p('if true { 1 } elseif true { 2 }'))).stack.pop()).toEqual(1);
+    });
+
+    it("should return else branch if if and if else conditions false", function() {
+      expect(v(c(p('if false { 1 } elseif false { 2 } else { 3 }'))).stack.pop()).toEqual(3);
+    });
+
+    it("should return second else branch if true and prev conditions false", function() {
+      expect(v(c(p('if false { 1 } elseif false { 2 } elseif true { 3 }'))).stack.pop()).toEqual(3);
+    });
+
+    it("should not return else if previous condition is true", function() {
+      expect(v(c(p('if false { 1 } elseif true { 2 } else { 3 }'))).stack.pop()).toEqual(2);
     });
   });
 });

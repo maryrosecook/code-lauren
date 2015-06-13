@@ -38,6 +38,29 @@ function compileInvocation(a) {
   return code;
 };
 
+function compileConditional(a) {
+  var parts = a.c;
+
+  var clauses = []
+  for (var i = 0; i < parts.length; i += 2) {
+    clauses.push(
+      compile(parts[i]).concat( // put conditional value to evaluate on stack
+        [["if_not_true_jump", 3]], // skip block if !condition
+        compile(parts[i + 1]), // push condition's lambda onto stack (skipped if !condition)
+        [["invoke", 0]] // invoke the lambda (skipped if !condition)
+      )
+    );
+  }
+
+  var bc = [];
+  for (var i = clauses.length - 1; i >= 0; i--) {
+    bc.unshift(["jump", bc.length]);
+    bc = clauses[i].concat(bc);
+  };
+
+  return bc;
+};
+
 function compileLambdaDef(a) {
   return [["push_lambda", { bc: compile(util.getNodeAt(a, ["lambda", 1])), ast: a }]];
 };
@@ -66,6 +89,8 @@ function compile(a) {
     return compileReturn(a);
   } else if (a.t === "assignment") {
     return compileAssignment(a);
+  } else if (a.t === "conditional") {
+    return compileConditional(a);
   } else if (a.t === "label") {
     return compileLabel(a);
   } else if (a.t === "number" || a.t === "string" || a.t === "boolean") {
