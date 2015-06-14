@@ -81,12 +81,12 @@ describe("bytecode interpreter", function() {
 
   describe("assignment", function() {
     it("should assign literal to env at top level", function() {
-      var env = v(c(p("a: 1"))).env;
+      var env = v(c(p("a: 1"))).envStack[0];
       expect(env.getLocalBinding("a")).toEqual(1);
     });
 
     it("should assign literal to env at top level", function() {
-      var fn = v(c(p("a: { 1 }"))).env.getLocalBinding("a");
+      var fn = v(c(p("a: { 1 }"))).envStack[0].getLocalBinding("a");
       expect(fn.bc).toEqual([["push", 1],
                              ["return"]]);
       expect(fn.ast).toBeDefined();
@@ -128,6 +128,13 @@ describe("bytecode interpreter", function() {
 
     it("should not return else if previous condition is true", function() {
       expect(v(c(p('if false { 1 } elseif true { 2 } else { 3 }'))).stack.pop()).toEqual(2);
+    });
+  });
+
+  describe("recursion", function() {
+    it("should trampoline a program where there is an if in the tail position", function() {
+      expect(v(c(p('tozero: { ?x if equals(x 0) { "done" } else { tozero(subtract(x 1)) } } \n tozero(20000)'))).stack.pop())
+        .toEqual("done");
     });
   });
 });

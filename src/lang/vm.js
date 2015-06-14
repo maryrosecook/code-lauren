@@ -15,7 +15,7 @@ function stepPush(ins, p) {
 
 function stepPushLambda(ins, p) {
   var lambda = ins[1];
-  lambda.closureEnv = p.env;
+  lambda.closureEnv = _.last(p.envStack);
   p.stack.push(lambda);
   return p;
 };
@@ -26,17 +26,17 @@ function stepPop(ins, p) {
 };
 
 function stepGetEnv(ins, p) {
-  p.stack.push(p.env.getScopedBinding(ins[1]));
+  p.stack.push(_.last(p.envStack).getScopedBinding(ins[1]));
   return p;
 };
 
 function stepSetEnv(ins, p) {
-  p.env.setGlobalBinding(ins[1], p.stack.pop());
+  _.last(p.envStack).setGlobalBinding(ins[1], p.stack.pop());
   return p;
 };
 
 function stepPopEnvScope(ins, p) {
-  p.env = p.env.parent;
+  p.envStack.pop();
   return p;
 };
 
@@ -50,7 +50,7 @@ function stepInvoke(ins, p) {
   if (fn.bc !== undefined) { // a lambda
     var lambdaEnv = scope(_.object(_.pluck(fn.ast.c[0], "c"), args), fn.closureEnv);
     p.bc = fn.bc.concat([["pop_env_scope"]], p.bc); // prepend fn bc to rest of bc
-    p.env = lambdaEnv;
+    p.envStack.push(lambdaEnv);
   } else { // is a JS function object
     p.stack.push(fn.apply(null, args));
   }
@@ -86,8 +86,6 @@ function step(p) {
   } else if (ins[0] === "set_env") {
     return stepSetEnv(ins, p);
   } else if (ins[0] === "pop_env_scope") {
-    console.log(p.env);
-    console.log();
     return stepPopEnvScope(ins, p);
   } else if (ins[0] === "invoke") {
     return stepInvoke(ins, p);
@@ -113,7 +111,7 @@ function complete(p) {
 function createProgram(bc, env, stack) {
   return {
     bc: bc,
-    env: env || scope(standardLibrary()),
+    envStack: [env ? env : scope(standardLibrary())],
     stack: stack || []
   };
 };
