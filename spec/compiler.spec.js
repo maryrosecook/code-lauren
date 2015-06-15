@@ -52,7 +52,8 @@ describe("bytecode compiler", function() {
         .toEqual([["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 1],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 0],
 
@@ -64,14 +65,16 @@ describe("bytecode compiler", function() {
         .toEqual([["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 1],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 5],
 
                   ["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 2],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 0],
 
@@ -83,21 +86,24 @@ describe("bytecode compiler", function() {
         .toEqual([["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 1],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 10],
 
                   ["push", false],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 2],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 5],
 
                   ["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 3],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 0],
 
@@ -109,28 +115,32 @@ describe("bytecode compiler", function() {
         .toEqual([["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 1],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 15],
 
                   ["push", false],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 2],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 10],
 
                   ["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 3],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 5],
 
                   ["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 4],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 0],
 
@@ -142,13 +152,15 @@ describe("bytecode compiler", function() {
         .toEqual([["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 1],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 5],
                   ["push", false],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 2],
-                                         ["return"]] }],
+                                         ["return"],
+                                         ["pop_env_scope"]] }],
                   ["invoke", 0],
                   ["jump", 0],
 
@@ -160,13 +172,15 @@ describe("bytecode compiler", function() {
     it("should compile an empty lambda", function() {
       expect(c(util.getNodeAt(p("{}"), ["top", "do", 0, "return"]))[0][1].bc)
         .toEqual([["push", undefined],
-                  ["return"]]);
+                  ["return"],
+                  ["pop_env_scope"]]);
     });
 
     it("should compile a lambda that returns 1", function() {
       expect(c(util.getNodeAt(p("{ 1 }"), ["top", "do", 0, "return"]))[0][1].bc)
         .toEqual([["push", 1],
-                  ["return"]]);
+                  ["return"],
+                  ["pop_env_scope"]]);
     });
 
     it("should compile lambda that has 2 expressions and returns the second", function() {
@@ -174,14 +188,16 @@ describe("bytecode compiler", function() {
         .toEqual([["push", 1],
                   ["pop"],
                   ["push", 2],
-                  ["return"]]);
+                  ["return"],
+                  ["pop_env_scope"]]);
     });
 
     it("should compile lambda that contains an invocation on no arguments", function() {
       expect(c(util.getNodeAt(p("{ a() }"), ["top", "do", 0, "return"]))[0][1].bc)
         .toEqual([["get_env", "a"],
                   ["invoke", 0],
-                  ["return"]]);
+                  ["return"],
+                  ["pop_env_scope"]]);
     });
 
     it("should compile lambda that contains an invocation with some arguments", function() {
@@ -190,16 +206,20 @@ describe("bytecode compiler", function() {
                   ["push", 2],
                   ["get_env", "a"],
                   ["invoke", 2],
-                  ["return"]]);
+                  ["return"],
+                  ["pop_env_scope"]]);
     });
 
     it("should compile invocation of lambda literal", function() {
       var code = stripFnAsts(c(util.getNodeAt(p("{ {}() }"),
                                               ["top", "do", 0, "return"]))[0][1].bc);
 
-      expect(code).toEqual([["push_lambda", { bc: [["push", undefined], ["return"]] }],
+      expect(code).toEqual([["push_lambda", { bc: [["push", undefined],
+                                                   ["return"],
+                                                   ["pop_env_scope"]] }],
                             ["invoke", 0],
-                            ["return"]]);
+                            ["return"],
+                            ["pop_env_scope"]]);
     });
   });
 });

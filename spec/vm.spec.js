@@ -88,7 +88,8 @@ describe("bytecode interpreter", function() {
     it("should assign lambda to env at top level", function() {
       var fn = v(c(p("a: { 1 }"))).envStack[0].getLocalBinding("a");
       expect(fn.bc).toEqual([["push", 1],
-                             ["return"]]);
+                             ["return"],
+                             ["pop_env_scope"]]);
       expect(fn.ast).toBeDefined();
     });
   });

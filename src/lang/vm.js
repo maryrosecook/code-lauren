@@ -46,7 +46,7 @@ function stepInvoke(ins, p) {
   if (fn.bc !== undefined) { // a lambda
     var lambdaEnv = scope(_.object(_.pluck(fn.ast.c[0], "c"), args), fn.closureEnv);
     Array.prototype.splice.apply(p.bc,
-                                 [p.bcPointer, 0].concat(fn.bc.concat([["pop_env_scope"]])));
+                                 [p.bcPointer, 0].concat(fn.bc));
     p.envStack.push(lambdaEnv);
   } else { // is a JS function object
     p.stack.push(fn.apply(null, args));
