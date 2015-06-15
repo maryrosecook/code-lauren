@@ -4,10 +4,6 @@ var util = require("../util");
 var standardLibrary = require("./standard-library");
 var scope = require("./scope");
 
-function stepEndOfProgram(ins, p) {
-  return p;
-};
-
 function stepPush(ins, p) {
   p.stack.push(ins[1]);
   return p;
@@ -49,7 +45,8 @@ function stepInvoke(ins, p) {
 
   if (fn.bc !== undefined) { // a lambda
     var lambdaEnv = scope(_.object(_.pluck(fn.ast.c[0], "c"), args), fn.closureEnv);
-    p.bc = fn.bc.concat([["pop_env_scope"]], p.bc); // prepend fn bc to rest of bc
+    Array.prototype.splice.apply(p.bc,
+                                 [p.bcPointer, 0].concat(fn.bc.concat([["pop_env_scope"]])));
     p.envStack.push(lambdaEnv);
   } else { // is a JS function object
     p.stack.push(fn.apply(null, args));
@@ -60,21 +57,23 @@ function stepInvoke(ins, p) {
 
 function stepIfNotTrueJump(ins, p) {
   if (p.stack.pop() !== true) {
-    p.bc.splice(0, ins[1]);
+    p.bcPointer += ins[1];
   }
 
   return p;
 };
 
 function stepJump(ins, p) {
-  p.bc.splice(0, ins[1]);
+  p.bcPointer += ins[1];
   return p;
 };
 
 function step(p) {
-  var ins = p.bc.shift();
+  var ins = p.bc[p.bcPointer];
+  p.bcPointer++;
+
   if (ins === undefined) {
-    return stepEndOfProgram(ins, p);
+    return p;
   } else if (ins[0] === "push") {
     return stepPush(ins, p);
   } else if (ins[0] === "push_lambda") {
@@ -101,16 +100,21 @@ function step(p) {
 };
 
 function complete(p) {
-  while (p.bc.length > 0) {
+  while (!isComplete(p)) {
     p = step(p);
   }
 
   return p;
 };
 
+function isComplete(p) {
+  return p.bcPointer === p.bc.length;
+};
+
 function createProgram(bc, env, stack) {
   return {
     bc: bc,
+    bcPointer: 0,
     envStack: [env ? env : scope(standardLibrary())],
     stack: stack || []
   };
@@ -120,8 +124,17 @@ function createProgramAndComplete(bc, env, stack) {
   return complete(createProgram(bc, env, stack));
 };
 
+function RuntimeError(e) {
+  util.copyException(e, this);
+};
+RuntimeError.prototype = new Error();
+
 createProgramAndComplete.createProgramAndComplete = createProgramAndComplete;
 createProgramAndComplete.createProgram = createProgram;
 createProgramAndComplete.step = step;
 createProgramAndComplete.complete = complete;
+createProgramAndComplete.isComplete = isComplete;
+
+createProgramAndComplete.RuntimeError = RuntimeError;
+
 module.exports = createProgramAndComplete;
