@@ -41,10 +41,7 @@ function step(p) {
 function parse(code, annotator) {
   try {
     parser.balanceParentheses(code);
-
-    var ast = parser.parse(code);
-
-    return ast;
+    return parser.parse(code);
   } catch(e) {
     if (e instanceof parser.ParseError) {
       annotator.codeHighlight(code, e.i, "error");
