@@ -51,9 +51,10 @@
 	__webpack_require__(9);
 
 	var parser = __webpack_require__(1);
-	var interpret = __webpack_require__(2);
-	var scope = __webpack_require__(3);
-	var r = __webpack_require__(4);
+	var compile = __webpack_require__(2);
+	var vm = __webpack_require__(3);
+
+	var scope = __webpack_require__(4);
 	var createEditor = __webpack_require__(5);
 	var createAnnotator = __webpack_require__(6);
 	var createEnv = __webpack_require__(7);
@@ -72,13 +73,11 @@
 	  });
 	});
 
-	function step(g) {
+	function step(p) {
 	  try {
-	    r.step(g);
+	    return vm.step(p);
 	  } catch (e) {
-	    if (e instanceof r.DoneError) {
-	      console.log("Program complete.");
-	    } else if (e instanceof r.RuntimeError) {
+	    if (e instanceof vm.RuntimeError) {
 	      console.log(e.stack);
 	    } else {
 	      console.log(e.stack);
@@ -120,13 +119,14 @@
 	  annotator.clear();
 
 	  try {
-	    var g = r(parse(code, annotator), env);
+	    var p = vm.createProgram(compile(parse(code, annotator)), env);
 	    var lastEventLoopYield = new Date().getTime();
 
 	    var going = true;
 	    (function tick() {
-	      if (going) {
-	        step(g);
+	      if (going && !vm.isComplete(p)) {
+	        p = step(p);
+
 	        if (timeToYieldToEventLoop(lastEventLoopYield)) {
 	          requestAnimationFrame(function () {
 	            lastEventLoopYield = new Date().getTime();
@@ -163,10 +163,10 @@
 	var peg = __webpack_require__(20);
 
 	var _ = __webpack_require__(8);
-	var util = __webpack_require__(10);
-	var parserStateError = __webpack_require__(16);
+	var util = __webpack_require__(15);
+	var parserStateError = __webpack_require__(17);
 
-	var pegParse = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, i: offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), offset); }\n  / __*\n    { return node(\"do\", [], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.i = offset; return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
+	var pegParse = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, i: offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n\n  function wrapLastDoExpressionInReturn(expressions) {\n    var initial = expressions.slice(0, expressions.length - 1);\n    var last = expressions[expressions.length - 1];\n    return initial.concat(node(\"return\", last, last.offset));\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }\n  / __*\n    { return node(\"do\", [node(\"return\", undefined, offset)], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.i = offset; return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
 
 	function parse(codeStr) {
 	  try {
@@ -280,374 +280,256 @@
 
 	"use strict";
 
-	var marked0$0 = [listStar, trampoline, interpretInvocation, interpretDo, interpretTop, interpretAssignment, interpretConditional, interpret].map(regeneratorRuntime.mark);
 	var _ = __webpack_require__(8);
 
-	var util = __webpack_require__(10);
-	var standardLibrary = __webpack_require__(11);
-	var scope = __webpack_require__(3);
+	var util = __webpack_require__(15);
 
-	function Thunk(gFn) {
-	  this.g = gFn();
+	function compileLiteral(a) {
+	  return [["push", a.c]];
 	};
 
-	function listStar(gs) {
-	  var exprs, i, x;
-	  return regeneratorRuntime.wrap(function listStar$(context$1$0) {
-	    while (1) switch (context$1$0.prev = context$1$0.next) {
-	      case 0:
-	        exprs = [];
-	        i = 0;
-
-	      case 2:
-	        if (!(i < gs.length)) {
-	          context$1$0.next = 10;
-	          break;
-	        }
-
-	        return context$1$0.delegateYield(gs[i], "t0", 4);
-
-	      case 4:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t0), "t1", 5);
-
-	      case 5:
-	        x = context$1$0.t1;
-
-	        exprs.push(x);
-
-	      case 7:
-	        i++;
-	        context$1$0.next = 2;
-	        break;
-
-	      case 10:
-	        return context$1$0.abrupt("return", exprs);
-
-	      case 11:
-	      case "end":
-	        return context$1$0.stop();
-	    }
-	  }, marked0$0[0], this);
+	function compileLabel(a) {
+	  return [["get_env", a.c]];
 	};
 
-	function trampoline(v) {
-	  return regeneratorRuntime.wrap(function trampoline$(context$1$0) {
-	    while (1) switch (context$1$0.prev = context$1$0.next) {
-	      case 0:
-	        if (!(v instanceof Thunk)) {
-	          context$1$0.next = 5;
-	          break;
-	        }
-
-	        return context$1$0.delegateYield(v.g, "t2", 2);
-
-	      case 2:
-	        v = context$1$0.t2;
-	        context$1$0.next = 0;
-	        break;
-
-	      case 5:
-	        return context$1$0.abrupt("return", v);
-
-	      case 6:
-	      case "end":
-	        return context$1$0.stop();
-	    }
-	  }, marked0$0[1], this);
+	function compileUndefined() {
+	  return [["push", undefined]];
 	};
 
-	function interpretInvocation(ast, env) {
-	  var exprs;
-	  return regeneratorRuntime.wrap(function interpretInvocation$(context$1$0) {
-	    while (1) switch (context$1$0.prev = context$1$0.next) {
-	      case 0:
-	        return context$1$0.delegateYield(listStar(ast.c.map(function (x) {
-	          return interpret(x, env);
-	        })), "t4", 1);
-
-	      case 1:
-	        exprs = context$1$0.t4;
-	        return context$1$0.abrupt("return", new Thunk(regeneratorRuntime.mark(function callee$1$0() {
-	          return regeneratorRuntime.wrap(function callee$1$0$(context$2$0) {
-	            while (1) switch (context$2$0.prev = context$2$0.next) {
-	              case 0:
-	                return context$2$0.delegateYield(exprs[0].apply(null, exprs.slice(1)), "t3", 1);
-
-	              case 1:
-	                return context$2$0.abrupt("return", context$2$0.t3);
-
-	              case 2:
-	              case "end":
-	                return context$2$0.stop();
-	            }
-	          }, callee$1$0, this);
-	        })));
-
-	      case 3:
-	      case "end":
-	        return context$1$0.stop();
-	    }
-	  }, marked0$0[2], this);
+	function compileTop(a) {
+	  return compile(a.c);
 	};
 
-	function interpretDo(ast, env) {
-	  return regeneratorRuntime.wrap(function interpretDo$(context$1$0) {
-	    while (1) switch (context$1$0.prev = context$1$0.next) {
-	      case 0:
-	        return context$1$0.delegateYield(listStar(_.initial(ast.c).map(function (x) {
-	          return interpret(x, env);
-	        })), "t5", 1);
-
-	      case 1:
-	        return context$1$0.delegateYield(interpret(_.last(ast.c), env), "t6", 2);
-
-	      case 2:
-	        return context$1$0.abrupt("return", context$1$0.t6);
-
-	      case 3:
-	      case "end":
-	        return context$1$0.stop();
-	    }
-	  }, marked0$0[3], this);
-	};
-
-	function interpretTop(ast, env) {
-	  return regeneratorRuntime.wrap(function interpretTop$(context$1$0) {
-	    while (1) switch (context$1$0.prev = context$1$0.next) {
-	      case 0:
-	        return context$1$0.delegateYield(interpret(ast.c, env), "t7", 1);
-
-	      case 1:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t7), "t8", 2);
-
-	      case 2:
-	        return context$1$0.abrupt("return", context$1$0.t8);
-
-	      case 3:
-	      case "end":
-	        return context$1$0.stop();
-	    }
-	  }, marked0$0[4], this);
-	};
-
-	function interpretAssignment(ast, env) {
-	  var name, value;
-	  return regeneratorRuntime.wrap(function interpretAssignment$(context$1$0) {
-	    while (1) switch (context$1$0.prev = context$1$0.next) {
-	      case 0:
-	        name = ast.c[0].c;
-	        return context$1$0.delegateYield(interpret(ast.c[1], env), "t9", 2);
-
-	      case 2:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t9), "t10", 3);
-
-	      case 3:
-	        value = context$1$0.t10;
-
-	        env.setGlobalBinding(name, value);return context$1$0.abrupt("return", value);
-
-	      case 6:
-	      case "end":
-	        return context$1$0.stop();
-	    }
-	  }, marked0$0[5], this);
-	};
-
-	function interpretConditional(ast, env) {
-	  var parts, i, conditionReturn, bodyLambdaFn;
-	  return regeneratorRuntime.wrap(function interpretConditional$(context$1$0) {
-	    while (1) switch (context$1$0.prev = context$1$0.next) {
-	      case 0:
-	        parts = ast.c;
-	        i = 0;
-
-	      case 2:
-	        if (!(i < parts.length)) {
-	          context$1$0.next = 14;
-	          break;
-	        }
-
-	        return context$1$0.delegateYield(interpret(parts[i], env), "t11", 4);
-
-	      case 4:
-	        return context$1$0.delegateYield(trampoline(context$1$0.t11), "t12", 5);
-
-	      case 5:
-	        conditionReturn = context$1$0.t12;
-
-	        if (!(conditionReturn === true)) {
-	          context$1$0.next = 11;
-	          break;
-	        }
-
-	        return context$1$0.delegateYield(interpret(parts[i + 1], env), "t13", 8);
-
-	      case 8:
-	        bodyLambdaFn = context$1$0.t13;
-	        return context$1$0.delegateYield(bodyLambdaFn(), "t14", 10);
-
-	      case 10:
-	        return context$1$0.abrupt("return", context$1$0.t14);
-
-	      case 11:
-	        i += 2;
-	        context$1$0.next = 2;
-	        break;
-
-	      case 14:
-	      case "end":
-	        return context$1$0.stop();
-	    }
-	  }, marked0$0[6], this);
-	};
-
-	function interpretLambdaDef(ast, env) {
-	  return regeneratorRuntime.mark(function callee$1$0() {
-	    var lambdaArguments,
-	        lambdaParameters,
-	        lambdaScope,
-	        args$2$0 = arguments;
-	    return regeneratorRuntime.wrap(function callee$1$0$(context$2$0) {
-	      while (1) switch (context$2$0.prev = context$2$0.next) {
-	        case 0:
-	          lambdaArguments = args$2$0;
-	          lambdaParameters = _.pluck(ast.c[0], "c");
-	          lambdaScope = scope(_.object(lambdaParameters, lambdaArguments), env);
-	          return context$2$0.delegateYield(interpret(ast.c[1], lambdaScope), "t15", 4);
-
-	        case 4:
-	          return context$2$0.abrupt("return", context$2$0.t15);
-
-	        case 5:
-	        case "end":
-	          return context$2$0.stop();
-	      }
-	    }, callee$1$0, this);
+	function compileDo(a) {
+	  var nonTerminalExpressions = a.c.slice(0, -1);
+	  var pops = _.range(nonTerminalExpressions.length).map(function () {
+	    return ["pop"];
 	  });
+	  var compiledReturnExpression = compile(a.c[a.c.length - 1]);
+
+	  return util.mapCat(nonTerminalExpressions, compile).concat(pops).concat(compiledReturnExpression);
 	};
 
-	function interpret(ast, env) {
-	  return regeneratorRuntime.wrap(function interpret$(context$1$0) {
-	    while (1) switch (context$1$0.prev = context$1$0.next) {
-	      case 0:
-	        context$1$0.next = 2;
-	        return null;
-
-	      case 2:
-	        if (!(ast === undefined)) {
-	          context$1$0.next = 6;
-	          break;
-	        }
-
-	        return context$1$0.abrupt("return");
-
-	      case 6:
-	        if (!(env === undefined)) {
-	          context$1$0.next = 11;
-	          break;
-	        }
-
-	        return context$1$0.delegateYield(interpret(ast, scope(standardLibrary())), "t16", 8);
-
-	      case 8:
-	        return context$1$0.abrupt("return", context$1$0.t16);
-
-	      case 11:
-	        if (!(ast.t === "top")) {
-	          context$1$0.next = 16;
-	          break;
-	        }
-
-	        return context$1$0.delegateYield(interpretTop(ast, env), "t17", 13);
-
-	      case 13:
-	        return context$1$0.abrupt("return", context$1$0.t17);
-
-	      case 16:
-	        if (!(ast.t === "lambda")) {
-	          context$1$0.next = 20;
-	          break;
-	        }
-
-	        return context$1$0.abrupt("return", interpretLambdaDef(ast, env));
-
-	      case 20:
-	        if (!(ast.t === "assignment")) {
-	          context$1$0.next = 25;
-	          break;
-	        }
-
-	        return context$1$0.delegateYield(interpretAssignment(ast, env), "t18", 22);
-
-	      case 22:
-	        return context$1$0.abrupt("return", context$1$0.t18);
-
-	      case 25:
-	        if (!(ast.t === "conditional")) {
-	          context$1$0.next = 30;
-	          break;
-	        }
-
-	        return context$1$0.delegateYield(interpretConditional(ast, env), "t19", 27);
-
-	      case 27:
-	        return context$1$0.abrupt("return", context$1$0.t19);
-
-	      case 30:
-	        if (!(ast.t === "do")) {
-	          context$1$0.next = 35;
-	          break;
-	        }
-
-	        return context$1$0.delegateYield(interpretDo(ast, env), "t20", 32);
-
-	      case 32:
-	        return context$1$0.abrupt("return", context$1$0.t20);
-
-	      case 35:
-	        if (!(ast.t === "invocation")) {
-	          context$1$0.next = 40;
-	          break;
-	        }
-
-	        return context$1$0.delegateYield(interpretInvocation(ast, env), "t21", 37);
-
-	      case 37:
-	        return context$1$0.abrupt("return", context$1$0.t21);
-
-	      case 40:
-	        if (!(ast.t === "label")) {
-	          context$1$0.next = 44;
-	          break;
-	        }
-
-	        return context$1$0.abrupt("return", env.getScopedBinding(ast.c));
-
-	      case 44:
-	        if (!(ast.t === "number" || ast.t === "string" || ast.t === "boolean")) {
-	          context$1$0.next = 46;
-	          break;
-	        }
-
-	        return context$1$0.abrupt("return", ast.c);
-
-	      case 46:
-	      case "end":
-	        return context$1$0.stop();
-	    }
-	  }, marked0$0[7], this);
+	function compileInvocation(a) {
+	  var aInvocation = util.getNodeAt(a, ["invocation"]);
+	  var aArgs = aInvocation.slice(1);
+	  var compiledArgs = util.mapCat(aArgs, compile);
+	  var compiledFn = compile(aInvocation[0]);
+	  var code = compiledArgs.concat(compiledFn, [["invoke", aArgs.length]]);
+	  return code;
 	};
 
-	interpret.interpret = interpret;
-	interpret.trampoline = trampoline;
-	module.exports = interpret;
-	// todo change this to create new scope?
-	// allows the program to be stepped, rather than only invoked in one go
+	function compileConditional(a) {
+	  var parts = a.c;
 
-	// for empty do block
+	  var clauses = [];
+	  for (var i = 0; i < parts.length; i += 2) {
+	    clauses.push(compile(parts[i]).concat( // put conditional value to evaluate on stack
+	    [["if_not_true_jump", 3]], // skip block if !condition
+	    compile(parts[i + 1]), // push condition's lambda onto stack (skipped if !condition)
+	    [["invoke", 0]] // invoke the lambda (skipped if !condition)
+	    ));
+	  }
+
+	  var bc = [];
+	  for (var i = clauses.length - 1; i >= 0; i--) {
+	    bc.unshift(["jump", bc.length]);
+	    bc = clauses[i].concat(bc);
+	  };
+
+	  return bc;
+	};
+
+	function compileLambdaDef(a) {
+	  return [["push_lambda", { bc: compile(util.getNodeAt(a, ["lambda", 1])), ast: a }]];
+	};
+
+	function compileReturn(a) {
+	  return compile(a.c).concat([["return"]]);
+	};
+
+	function compileAssignment(a) {
+	  return compile(a.c[1]).concat([["set_env", a.c[0].c], ["pop"]]);
+	};
+
+	function compile(a) {
+	  if (a === undefined) {
+	    return compileUndefined();
+	  } else if (a.t === "top") {
+	    return compileTop(a);
+	  } else if (a.t === "do") {
+	    return compileDo(a);
+	  } else if (a.t === "lambda") {
+	    return compileLambdaDef(a);
+	  } else if (a.t === "invocation") {
+	    return compileInvocation(a);
+	  } else if (a.t === "return") {
+	    return compileReturn(a);
+	  } else if (a.t === "assignment") {
+	    return compileAssignment(a);
+	  } else if (a.t === "conditional") {
+	    return compileConditional(a);
+	  } else if (a.t === "label") {
+	    return compileLabel(a);
+	  } else if (a.t === "number" || a.t === "string" || a.t === "boolean") {
+	    return compileLiteral(a);
+	  }
+	};
+
+	module.exports = compile;
 
 /***/ },
 /* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _ = __webpack_require__(8);
+
+	var util = __webpack_require__(15);
+	var standardLibrary = __webpack_require__(13);
+	var scope = __webpack_require__(4);
+
+	function stepPush(ins, p) {
+	  p.stack.push(ins[1]);
+	  return p;
+	};
+
+	function stepPushLambda(ins, p) {
+	  var lambda = ins[1];
+	  lambda.closureEnv = _.last(p.envStack);
+	  p.stack.push(lambda);
+	  return p;
+	};
+
+	function stepPop(ins, p) {
+	  p.stack.pop();
+	  return p;
+	};
+
+	function stepGetEnv(ins, p) {
+	  p.stack.push(_.last(p.envStack).getScopedBinding(ins[1]));
+	  return p;
+	};
+
+	function stepSetEnv(ins, p) {
+	  _.last(p.envStack).setGlobalBinding(ins[1], p.stack.pop());
+	  return p;
+	};
+
+	function stepPopEnvScope(ins, p) {
+	  p.envStack.pop();
+	  return p;
+	};
+
+	function stepInvoke(ins, p) {
+	  var fn = p.stack.pop();
+	  var arity = ins[1];
+
+	  // TODO: raise errors for arity problems
+	  var args = _.range(arity).map(function () {
+	    return p.stack.pop();
+	  }).reverse();
+
+	  if (fn.bc !== undefined) {
+	    // a lambda
+	    var lambdaEnv = scope(_.object(_.pluck(fn.ast.c[0], "c"), args), fn.closureEnv);
+	    Array.prototype.splice.apply(p.bc, [p.bcPointer, 0].concat(fn.bc.concat([["pop_env_scope"]])));
+	    p.envStack.push(lambdaEnv);
+	  } else {
+	    // is a JS function object
+	    p.stack.push(fn.apply(null, args));
+	  }
+
+	  return p;
+	};
+
+	function stepIfNotTrueJump(ins, p) {
+	  if (p.stack.pop() !== true) {
+	    p.bcPointer += ins[1];
+	  }
+
+	  return p;
+	};
+
+	function stepJump(ins, p) {
+	  p.bcPointer += ins[1];
+	  return p;
+	};
+
+	function step(p) {
+	  var ins = p.bc[p.bcPointer];
+	  p.bcPointer++;
+
+	  if (ins === undefined) {
+	    return p;
+	  } else if (ins[0] === "push") {
+	    return stepPush(ins, p);
+	  } else if (ins[0] === "push_lambda") {
+	    return stepPushLambda(ins, p);
+	  } else if (ins[0] === "pop") {
+	    return stepPop(ins, p);
+	  } else if (ins[0] === "get_env") {
+	    return stepGetEnv(ins, p);
+	  } else if (ins[0] === "set_env") {
+	    return stepSetEnv(ins, p);
+	  } else if (ins[0] === "pop_env_scope") {
+	    return stepPopEnvScope(ins, p);
+	  } else if (ins[0] === "invoke") {
+	    return stepInvoke(ins, p);
+	  } else if (ins[0] === "if_not_true_jump") {
+	    return stepIfNotTrueJump(ins, p);
+	  } else if (ins[0] === "jump") {
+	    return stepJump(ins, p);
+	  } else if (ins[0] === "return") {
+	    return p;
+	  } else {
+	    throw new Error("I don't know how to run this instruction: " + ins);
+	  }
+	};
+
+	function complete(p) {
+	  while (!isComplete(p)) {
+	    p = step(p);
+	  }
+
+	  return p;
+	};
+
+	function isComplete(p) {
+	  return p.bcPointer === p.bc.length;
+	};
+
+	function createProgram(bc, env, stack) {
+	  return {
+	    bc: bc,
+	    bcPointer: 0,
+	    envStack: [env ? env : scope(standardLibrary())],
+	    stack: stack || []
+	  };
+	};
+
+	function createProgramAndComplete(bc, env, stack) {
+	  return complete(createProgram(bc, env, stack));
+	};
+
+	function RuntimeError(e) {
+	  util.copyException(e, this);
+	};
+	RuntimeError.prototype = new Error();
+
+	createProgramAndComplete.createProgramAndComplete = createProgramAndComplete;
+	createProgramAndComplete.createProgram = createProgram;
+	createProgramAndComplete.step = step;
+	createProgramAndComplete.complete = complete;
+	createProgramAndComplete.isComplete = isComplete;
+
+	createProgramAndComplete.RuntimeError = RuntimeError;
+
+	module.exports = createProgramAndComplete;
+
+/***/ },
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -696,59 +578,16 @@
 	module.exports = createScope;
 
 /***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var util = __webpack_require__(10);
-	var parse = __webpack_require__(1);
-	var interpret = __webpack_require__(2);
-
-	function start(ast, env) {
-	  return interpret(ast, env);
-	};
-
-	function complete(g) {
-	  var result = g.next();
-	  while (result.done !== true) {
-	    result = g.next();
-	  }
-
-	  return result.value;
-	};
-
-	function step(g) {
-	  return g.next().value;
-	};
-
-	function RuntimeError(e) {
-	  util.copyException(e, this);
-	};
-	RuntimeError.prototype = new Error();
-
-	function DoneError(e) {
-	  util.copyException(e, this);
-	};
-	DoneError.prototype = new Error();
-
-	start.RuntimeError = RuntimeError;
-	start.DoneError = DoneError;
-	start.complete = complete;
-	start.step = step;
-	module.exports = start;
-
-/***/ },
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var ace = __webpack_require__(17);
-	__webpack_require__(13);
-	__webpack_require__(14);
+	var ace = __webpack_require__(16);
+	__webpack_require__(10);
+	__webpack_require__(11);
 
-	__webpack_require__(15);
+	__webpack_require__(12);
 
 	var createEditor = module.exports = function (initialText) {
 	  var editor = ace.edit('editor');
@@ -863,7 +702,7 @@
 	    return library;
 	  };
 
-	  return mergeLibrary(__webpack_require__(11)(), __webpack_require__(12)(screen));
+	  return mergeLibrary(__webpack_require__(13)(), __webpack_require__(14)(screen));
 	};
 
 /***/ },
@@ -2421,490 +2260,6 @@
 
 	"use strict";
 
-	var util = module.exports = {
-	  pp: function pp(str) {
-	    console.log(JSON.stringify(str, null, 2));
-	  },
-
-	  stripAst: function stripAst(obj) {
-	    if (typeof obj === "object") {
-	      delete obj.l;
-	      delete obj.i;
-	      Object.keys(obj).forEach(function (k) {
-	        util.stripAst(obj[k]);
-	      });
-	    }
-
-	    return obj;
-	  },
-
-	  copyException: function copyException(from, to) {
-	    to.stack = from.stack;
-	    to.message = from.message;
-	    for (var i in from) {
-	      to[i] = from[i];
-	    }
-
-	    return to;
-	  },
-
-	  defaultObj: function defaultObj(keys, def) {
-	    return keys.reduce(function (o, p) {
-	      o[p] = def instanceof Function ? def() : def;
-	      return o;
-	    }, {});
-	  }
-	};
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var _ = __webpack_require__(8);
-	var interpreter = __webpack_require__(2);
-
-	var createStandardLibrary = module.exports = function () {
-	  var lib = {
-	    add: regeneratorRuntime.mark(function add() {
-	      var args$2$0 = arguments;
-	      return regeneratorRuntime.wrap(function add$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", _.reduce(args$2$0, function (a, n) {
-	              return a + n;
-	            }));
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, add, this);
-	    }),
-
-	    subtract: regeneratorRuntime.mark(function subtract() {
-	      var args$2$0 = arguments;
-	      return regeneratorRuntime.wrap(function subtract$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", _.reduce(args$2$0, function (a, n) {
-	              return a - n;
-	            }));
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, subtract, this);
-	    }),
-
-	    multiply: regeneratorRuntime.mark(function multiply() {
-	      var args$2$0 = arguments;
-	      return regeneratorRuntime.wrap(function multiply$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", _.reduce(args$2$0, function (a, n) {
-	              return a * n;
-	            }));
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, multiply, this);
-	    }),
-
-	    sine: regeneratorRuntime.mark(function sine(x) {
-	      return regeneratorRuntime.wrap(function sine$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", Math.sin(lib.radians(x).next().value));
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, sine, this);
-	    }),
-
-	    cosine: regeneratorRuntime.mark(function cosine(x) {
-	      return regeneratorRuntime.wrap(function cosine$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", Math.cos(lib.radians(x).next().value));
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, cosine, this);
-	    }),
-
-	    tangent: regeneratorRuntime.mark(function tangent(x) {
-	      return regeneratorRuntime.wrap(function tangent$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", Math.tan(lib.radians(x).next().value));
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, tangent, this);
-	    }),
-
-	    radians: regeneratorRuntime.mark(function radians(x) {
-	      return regeneratorRuntime.wrap(function radians$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", 0.01745 * x);
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, radians, this);
-	    }),
-
-	    degrees: regeneratorRuntime.mark(function degrees(x) {
-	      return regeneratorRuntime.wrap(function degrees$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", x / 0.01745);
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, degrees, this);
-	    }),
-
-	    "new-dictionary": regeneratorRuntime.mark(function newDictionary() {
-	      var args$2$0 = arguments;
-	      return regeneratorRuntime.wrap(function newDictionary$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", _.object(_.filter(args$2$0, function (_, i) {
-	              return i % 2 === 0;
-	            }), _.filter(args$2$0, function (_, i) {
-	              return i % 2 === 1;
-	            })));
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, newDictionary, this);
-	    }),
-
-	    "less-than": regeneratorRuntime.mark(function lessThan(a, b) {
-	      return regeneratorRuntime.wrap(function lessThan$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", a < b);
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, lessThan, this);
-	    }),
-
-	    "greater-than": regeneratorRuntime.mark(function greaterThan(a, b) {
-	      return regeneratorRuntime.wrap(function greaterThan$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", a > b);
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, greaterThan, this);
-	    }),
-
-	    equals: regeneratorRuntime.mark(function equals() {
-	      var args,
-	          args$2$0 = arguments;
-	      return regeneratorRuntime.wrap(function equals$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            args = _.toArray(args$2$0);
-
-	            if (!(args.length < 2 || args[0] !== args[1])) {
-	              context$2$0.next = 5;
-	              break;
-	            }
-
-	            return context$2$0.abrupt("return", false);
-
-	          case 5:
-	            if (!(args.length === 2)) {
-	              context$2$0.next = 9;
-	              break;
-	            }
-
-	            return context$2$0.abrupt("return", true);
-
-	          case 9:
-	            return context$2$0.delegateYield(lib.equals.apply(null, args.slice(1)), "t22", 10);
-
-	          case 10:
-	            return context$2$0.abrupt("return", context$2$0.t22);
-
-	          case 11:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, equals, this);
-	    }),
-
-	    set: regeneratorRuntime.mark(function set(dict, key, value) {
-	      return regeneratorRuntime.wrap(function set$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            dict[key] = value;
-	            return context$2$0.abrupt("return", dict);
-
-	          case 2:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, set, this);
-	    }),
-
-	    get: regeneratorRuntime.mark(function get(dict, key) {
-	      return regeneratorRuntime.wrap(function get$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.abrupt("return", dict[key]);
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, get, this);
-	    }),
-
-	    print: regeneratorRuntime.mark(function print() {
-	      var output,
-	          args$2$0 = arguments;
-	      return regeneratorRuntime.wrap(function print$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            output = _.map(args$2$0, function (x) {
-	              return x.toString();
-	            }).join(" ");
-
-	            console.log(output);
-	            return context$2$0.abrupt("return", output + "\n");
-
-	          case 3:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, print, this);
-	    }),
-
-	    forever: regeneratorRuntime.mark(function forever(fn) {
-	      return regeneratorRuntime.wrap(function forever$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            if (false) {
-	              context$2$0.next = 5;
-	              break;
-	            }
-
-	            return context$2$0.delegateYield(fn(), "t23", 2);
-
-	          case 2:
-	            return context$2$0.delegateYield(__webpack_require__(2).trampoline(context$2$0.t23), "t24", 3);
-
-	          case 3:
-	            context$2$0.next = 0;
-	            break;
-
-	          case 5:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, forever, this);
-	    })
-	  };
-
-	  return lib;
-	};
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var _ = __webpack_require__(8);
-
-	var canvasLibrary = module.exports = function (screen) {
-	  var marked1$0 = [runCachedOperations].map(regeneratorRuntime.mark);
-
-	  var drawOperations = [];
-
-	  function runCachedOperations() {
-	    var i;
-	    return regeneratorRuntime.wrap(function runCachedOperations$(context$2$0) {
-	      while (1) switch (context$2$0.prev = context$2$0.next) {
-	        case 0:
-	          i = 0;
-
-	        case 1:
-	          if (!(i < drawOperations.length)) {
-	            context$2$0.next = 6;
-	            break;
-	          }
-
-	          return context$2$0.delegateYield(drawOperations[i](), "t25", 3);
-
-	        case 3:
-	          i++;
-	          context$2$0.next = 1;
-	          break;
-
-	        case 6:
-
-	          drawOperations = [];
-
-	        case 7:
-	        case "end":
-	          return context$2$0.stop();
-	      }
-	    }, marked1$0[0], this);
-	  };
-
-	  return {
-	    "write-text": regeneratorRuntime.mark(function writeText(str, x, y, color) {
-	      return regeneratorRuntime.wrap(function writeText$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.delegateYield(runCachedOperations(), "t26", 1);
-
-	          case 1:
-	            screen.font = "20px Georgia";
-	            screen.fillStyle = color;
-	            screen.fillText(str, x, y);
-
-	          case 4:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, writeText, this);
-	    }),
-
-	    "clear-screen": regeneratorRuntime.mark(function clearScreen() {
-	      return regeneratorRuntime.wrap(function clearScreen$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            drawOperations.push(regeneratorRuntime.mark(function callee$2$0() {
-	              return regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
-	                while (1) switch (context$3$0.prev = context$3$0.next) {
-	                  case 0:
-	                    screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
-
-	                  case 1:
-	                  case "end":
-	                    return context$3$0.stop();
-	                }
-	              }, callee$2$0, this);
-	            }));
-
-	          case 1:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, clearScreen, this);
-	    }),
-
-	    "draw-unfilled-circle": regeneratorRuntime.mark(function drawUnfilledCircle(x, y, radius, color) {
-	      return regeneratorRuntime.wrap(function drawUnfilledCircle$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.delegateYield(runCachedOperations(), "t27", 1);
-
-	          case 1:
-	            screen.beginPath();
-	            screen.arc(x, y, radius, 0, Math.PI * 2, true);
-	            screen.closePath();
-	            screen.strokeStyle = color;
-	            screen.stroke();
-
-	          case 6:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, drawUnfilledCircle, this);
-	    }),
-
-	    "draw-filled-circle": regeneratorRuntime.mark(function drawFilledCircle(x, y, radius, color) {
-	      return regeneratorRuntime.wrap(function drawFilledCircle$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.delegateYield(runCachedOperations(), "t28", 1);
-
-	          case 1:
-	            screen.beginPath();
-	            screen.arc(x, y, radius, 0, Math.PI * 2, true);
-	            screen.closePath();
-	            screen.fillStyle = color;
-	            screen.fill();
-
-	          case 6:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, drawFilledCircle, this);
-	    }),
-
-	    "draw-unfilled-rectangle": regeneratorRuntime.mark(function drawUnfilledRectangle(x, y, width, height, color) {
-	      return regeneratorRuntime.wrap(function drawUnfilledRectangle$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.delegateYield(runCachedOperations(), "t29", 1);
-
-	          case 1:
-	            screen.strokeStyle = color;
-	            screen.strokeRect(x, y, width, height);
-
-	          case 3:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, drawUnfilledRectangle, this);
-	    }),
-
-	    "draw-filled-rectangle": regeneratorRuntime.mark(function drawFilledRectangle(x, y, width, height, color) {
-	      return regeneratorRuntime.wrap(function drawFilledRectangle$(context$2$0) {
-	        while (1) switch (context$2$0.prev = context$2$0.next) {
-	          case 0:
-	            return context$2$0.delegateYield(runCachedOperations(), "t30", 1);
-
-	          case 1:
-	            screen.fillStyle = color;
-	            screen.fillRect(x, y, width, height);
-
-	          case 3:
-	          case "end":
-	            return context$2$0.stop();
-	        }
-	      }, drawFilledRectangle, this);
-	    })
-	  };
-	};
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
 	ace.define("ace/mode/scheme_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function (acequire, exports, module) {
 	  "use strict";
 
@@ -3000,7 +2355,7 @@
 	});
 
 /***/ },
-/* 14 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3016,7 +2371,7 @@
 	});
 
 /***/ },
-/* 15 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3026,180 +2381,230 @@
 	})();
 
 /***/ },
-/* 16 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var peg = __webpack_require__(20);
+	var _ = __webpack_require__(8);
+
+	var createStandardLibrary = module.exports = function () {
+	  var lib = {
+	    add: function add() {
+	      return _.reduce(arguments, function (a, n) {
+	        return a + n;
+	      });
+	    },
+
+	    subtract: function subtract() {
+	      return _.reduce(arguments, function (a, n) {
+	        return a - n;
+	      });
+	    },
+
+	    multiply: function multiply() {
+	      return _.reduce(arguments, function (a, n) {
+	        return a * n;
+	      });
+	    },
+
+	    sine: function sine(x) {
+	      return Math.sin(lib.radians(x));
+	    },
+
+	    cosine: function cosine(x) {
+	      return Math.cos(lib.radians(x));
+	    },
+
+	    tangent: function tangent(x) {
+	      return Math.tan(lib.radians(x));
+	    },
+
+	    radians: function radians(x) {
+	      return 0.01745 * x;
+	    },
+
+	    degrees: function degrees(x) {
+	      return x / 0.01745;
+	    },
+
+	    "new-dictionary": function newDictionary() {
+	      return _.object(_.filter(arguments, function (_, i) {
+	        return i % 2 === 0;
+	      }), _.filter(arguments, function (_, i) {
+	        return i % 2 === 1;
+	      }));
+	    },
+
+	    "less-than": function lessThan(a, b) {
+	      return a < b;
+	    },
+
+	    "greater-than": function greaterThan(a, b) {
+	      return a > b;
+	    },
+
+	    equals: function equals() {
+	      var args = _.toArray(arguments);
+	      if (args.length < 2 || args[0] !== args[1]) {
+	        return false;
+	      } else if (args.length === 2) {
+	        return true;
+	      } else {
+	        return lib.equals.apply(null, args.slice(1));
+	      }
+	    },
+
+	    set: function set(dict, key, value) {
+	      dict[key] = value;
+	      return dict;
+	    },
+
+	    get: function get(dict, key) {
+	      return dict[key];
+	    },
+
+	    print: function print(printable) {
+	      var output = _.map(arguments, function (x) {
+	        return x.toString();
+	      }).join(" ");
+	      console.log(output);
+	      return output + "\n";
+	    }
+	  };
+
+	  return lib;
+	};
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
 
 	var _ = __webpack_require__(8);
 
-	var examples = JSON.parse("{\n  \"examples\": [\n    {\n      \"code\":    \"a b\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"nextInput\":   \"[a-zA-Z0-9_\\\\-]+\",\n      \"message\": \"Expected this to be on a new line\"\n    },\n\n    {\n      \"code\":    \"a ()\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"nextInput\":   \"\\\\(\\\\)\",\n      \"message\": \"There should be no spaces between\\nthe name of the action and the ()\"\n    },\n\n    {\n      \"code\":    \"a: \",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"nextInput\":   \"$\",\n      \"message\": \"You have specified a name, but you also need a value\"\n    },\n\n    {\n      \"code\":    \"a: \\n\",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"nextInput\":   \"\\n\",\n      \"message\": \"You have specified a name, but you also need a value\"\n    },\n\n    {\n      \"code\":    \": 1\",\n      \"stack\":   [\"expression\", \"parenthetical\", \"invocation\", \"function\",\n                  \"label\", \"label_char\"],\n      \"nextInput\":   \":\",\n      \"message\": \"You have specified a value, but you also need a label\"\n    }\n  ]\n}\n").examples;
+	var canvasLibrary = module.exports = function (screen) {
+	  var drawOperations = [];
 
-	var pegParseTrace = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, i: offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), offset); }\n  / __*\n    { return node(\"do\", [], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.i = offset; return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true, trace: true }).parse;
-
-	var pegParseNoTrace = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, i: offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", [first].concat(rest), offset); }\n  / __*\n    { return node(\"do\", [], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.i = offset; return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
-
-	function parserStateError(code) {
-	  for (var i = 0; i < examples.length; i++) {
-	    if (isMatchingExample(examples[i], code)) {
-	      return examples[i].message;
+	  function runCachedOperations() {
+	    for (var i = 0; i < drawOperations.length; i++) {
+	      drawOperations[i]();
 	    }
-	  }
-	};
 
-	function isMatchingExample(example, code) {
-	  if (!isMatchingNextInput(example, code)) {
-	    return false;
-	  } else {
-	    var codeStack = codeToFailedParseStack(code);
-	    if (example.stack.length > codeStack.length) {
-	      return false;
-	    } else {
-	      return _.isEqual(example.stack, _.last(codeStack, example.stack.length));
-	    }
-	  }
-	};
+	    drawOperations = [];
+	  };
 
-	function isMatchingNextInput(example, code) {
-	  return nextInput(code).match(example.nextInput) !== null;
-	};
-
-	function nextInput(code) {
-	  try {
-	    pegParseNoTrace(code);
-	  } catch (e) {
-	    return code.slice(e.offset);
-	  }
-
-	  throw "Looking for failed token but code parsed";
-	};
-
-	function eventsToTree(_x, _x2) {
-	  var _again = true;
-
-	  _function: while (_again) {
-	    child = undefined;
-
-	    var createNode = function createNode(ev, parent) {
-	      return { rule: ev.rule, i: ev.offset, parent: parent, children: [] };
-	    };
-
-	    _again = false;
-	    var evs = _x,
-	        node = _x2;
-	    ;
-
-	    if (evs.length === 0) {
-	      return node;
-	    } else if (node === undefined) {
-	      node = createNode(evs[0]);
-	      eventsToTree(evs.slice(1), node);
-	      return node;
-	    } else if (evs[0].type === "rule.enter") {
-	      var child = createNode(evs[0], node);
-	      node.children.push(child);
-	      _x = evs.slice(1);
-	      _x2 = child;
-	      _again = true;
-	      continue _function;
-	    } else if (evs[0].type === "rule.fail" || evs[0].type === "rule.match") {
-	      _x = evs.slice(1);
-	      _x2 = node.parent;
-	      _again = true;
-	      continue _function;
-	    } else {
-	      throw "Unexpected rule type: " + evs[0].type;
-	    }
-	  }
-	};
-
-	function codeToFailedParseStack(code) {
-	  var eventGatherer = createEventGathererTracer();
-	  try {
-	    pegParseTrace(code, { tracer: eventGatherer });
-	  } catch (e) {
-	    var tree = eventsToTree(eventGatherer.getEvents());
-	    var stack = deepestFailedStack(treeToStacks(tree));
-	    return _.pluck(stack, "rule");
-	  }
-	};
-
-	function deepestFailedStack(stacks) {
-	  var furthestI = stacks.reduce(function (a, s) {
-	    return Math.max(a, _.last(s).i);
-	  }, 0);
-	  var furthest = stacks.filter(function (s) {
-	    return _.last(s).i === furthestI;
-	  });
-	  var greatestDepth = furthest.reduce(function (a, s) {
-	    return Math.max(a, s.length);
-	  }, 0);
-	  return _.last(furthest.filter(function (s) {
-	    return s.length === greatestDepth;
-	  }));
-	};
-
-	function treeToStacks(node, stack, allStacks) {
-	  if (stack === undefined && allStacks === undefined) {
-	    allStacks = [];
-	    treeToStacks(node, [], allStacks);
-	    return allStacks;
-	  } else {
-	    stack = stack.concat(node);
-	    if (node.children.length > 0) {
-	      node.children.forEach(function (c) {
-	        treeToStacks(c, stack, allStacks);
-	      });
-	    } else {
-	      allStacks.push(stack);
-	    }
-	  }
-	};
-
-	function printTree(_x3, _x4) {
-	  var _again2 = true;
-
-	  _function2: while (_again2) {
-	    i = undefined;
-	    _again2 = false;
-	    var node = _x3,
-	        depth = _x4;
-
-	    if (depth === undefined) {
-	      _x3 = node;
-	      _x4 = 1;
-	      _again2 = true;
-	      continue _function2;
-	    } else {
-	      console.log(Array(depth).join(" "), node.rule, node.i);
-	      for (var i = 0; i < node.children.length; i++) {
-	        printTree(node.children[i], depth + 1);
-	      }
-	    }
-	  }
-	};
-
-	function createEventGathererTracer() {
 	  return {
-	    events: [],
-
-	    trace: function trace(ev) {
-	      this.events.push(ev);
+	    "write-text": function writeText(str, x, y, color) {
+	      runCachedOperations();
+	      screen.font = "20px Georgia";
+	      screen.fillStyle = color;
+	      screen.fillText(str, x, y);
 	    },
 
-	    getEvents: function getEvents() {
-	      return this.events;
+	    "clear-screen": function clearScreen() {
+	      drawOperations.push(function () {
+	        screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
+	      });
+	    },
+
+	    "draw-unfilled-circle": function drawUnfilledCircle(x, y, radius, color) {
+	      runCachedOperations();
+	      screen.beginPath();
+	      screen.arc(x, y, radius, 0, Math.PI * 2, true);
+	      screen.closePath();
+	      screen.strokeStyle = color;
+	      screen.stroke();
+	    },
+
+	    "draw-filled-circle": function drawFilledCircle(x, y, radius, color) {
+	      runCachedOperations();
+	      screen.beginPath();
+	      screen.arc(x, y, radius, 0, Math.PI * 2, true);
+	      screen.closePath();
+	      screen.fillStyle = color;
+	      screen.fill();
+	    },
+
+	    "draw-unfilled-rectangle": function drawUnfilledRectangle(x, y, width, height, color) {
+	      runCachedOperations();
+	      screen.strokeStyle = color;
+	      screen.strokeRect(x, y, width, height);
+	    },
+
+	    "draw-filled-rectangle": function drawFilledRectangle(x, y, width, height, color) {
+	      runCachedOperations();
+	      screen.fillStyle = color;
+	      screen.fillRect(x, y, width, height);
 	    }
 	  };
 	};
 
-	parserStateError.codeToFailedParseStack = codeToFailedParseStack;
-	module.exports = parserStateError;
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _ = __webpack_require__(8);
+
+	var util = module.exports = {
+	  pp: function pp(str) {
+	    console.log(JSON.stringify(str, null, 2));
+	  },
+
+	  stripAst: function stripAst(obj) {
+	    if (typeof obj === "object") {
+	      delete obj.l;
+	      delete obj.i;
+	      Object.keys(obj).forEach(function (k) {
+	        util.stripAst(obj[k]);
+	      });
+	    }
+
+	    return obj;
+	  },
+
+	  copyException: function copyException(from, to) {
+	    to.stack = from.stack;
+	    to.message = from.message;
+	    for (var i in from) {
+	      to[i] = from[i];
+	    }
+
+	    return to;
+	  },
+
+	  defaultObj: function defaultObj(keys, def) {
+	    return keys.reduce(function (o, p) {
+	      o[p] = def instanceof Function ? def() : def;
+	      return o;
+	    }, {});
+	  },
+
+	  getNodeAt: function getNodeAt(node, keys) {
+	    var nextKey = keys[0];
+	    if (keys.length === 0) {
+	      return node;
+	    } else if (_.isArray(node) && nextKey in node) {
+	      return util.getNodeAt(node[nextKey], _.rest(keys));
+	    } else if (_.isObject(node) && node.t === nextKey) {
+	      return util.getNodeAt(node.c, _.rest(keys));
+	    } else {
+	      throw "Couldn't find node with key " + nextKey;
+	    }
+	  },
+
+	  mapCat: function mapCat(list, fn) {
+	    return list.reduce(function (acc, x) {
+	      return acc.concat(fn(x));
+	    }, []);
+	  }
+	};
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* ***** BEGIN LICENSE BLOCK *****
@@ -21415,6 +20820,179 @@
 	module.exports = window.ace.acequire("ace/ace");
 
 /***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var peg = __webpack_require__(20);
+
+	var _ = __webpack_require__(8);
+
+	var examples = JSON.parse("{\n  \"examples\": [\n    {\n      \"code\":    \"a b\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"nextInput\":   \"[a-zA-Z0-9_\\\\-]+\",\n      \"message\": \"Expected this to be on a new line\"\n    },\n\n    {\n      \"code\":    \"a ()\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"nextInput\":   \"\\\\(\\\\)\",\n      \"message\": \"There should be no spaces between\\nthe name of the action and the ()\"\n    },\n\n    {\n      \"code\":    \"a: \",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"nextInput\":   \"$\",\n      \"message\": \"You have specified a name, but you also need a value\"\n    },\n\n    {\n      \"code\":    \"a: \\n\",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"nextInput\":   \"\\n\",\n      \"message\": \"You have specified a name, but you also need a value\"\n    },\n\n    {\n      \"code\":    \": 1\",\n      \"stack\":   [\"expression\", \"parenthetical\", \"invocation\", \"function\",\n                  \"label\", \"label_char\"],\n      \"nextInput\":   \":\",\n      \"message\": \"You have specified a value, but you also need a label\"\n    }\n  ]\n}\n").examples;
+
+	var pegParseTrace = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, i: offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n\n  function wrapLastDoExpressionInReturn(expressions) {\n    var initial = expressions.slice(0, expressions.length - 1);\n    var last = expressions[expressions.length - 1];\n    return initial.concat(node(\"return\", last, last.offset));\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }\n  / __*\n    { return node(\"do\", [node(\"return\", undefined, offset)], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.i = offset; return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true, trace: true }).parse;
+
+	var pegParseNoTrace = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, i: offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n\n  function wrapLastDoExpressionInReturn(expressions) {\n    var initial = expressions.slice(0, expressions.length - 1);\n    var last = expressions[expressions.length - 1];\n    return initial.concat(node(\"return\", last, last.offset));\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }\n  / __*\n    { return node(\"do\", [node(\"return\", undefined, offset)], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.i = offset; return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition, lambda].concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, lambda].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, lambda]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
+
+	function parserStateError(code) {
+	  for (var i = 0; i < examples.length; i++) {
+	    if (isMatchingExample(examples[i], code)) {
+	      return examples[i].message;
+	    }
+	  }
+	};
+
+	function isMatchingExample(example, code) {
+	  if (!isMatchingNextInput(example, code)) {
+	    return false;
+	  } else {
+	    var codeStack = codeToFailedParseStack(code);
+	    if (example.stack.length > codeStack.length) {
+	      return false;
+	    } else {
+	      return _.isEqual(example.stack, _.last(codeStack, example.stack.length));
+	    }
+	  }
+	};
+
+	function isMatchingNextInput(example, code) {
+	  return nextInput(code).match(example.nextInput) !== null;
+	};
+
+	function nextInput(code) {
+	  try {
+	    pegParseNoTrace(code);
+	  } catch (e) {
+	    return code.slice(e.offset);
+	  }
+
+	  throw "Looking for failed token but code parsed";
+	};
+
+	function eventsToTree(_x, _x2) {
+	  var _again = true;
+
+	  _function: while (_again) {
+	    child = undefined;
+
+	    var createNode = function createNode(ev, parent) {
+	      return { rule: ev.rule, i: ev.offset, parent: parent, children: [] };
+	    };
+
+	    _again = false;
+	    var evs = _x,
+	        node = _x2;
+	    ;
+
+	    if (evs.length === 0) {
+	      return node;
+	    } else if (node === undefined) {
+	      node = createNode(evs[0]);
+	      eventsToTree(evs.slice(1), node);
+	      return node;
+	    } else if (evs[0].type === "rule.enter") {
+	      var child = createNode(evs[0], node);
+	      node.children.push(child);
+	      _x = evs.slice(1);
+	      _x2 = child;
+	      _again = true;
+	      continue _function;
+	    } else if (evs[0].type === "rule.fail" || evs[0].type === "rule.match") {
+	      _x = evs.slice(1);
+	      _x2 = node.parent;
+	      _again = true;
+	      continue _function;
+	    } else {
+	      throw "Unexpected rule type: " + evs[0].type;
+	    }
+	  }
+	};
+
+	function codeToFailedParseStack(code) {
+	  var eventGatherer = createEventGathererTracer();
+	  try {
+	    pegParseTrace(code, { tracer: eventGatherer });
+	  } catch (e) {
+	    var tree = eventsToTree(eventGatherer.getEvents());
+	    var stack = deepestFailedStack(treeToStacks(tree));
+	    return _.pluck(stack, "rule");
+	  }
+	};
+
+	function deepestFailedStack(stacks) {
+	  var furthestI = stacks.reduce(function (a, s) {
+	    return Math.max(a, _.last(s).i);
+	  }, 0);
+	  var furthest = stacks.filter(function (s) {
+	    return _.last(s).i === furthestI;
+	  });
+	  var greatestDepth = furthest.reduce(function (a, s) {
+	    return Math.max(a, s.length);
+	  }, 0);
+	  return _.last(furthest.filter(function (s) {
+	    return s.length === greatestDepth;
+	  }));
+	};
+
+	function treeToStacks(node, stack, allStacks) {
+	  if (stack === undefined && allStacks === undefined) {
+	    allStacks = [];
+	    treeToStacks(node, [], allStacks);
+	    return allStacks;
+	  } else {
+	    stack = stack.concat(node);
+	    if (node.children.length > 0) {
+	      node.children.forEach(function (c) {
+	        treeToStacks(c, stack, allStacks);
+	      });
+	    } else {
+	      allStacks.push(stack);
+	    }
+	  }
+	};
+
+	function printTree(_x3, _x4) {
+	  var _again2 = true;
+
+	  _function2: while (_again2) {
+	    i = undefined;
+	    _again2 = false;
+	    var node = _x3,
+	        depth = _x4;
+
+	    if (depth === undefined) {
+	      _x3 = node;
+	      _x4 = 1;
+	      _again2 = true;
+	      continue _function2;
+	    } else {
+	      console.log(Array(depth).join(" "), node.rule, node.i);
+	      for (var i = 0; i < node.children.length; i++) {
+	        printTree(node.children[i], depth + 1);
+	      }
+	    }
+	  }
+	};
+
+	function createEventGathererTracer() {
+	  return {
+	    events: [],
+
+	    trace: function trace(ev) {
+	      this.events.push(ev);
+	    },
+
+	    getEvents: function getEvents() {
+	      return this.events;
+	    }
+	  };
+	};
+
+	parserStateError.codeToFailedParseStack = codeToFailedParseStack;
+	module.exports = parserStateError;
+
+/***/ },
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -31777,9 +31355,9 @@
 	}
 	global._babelPolyfill = true;
 
-	__webpack_require__(28);
-
 	__webpack_require__(29);
+
+	__webpack_require__(28);
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
@@ -31991,7 +31569,7 @@
 /* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var classes = __webpack_require__(35);
+	var classes = __webpack_require__(30);
 
 	/* Thrown when the grammar contains an error. */
 	function GrammarError(message) {
@@ -36931,15 +36509,15 @@
 	   */
 	  passes: {
 	    check: {
-	      reportMissingRules:  __webpack_require__(30),
-	      reportLeftRecursion: __webpack_require__(31)
+	      reportMissingRules:  __webpack_require__(31),
+	      reportLeftRecursion: __webpack_require__(32)
 	    },
 	    transform: {
-	      removeProxyRules:    __webpack_require__(32)
+	      removeProxyRules:    __webpack_require__(33)
 	    },
 	    generate: {
-	      generateBytecode:    __webpack_require__(33),
-	      generateJavascript:  __webpack_require__(34)
+	      generateBytecode:    __webpack_require__(34),
+	      generateJavascript:  __webpack_require__(35)
 	    }
 	  },
 
@@ -37021,56 +36599,6 @@
 
 /***/ },
 /* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(40);
-	__webpack_require__(41);
-	__webpack_require__(42);
-	__webpack_require__(43);
-	__webpack_require__(44);
-	__webpack_require__(45);
-	__webpack_require__(46);
-	__webpack_require__(47);
-	__webpack_require__(48);
-	__webpack_require__(49);
-	__webpack_require__(50);
-	__webpack_require__(51);
-	__webpack_require__(52);
-	__webpack_require__(53);
-	__webpack_require__(54);
-	__webpack_require__(55);
-	__webpack_require__(56);
-	__webpack_require__(57);
-	__webpack_require__(58);
-	__webpack_require__(59);
-	__webpack_require__(60);
-	__webpack_require__(61);
-	__webpack_require__(62);
-	__webpack_require__(63);
-	__webpack_require__(64);
-	__webpack_require__(65);
-	__webpack_require__(66);
-	__webpack_require__(67);
-	__webpack_require__(68);
-	__webpack_require__(69);
-	__webpack_require__(70);
-	__webpack_require__(71);
-	__webpack_require__(72);
-	__webpack_require__(73);
-	__webpack_require__(74);
-	__webpack_require__(75);
-	__webpack_require__(76);
-	__webpack_require__(77);
-	__webpack_require__(78);
-	__webpack_require__(79);
-	__webpack_require__(80);
-	__webpack_require__(81);
-	__webpack_require__(82);
-	__webpack_require__(83);
-	module.exports = __webpack_require__(84).core;
-
-/***/ },
-/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -37641,7 +37169,73 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(40);
+	__webpack_require__(41);
+	__webpack_require__(42);
+	__webpack_require__(43);
+	__webpack_require__(44);
+	__webpack_require__(45);
+	__webpack_require__(46);
+	__webpack_require__(47);
+	__webpack_require__(48);
+	__webpack_require__(49);
+	__webpack_require__(50);
+	__webpack_require__(51);
+	__webpack_require__(52);
+	__webpack_require__(53);
+	__webpack_require__(54);
+	__webpack_require__(55);
+	__webpack_require__(56);
+	__webpack_require__(57);
+	__webpack_require__(58);
+	__webpack_require__(59);
+	__webpack_require__(60);
+	__webpack_require__(61);
+	__webpack_require__(62);
+	__webpack_require__(63);
+	__webpack_require__(64);
+	__webpack_require__(65);
+	__webpack_require__(66);
+	__webpack_require__(67);
+	__webpack_require__(68);
+	__webpack_require__(69);
+	__webpack_require__(70);
+	__webpack_require__(71);
+	__webpack_require__(72);
+	__webpack_require__(73);
+	__webpack_require__(74);
+	__webpack_require__(75);
+	__webpack_require__(76);
+	__webpack_require__(77);
+	__webpack_require__(78);
+	__webpack_require__(79);
+	__webpack_require__(80);
+	__webpack_require__(81);
+	__webpack_require__(82);
+	__webpack_require__(83);
+	module.exports = __webpack_require__(84).core;
+
+/***/ },
 /* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* Class utilities */
+	var classes = {
+	  subclass: function(child, parent) {
+	    function ctor() { this.constructor = child; }
+	    ctor.prototype = parent.prototype;
+	    child.prototype = new ctor();
+	  },
+	};
+
+	module.exports = classes;
+
+
+/***/ },
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var GrammarError = __webpack_require__(23),
@@ -37667,7 +37261,7 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var arrays       = __webpack_require__(21),
@@ -37703,7 +37297,7 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var arrays  = __webpack_require__(21),
@@ -37749,7 +37343,7 @@
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var arrays  = __webpack_require__(21),
@@ -38371,7 +37965,7 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var arrays = __webpack_require__(21),
@@ -39542,22 +39136,6 @@
 
 
 /***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* Class utilities */
-	var classes = {
-	  subclass: function(child, parent) {
-	    function ctor() { this.constructor = child; }
-	    ctor.prototype = parent.prototype;
-	    child.prototype = new ctor();
-	  },
-	};
-
-	module.exports = classes;
-
-
-/***/ },
 /* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -39776,12 +39354,12 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $                = __webpack_require__(84)
-	  , cof              = __webpack_require__(85)
-	  , $def             = __webpack_require__(87)
-	  , invoke           = __webpack_require__(90)
-	  , arrayMethod      = __webpack_require__(91)
-	  , IE_PROTO         = __webpack_require__(86).safe('__proto__')
-	  , assert           = __webpack_require__(92)
+	  , cof              = __webpack_require__(86)
+	  , $def             = __webpack_require__(85)
+	  , invoke           = __webpack_require__(91)
+	  , arrayMethod      = __webpack_require__(92)
+	  , IE_PROTO         = __webpack_require__(87).safe('__proto__')
+	  , assert           = __webpack_require__(93)
 	  , assertObject     = assert.obj
 	  , ObjectProto      = Object.prototype
 	  , A                = []
@@ -39992,7 +39570,7 @@
 	  // 22.1.3.19 / 15.4.4.22 Array.prototype.reduceRight(callbackfn [, initialValue])
 	  reduceRight: createArrayReduce(true),
 	  // 22.1.3.11 / 15.4.4.14 Array.prototype.indexOf(searchElement [, fromIndex])
-	  indexOf: indexOf = indexOf || __webpack_require__(93)(false),
+	  indexOf: indexOf = indexOf || __webpack_require__(94)(false),
 	  // 22.1.3.14 / 15.4.4.15 Array.prototype.lastIndexOf(searchElement [, fromIndex])
 	  lastIndexOf: function(el, fromIndex /* = @[*-1] */){
 	    var O      = toObject(this)
@@ -40006,7 +39584,7 @@
 	});
 
 	// 21.1.3.25 / 15.5.4.20 String.prototype.trim()
-	$def($def.P, 'String', {trim: __webpack_require__(94)(/^\s*([\s\S]*\S)?\s*$/, '$1')});
+	$def($def.P, 'String', {trim: __webpack_require__(95)(/^\s*([\s\S]*\S)?\s*$/, '$1')});
 
 	// 20.3.3.1 / 15.9.4.4 Date.now()
 	$def($def.S, 'Date', {now: function(){
@@ -40041,9 +39619,9 @@
 	'use strict';
 	// ECMAScript 6 symbols shim
 	var $        = __webpack_require__(84)
-	  , setTag   = __webpack_require__(85).set
-	  , uid      = __webpack_require__(86)
-	  , $def     = __webpack_require__(87)
+	  , setTag   = __webpack_require__(86).set
+	  , uid      = __webpack_require__(87)
+	  , $def     = __webpack_require__(85)
 	  , keyOf    = __webpack_require__(88)
 	  , has      = $.has
 	  , hide     = $.hide
@@ -40145,15 +39723,15 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.3.1 Object.assign(target, source)
-	var $def = __webpack_require__(87);
-	$def($def.S, 'Object', {assign: __webpack_require__(95)});
+	var $def = __webpack_require__(85);
+	$def($def.S, 'Object', {assign: __webpack_require__(90)});
 
 /***/ },
 /* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.3.10 Object.is(value1, value2)
-	var $def = __webpack_require__(87);
+	var $def = __webpack_require__(85);
 	$def($def.S, 'Object', {
 	  is: function is(x, y){
 	    return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
@@ -40165,7 +39743,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.3.19 Object.setPrototypeOf(O, proto)
-	var $def = __webpack_require__(87);
+	var $def = __webpack_require__(85);
 	$def($def.S, 'Object', {setPrototypeOf: __webpack_require__(96).set});
 
 /***/ },
@@ -40175,7 +39753,7 @@
 	'use strict';
 	// 19.1.3.6 Object.prototype.toString()
 	var $   = __webpack_require__(84)
-	  , cof = __webpack_require__(85)
+	  , cof = __webpack_require__(86)
 	  , tmp = {};
 	tmp[__webpack_require__(89)('toStringTag')] = 'z';
 	if($.FW && cof(tmp) != 'z')$.hide(Object.prototype, 'toString', function toString(){
@@ -40187,7 +39765,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $        = __webpack_require__(84)
-	  , $def     = __webpack_require__(87)
+	  , $def     = __webpack_require__(85)
 	  , isObject = $.isObject
 	  , toObject = $.toObject;
 	function wrapObjectMethod(METHOD, MODE){
@@ -40302,7 +39880,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $     = __webpack_require__(84)
-	  , $def  = __webpack_require__(87)
+	  , $def  = __webpack_require__(85)
 	  , abs   = Math.abs
 	  , floor = Math.floor
 	  , _isFinite = $.g.isFinite
@@ -40342,7 +39920,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var Infinity = 1 / 0
-	  , $def  = __webpack_require__(87)
+	  , $def  = __webpack_require__(85)
 	  , E     = Math.E
 	  , pow   = Math.pow
 	  , abs   = Math.abs
@@ -40468,7 +40046,7 @@
 /* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $def    = __webpack_require__(87)
+	var $def    = __webpack_require__(85)
 	  , toIndex = __webpack_require__(84).toIndex
 	  , fromCharCode = String.fromCharCode;
 
@@ -40495,7 +40073,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $    = __webpack_require__(84)
-	  , $def = __webpack_require__(87);
+	  , $def = __webpack_require__(85);
 
 	$def($def.S, 'String', {
 	  // 21.1.2.4 String.raw(callSite, ...substitutions)
@@ -40518,7 +40096,7 @@
 
 	var set   = __webpack_require__(84).set
 	  , at    = __webpack_require__(97)(true)
-	  , ITER  = __webpack_require__(86).safe('iter')
+	  , ITER  = __webpack_require__(87).safe('iter')
 	  , $iter = __webpack_require__(98)
 	  , step  = $iter.step;
 
@@ -40541,7 +40119,7 @@
 /* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $def = __webpack_require__(87);
+	var $def = __webpack_require__(85);
 	$def($def.P, 'String', {
 	  // 21.1.3.3 String.prototype.codePointAt(pos)
 	  codePointAt: __webpack_require__(97)(false)
@@ -40553,8 +40131,8 @@
 
 	'use strict';
 	var $    = __webpack_require__(84)
-	  , cof  = __webpack_require__(85)
-	  , $def = __webpack_require__(87)
+	  , cof  = __webpack_require__(86)
+	  , $def = __webpack_require__(85)
 	  , toLength = $.toLength;
 
 	$def($def.P, 'String', {
@@ -40576,8 +40154,8 @@
 
 	'use strict';
 	var $    = __webpack_require__(84)
-	  , cof  = __webpack_require__(85)
-	  , $def = __webpack_require__(87);
+	  , cof  = __webpack_require__(86)
+	  , $def = __webpack_require__(85);
 
 	$def($def.P, 'String', {
 	  // 21.1.3.7 String.prototype.includes(searchString, position = 0)
@@ -40593,7 +40171,7 @@
 
 	'use strict';
 	var $    = __webpack_require__(84)
-	  , $def = __webpack_require__(87);
+	  , $def = __webpack_require__(85);
 
 	$def($def.P, 'String', {
 	  // 21.1.3.13 String.prototype.repeat(count)
@@ -40613,8 +40191,8 @@
 
 	'use strict';
 	var $    = __webpack_require__(84)
-	  , cof  = __webpack_require__(85)
-	  , $def = __webpack_require__(87);
+	  , cof  = __webpack_require__(86)
+	  , $def = __webpack_require__(85);
 
 	$def($def.P, 'String', {
 	  // 21.1.3.18 String.prototype.startsWith(searchString [, position ])
@@ -40633,7 +40211,7 @@
 
 	var $     = __webpack_require__(84)
 	  , ctx   = __webpack_require__(99)
-	  , $def  = __webpack_require__(87)
+	  , $def  = __webpack_require__(85)
 	  , $iter = __webpack_require__(98)
 	  , stepCall = $iter.stepCall;
 	$def($def.S + $def.F * !__webpack_require__(100)(function(iter){ Array.from(iter); }), 'Array', {
@@ -40668,7 +40246,7 @@
 /* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $def = __webpack_require__(87);
+	var $def = __webpack_require__(85);
 	$def($def.S, 'Array', {
 	  // 22.1.2.3 Array.of( ...items)
 	  of: function of(/* ...args */){
@@ -40688,7 +40266,7 @@
 
 	var $          = __webpack_require__(84)
 	  , setUnscope = __webpack_require__(101)
-	  , ITER       = __webpack_require__(86).safe('iter')
+	  , ITER       = __webpack_require__(87).safe('iter')
 	  , $iter      = __webpack_require__(98)
 	  , step       = $iter.step
 	  , Iterators  = $iter.Iterators;
@@ -40733,7 +40311,7 @@
 
 	'use strict';
 	var $       = __webpack_require__(84)
-	  , $def    = __webpack_require__(87)
+	  , $def    = __webpack_require__(85)
 	  , toIndex = $.toIndex;
 	$def($def.P, 'Array', {
 	  // 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
@@ -40767,7 +40345,7 @@
 
 	'use strict';
 	var $       = __webpack_require__(84)
-	  , $def    = __webpack_require__(87)
+	  , $def    = __webpack_require__(85)
 	  , toIndex = $.toIndex;
 	$def($def.P, 'Array', {
 	  // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
@@ -40787,10 +40365,10 @@
 /* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $def = __webpack_require__(87);
+	var $def = __webpack_require__(85);
 	$def($def.P, 'Array', {
 	  // 22.1.3.8 Array.prototype.find(predicate, thisArg = undefined)
-	  find: __webpack_require__(91)(5)
+	  find: __webpack_require__(92)(5)
 	});
 	__webpack_require__(101)('find');
 
@@ -40798,10 +40376,10 @@
 /* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $def = __webpack_require__(87);
+	var $def = __webpack_require__(85);
 	$def($def.P, 'Array', {
 	  // 22.1.3.9 Array.prototype.findIndex(predicate, thisArg = undefined)
-	  findIndex: __webpack_require__(91)(6)
+	  findIndex: __webpack_require__(92)(6)
 	});
 	__webpack_require__(101)('findIndex');
 
@@ -40810,7 +40388,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $      = __webpack_require__(84)
-	  , cof    = __webpack_require__(85)
+	  , cof    = __webpack_require__(86)
 	  , RegExp = $.g.RegExp
 	  , Base   = RegExp
 	  , proto  = RegExp.prototype;
@@ -40835,7 +40413,7 @@
 	  // 21.2.5.3 get RegExp.prototype.flags()
 	  if(/./g.flags != 'g')$.setDesc(proto, 'flags', {
 	    configurable: true,
-	    get: __webpack_require__(94)(/^.*\/(\w*)$/, '$1')
+	    get: __webpack_require__(95)(/^.*\/(\w*)$/, '$1')
 	  });
 	}
 	__webpack_require__(102)(RegExp);
@@ -40847,17 +40425,17 @@
 	'use strict';
 	var $       = __webpack_require__(84)
 	  , ctx     = __webpack_require__(99)
-	  , cof     = __webpack_require__(85)
-	  , $def    = __webpack_require__(87)
-	  , assert  = __webpack_require__(92)
+	  , cof     = __webpack_require__(86)
+	  , $def    = __webpack_require__(85)
+	  , assert  = __webpack_require__(93)
 	  , $iter   = __webpack_require__(98)
 	  , SPECIES = __webpack_require__(89)('species')
-	  , RECORD  = __webpack_require__(86).safe('record')
+	  , RECORD  = __webpack_require__(87).safe('record')
 	  , forOf   = $iter.forOf
 	  , PROMISE = 'Promise'
 	  , global  = $.g
 	  , process = global.process
-	  , asap    = process && process.nextTick || __webpack_require__(103).set
+	  , asap    = process && process.nextTick || __webpack_require__(107).set
 	  , P       = global[PROMISE]
 	  , Base    = P
 	  , isFunction     = $.isFunction
@@ -41054,10 +40632,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var strong = __webpack_require__(104);
+	var strong = __webpack_require__(103);
 
 	// 23.1 Map Objects
-	__webpack_require__(105)('Map', {
+	__webpack_require__(104)('Map', {
 	  // 23.1.3.6 Map.prototype.get(key)
 	  get: function get(key){
 	    var entry = strong.getEntry(this, key);
@@ -41074,10 +40652,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var strong = __webpack_require__(104);
+	var strong = __webpack_require__(103);
 
 	// 23.2 Set Objects
-	__webpack_require__(105)('Set', {
+	__webpack_require__(104)('Set', {
 	  // 23.2.3.1 Set.prototype.add(value)
 	  add: function add(value){
 	    return strong.def(this, value = value === 0 ? 0 : value, value);
@@ -41090,7 +40668,7 @@
 
 	'use strict';
 	var $         = __webpack_require__(84)
-	  , weak      = __webpack_require__(106)
+	  , weak      = __webpack_require__(105)
 	  , leakStore = weak.leakStore
 	  , ID        = weak.ID
 	  , WEAK      = weak.WEAK
@@ -41100,7 +40678,7 @@
 	  , tmp       = {};
 
 	// 23.3 WeakMap Objects
-	var WeakMap = __webpack_require__(105)('WeakMap', {
+	var WeakMap = __webpack_require__(104)('WeakMap', {
 	  // 23.3.3.3 WeakMap.prototype.get(key)
 	  get: function get(key){
 	    if(isObject(key)){
@@ -41134,10 +40712,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var weak = __webpack_require__(106);
+	var weak = __webpack_require__(105);
 
 	// 23.4 WeakSet Objects
-	__webpack_require__(105)('WeakSet', {
+	__webpack_require__(104)('WeakSet', {
 	  // 23.4.3.1 WeakSet.prototype.add(value)
 	  add: function add(value){
 	    return weak.def(this, value, true);
@@ -41149,12 +40727,12 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $         = __webpack_require__(84)
-	  , $def      = __webpack_require__(87)
+	  , $def      = __webpack_require__(85)
 	  , setProto  = __webpack_require__(96)
 	  , $iter     = __webpack_require__(98)
-	  , ITER      = __webpack_require__(86).safe('iter')
+	  , ITER      = __webpack_require__(87).safe('iter')
 	  , step      = $iter.step
-	  , assert    = __webpack_require__(92)
+	  , assert    = __webpack_require__(93)
 	  , isObject  = $.isObject
 	  , getDesc   = $.getDesc
 	  , setDesc   = $.setDesc
@@ -41261,7 +40839,7 @@
 	    return !!_isExtensible(assertObject(target));
 	  },
 	  // 26.1.11 Reflect.ownKeys(target)
-	  ownKeys: __webpack_require__(107),
+	  ownKeys: __webpack_require__(106),
 	  // 26.1.12 Reflect.preventExtensions(target)
 	  preventExtensions: wrap(Object.preventExtensions || $.it),
 	  // 26.1.13 Reflect.set(target, propertyKey, V [, receiver])
@@ -41286,9 +40864,9 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://github.com/domenic/Array.prototype.includes
-	var $def = __webpack_require__(87);
+	var $def = __webpack_require__(85);
 	$def($def.P, 'Array', {
-	  includes: __webpack_require__(93)(true)
+	  includes: __webpack_require__(94)(true)
 	});
 	__webpack_require__(101)('includes');
 
@@ -41297,7 +40875,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://github.com/mathiasbynens/String.prototype.at
-	var $def = __webpack_require__(87);
+	var $def = __webpack_require__(85);
 	$def($def.P, 'String', {
 	  at: __webpack_require__(97)(true)
 	});
@@ -41307,9 +40885,9 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://gist.github.com/kangax/9698100
-	var $def = __webpack_require__(87);
+	var $def = __webpack_require__(85);
 	$def($def.S, 'RegExp', {
-	  escape: __webpack_require__(94)(/([\\\-[\]{}()*+?.,^$|])/g, '\\$1', true)
+	  escape: __webpack_require__(95)(/([\\\-[\]{}()*+?.,^$|])/g, '\\$1', true)
 	});
 
 /***/ },
@@ -41318,8 +40896,8 @@
 
 	// https://gist.github.com/WebReflection/9353781
 	var $       = __webpack_require__(84)
-	  , $def    = __webpack_require__(87)
-	  , ownKeys = __webpack_require__(107);
+	  , $def    = __webpack_require__(85)
+	  , ownKeys = __webpack_require__(106);
 
 	$def($def.S, 'Object', {
 	  getOwnPropertyDescriptors: function getOwnPropertyDescriptors(object){
@@ -41338,7 +40916,7 @@
 
 	// http://goo.gl/XkBrjD
 	var $    = __webpack_require__(84)
-	  , $def = __webpack_require__(87);
+	  , $def = __webpack_require__(85);
 	function createObjectToArray(isEntries){
 	  return function(object){
 	    var O      = $.toObject(object)
@@ -41362,7 +40940,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
-	var $def  = __webpack_require__(87)
+	var $def  = __webpack_require__(85)
 	  , forOf = __webpack_require__(98).forOf;
 	$def($def.P, 'Set', {
 	  toJSON: function(){
@@ -41378,7 +40956,7 @@
 
 	// JavaScript 1.6 / Strawman array statics shim
 	var $       = __webpack_require__(84)
-	  , $def    = __webpack_require__(87)
+	  , $def    = __webpack_require__(85)
 	  , $Array  = $.core.Array || Array
 	  , statics = {};
 	function setStatics(keys, length){
@@ -41399,8 +40977,8 @@
 
 	// ie9- setTimeout & setInterval additional parameters fix
 	var $         = __webpack_require__(84)
-	  , $def      = __webpack_require__(87)
-	  , invoke    = __webpack_require__(90)
+	  , $def      = __webpack_require__(85)
+	  , invoke    = __webpack_require__(91)
 	  , partial   = __webpack_require__(108)
 	  , navigator = $.g.navigator
 	  , MSIE      = !!navigator && /MSIE .\./.test(navigator.userAgent); // <- dirty ie9- check
@@ -41422,8 +41000,8 @@
 /* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $def  = __webpack_require__(87)
-	  , $task = __webpack_require__(103);
+	var $def  = __webpack_require__(85)
+	  , $task = __webpack_require__(107);
 	$def($def.G + $def.B, {
 	  setImmediate:   $task.set,
 	  clearImmediate: $task.clear
@@ -41554,37 +41132,6 @@
 /* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $        = __webpack_require__(84)
-	  , TAG      = __webpack_require__(89)('toStringTag')
-	  , toString = {}.toString;
-	function cof(it){
-	  return toString.call(it).slice(8, -1);
-	}
-	cof.classof = function(it){
-	  var O, T;
-	  return it == undefined ? it === undefined ? 'Undefined' : 'Null'
-	    : typeof (T = (O = Object(it))[TAG]) == 'string' ? T : cof(O);
-	};
-	cof.set = function(it, tag, stat){
-	  if(it && !$.has(it = stat ? it : it.prototype, TAG))$.hide(it, TAG, tag);
-	};
-	module.exports = cof;
-
-/***/ },
-/* 86 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var sid = 0;
-	function uid(key){
-	  return 'Symbol(' + key + ')_' + (++sid + Math.random()).toString(36);
-	}
-	uid.safe = __webpack_require__(84).g.Symbol || uid;
-	module.exports = uid;
-
-/***/ },
-/* 87 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var $          = __webpack_require__(84)
 	  , global     = $.g
 	  , core       = $.core
@@ -41629,6 +41176,37 @@
 	module.exports = $def;
 
 /***/ },
+/* 86 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $        = __webpack_require__(84)
+	  , TAG      = __webpack_require__(89)('toStringTag')
+	  , toString = {}.toString;
+	function cof(it){
+	  return toString.call(it).slice(8, -1);
+	}
+	cof.classof = function(it){
+	  var O, T;
+	  return it == undefined ? it === undefined ? 'Undefined' : 'Null'
+	    : typeof (T = (O = Object(it))[TAG]) == 'string' ? T : cof(O);
+	};
+	cof.set = function(it, tag, stat){
+	  if(it && !$.has(it = stat ? it : it.prototype, TAG))$.hide(it, TAG, tag);
+	};
+	module.exports = cof;
+
+/***/ },
+/* 87 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var sid = 0;
+	function uid(key){
+	  return 'Symbol(' + key + ')_' + (++sid + Math.random()).toString(36);
+	}
+	uid.safe = __webpack_require__(84).g.Symbol || uid;
+	module.exports = uid;
+
+/***/ },
 /* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -41650,11 +41228,34 @@
 	  , store  = {};
 	module.exports = function(name){
 	  return store[name] || (store[name] =
-	    global.Symbol && global.Symbol[name] || __webpack_require__(86).safe('Symbol.' + name));
+	    global.Symbol && global.Symbol[name] || __webpack_require__(87).safe('Symbol.' + name));
 	};
 
 /***/ },
 /* 90 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(84);
+	// 19.1.2.1 Object.assign(target, source, ...)
+	/*eslint-disable no-unused-vars */
+	module.exports = Object.assign || function assign(target, source){
+	/*eslint-enable no-unused-vars */
+	  var T = Object($.assertDefined(target))
+	    , l = arguments.length
+	    , i = 1;
+	  while(l > i){
+	    var S      = $.ES5Object(arguments[i++])
+	      , keys   = $.getKeys(S)
+	      , length = keys.length
+	      , j      = 0
+	      , key;
+	    while(length > j)T[key = keys[j++]] = S[key];
+	  }
+	  return T;
+	};
+
+/***/ },
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Fast apply
@@ -41678,7 +41279,7 @@
 	};
 
 /***/ },
-/* 91 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41724,7 +41325,7 @@
 	};
 
 /***/ },
-/* 92 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $ = __webpack_require__(84);
@@ -41747,7 +41348,7 @@
 	module.exports = assert;
 
 /***/ },
-/* 93 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41770,7 +41371,7 @@
 	};
 
 /***/ },
-/* 94 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41784,36 +41385,13 @@
 	};
 
 /***/ },
-/* 95 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var $ = __webpack_require__(84);
-	// 19.1.2.1 Object.assign(target, source, ...)
-	/*eslint-disable no-unused-vars */
-	module.exports = Object.assign || function assign(target, source){
-	/*eslint-enable no-unused-vars */
-	  var T = Object($.assertDefined(target))
-	    , l = arguments.length
-	    , i = 1;
-	  while(l > i){
-	    var S      = $.ES5Object(arguments[i++])
-	      , keys   = $.getKeys(S)
-	      , length = keys.length
-	      , j      = 0
-	      , key;
-	    while(length > j)T[key = keys[j++]] = S[key];
-	  }
-	  return T;
-	};
-
-/***/ },
 /* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Works with __proto__ only. Old v8 can't work with null proto objects.
 	/*eslint-disable no-proto */
 	var $      = __webpack_require__(84)
-	  , assert = __webpack_require__(92);
+	  , assert = __webpack_require__(93);
 	function check(O, proto){
 	  assert.obj(O);
 	  assert(proto === null || $.isObject(proto), proto, ": can't set as prototype!");
@@ -41866,9 +41444,9 @@
 	'use strict';
 	var $                 = __webpack_require__(84)
 	  , ctx               = __webpack_require__(99)
-	  , cof               = __webpack_require__(85)
-	  , $def              = __webpack_require__(87)
-	  , assertObject      = __webpack_require__(92).obj
+	  , cof               = __webpack_require__(86)
+	  , $def              = __webpack_require__(85)
+	  , assertObject      = __webpack_require__(93).obj
 	  , SYMBOL_ITERATOR   = __webpack_require__(89)('iterator')
 	  , FF_ITERATOR       = '@@iterator'
 	  , Iterators         = {}
@@ -41982,7 +41560,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// Optional / simple context binding
-	var assertFunction = __webpack_require__(92).fn;
+	var assertFunction = __webpack_require__(93).fn;
 	module.exports = function(fn, that, length){
 	  assertFunction(fn);
 	  if(~length && that === undefined)return fn;
@@ -42054,96 +41632,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $      = __webpack_require__(84)
-	  , ctx    = __webpack_require__(99)
-	  , cof    = __webpack_require__(85)
-	  , invoke = __webpack_require__(90)
-	  , global             = $.g
-	  , isFunction         = $.isFunction
-	  , html               = $.html
-	  , document           = global.document
-	  , process            = global.process
-	  , setTask            = global.setImmediate
-	  , clearTask          = global.clearImmediate
-	  , postMessage        = global.postMessage
-	  , addEventListener   = global.addEventListener
-	  , MessageChannel     = global.MessageChannel
-	  , counter            = 0
-	  , queue              = {}
-	  , ONREADYSTATECHANGE = 'onreadystatechange'
-	  , defer, channel, port;
-	function run(){
-	  var id = +this;
-	  if($.has(queue, id)){
-	    var fn = queue[id];
-	    delete queue[id];
-	    fn();
-	  }
-	}
-	function listner(event){
-	  run.call(event.data);
-	}
-	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
-	if(!isFunction(setTask) || !isFunction(clearTask)){
-	  setTask = function(fn){
-	    var args = [], i = 1;
-	    while(arguments.length > i)args.push(arguments[i++]);
-	    queue[++counter] = function(){
-	      invoke(isFunction(fn) ? fn : Function(fn), args);
-	    };
-	    defer(counter);
-	    return counter;
-	  };
-	  clearTask = function(id){
-	    delete queue[id];
-	  };
-	  // Node.js 0.8-
-	  if(cof(process) == 'process'){
-	    defer = function(id){
-	      process.nextTick(ctx(run, id, 1));
-	    };
-	  // Modern browsers, skip implementation for WebWorkers
-	  // IE8 has postMessage, but it's sync & typeof its postMessage is object
-	  } else if(addEventListener && isFunction(postMessage) && !global.importScripts){
-	    defer = function(id){
-	      postMessage(id, '*');
-	    };
-	    addEventListener('message', listner, false);
-	  // WebWorkers
-	  } else if(isFunction(MessageChannel)){
-	    channel = new MessageChannel;
-	    port    = channel.port2;
-	    channel.port1.onmessage = listner;
-	    defer = ctx(port.postMessage, port, 1);
-	  // IE8-
-	  } else if(document && ONREADYSTATECHANGE in document.createElement('script')){
-	    defer = function(id){
-	      html.appendChild(document.createElement('script'))[ONREADYSTATECHANGE] = function(){
-	        html.removeChild(this);
-	        run.call(id);
-	      };
-	    };
-	  // Rest old browsers
-	  } else {
-	    defer = function(id){
-	      setTimeout(ctx(run, id, 1), 0);
-	    };
-	  }
-	}
-	module.exports = {
-	  set:   setTask,
-	  clear: clearTask
-	};
-
-/***/ },
-/* 104 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
 	var $        = __webpack_require__(84)
 	  , ctx      = __webpack_require__(99)
-	  , safe     = __webpack_require__(86).safe
-	  , assert   = __webpack_require__(92)
+	  , safe     = __webpack_require__(87).safe
+	  , assert   = __webpack_require__(93)
 	  , $iter    = __webpack_require__(98)
 	  , has      = $.has
 	  , set      = $.set
@@ -42295,14 +41787,14 @@
 	};
 
 /***/ },
-/* 105 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	var $     = __webpack_require__(84)
-	  , $def  = __webpack_require__(87)
+	  , $def  = __webpack_require__(85)
 	  , $iter = __webpack_require__(98)
-	  , assertInstance = __webpack_require__(92).inst;
+	  , assertInstance = __webpack_require__(93).inst;
 
 	module.exports = function(NAME, methods, common, IS_MAP, isWeak){
 	  var Base  = $.g[NAME]
@@ -42349,7 +41841,7 @@
 	    if(buggyZero || chain !== inst)fixMethod(ADDER, true);
 	  }
 
-	  __webpack_require__(85).set(C, NAME);
+	  __webpack_require__(86).set(C, NAME);
 	  __webpack_require__(102)(C);
 
 	  O[NAME] = C;
@@ -42367,13 +41859,13 @@
 	};
 
 /***/ },
-/* 106 */
+/* 105 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	var $         = __webpack_require__(84)
-	  , safe      = __webpack_require__(86).safe
-	  , assert    = __webpack_require__(92)
+	  , safe      = __webpack_require__(87).safe
+	  , assert    = __webpack_require__(93)
 	  , forOf     = __webpack_require__(98).forOf
 	  , _has      = $.has
 	  , isObject  = $.isObject
@@ -42383,7 +41875,7 @@
 	  , ID        = safe('id')
 	  , WEAK      = safe('weak')
 	  , LEAK      = safe('leak')
-	  , method    = __webpack_require__(91)
+	  , method    = __webpack_require__(92)
 	  , find      = method(5)
 	  , findIndex = method(6);
 	function findFrozen(store, key){
@@ -42455,14 +41947,100 @@
 	};
 
 /***/ },
-/* 107 */
+/* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $            = __webpack_require__(84)
-	  , assertObject = __webpack_require__(92).obj;
+	  , assertObject = __webpack_require__(93).obj;
 	module.exports = function ownKeys(it){
 	  assertObject(it);
 	  return $.getSymbols ? $.getNames(it).concat($.getSymbols(it)) : $.getNames(it);
+	};
+
+/***/ },
+/* 107 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $      = __webpack_require__(84)
+	  , ctx    = __webpack_require__(99)
+	  , cof    = __webpack_require__(86)
+	  , invoke = __webpack_require__(91)
+	  , global             = $.g
+	  , isFunction         = $.isFunction
+	  , html               = $.html
+	  , document           = global.document
+	  , process            = global.process
+	  , setTask            = global.setImmediate
+	  , clearTask          = global.clearImmediate
+	  , postMessage        = global.postMessage
+	  , addEventListener   = global.addEventListener
+	  , MessageChannel     = global.MessageChannel
+	  , counter            = 0
+	  , queue              = {}
+	  , ONREADYSTATECHANGE = 'onreadystatechange'
+	  , defer, channel, port;
+	function run(){
+	  var id = +this;
+	  if($.has(queue, id)){
+	    var fn = queue[id];
+	    delete queue[id];
+	    fn();
+	  }
+	}
+	function listner(event){
+	  run.call(event.data);
+	}
+	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
+	if(!isFunction(setTask) || !isFunction(clearTask)){
+	  setTask = function(fn){
+	    var args = [], i = 1;
+	    while(arguments.length > i)args.push(arguments[i++]);
+	    queue[++counter] = function(){
+	      invoke(isFunction(fn) ? fn : Function(fn), args);
+	    };
+	    defer(counter);
+	    return counter;
+	  };
+	  clearTask = function(id){
+	    delete queue[id];
+	  };
+	  // Node.js 0.8-
+	  if(cof(process) == 'process'){
+	    defer = function(id){
+	      process.nextTick(ctx(run, id, 1));
+	    };
+	  // Modern browsers, skip implementation for WebWorkers
+	  // IE8 has postMessage, but it's sync & typeof its postMessage is object
+	  } else if(addEventListener && isFunction(postMessage) && !global.importScripts){
+	    defer = function(id){
+	      postMessage(id, '*');
+	    };
+	    addEventListener('message', listner, false);
+	  // WebWorkers
+	  } else if(isFunction(MessageChannel)){
+	    channel = new MessageChannel;
+	    port    = channel.port2;
+	    channel.port1.onmessage = listner;
+	    defer = ctx(port.postMessage, port, 1);
+	  // IE8-
+	  } else if(document && ONREADYSTATECHANGE in document.createElement('script')){
+	    defer = function(id){
+	      html.appendChild(document.createElement('script'))[ONREADYSTATECHANGE] = function(){
+	        html.removeChild(this);
+	        run.call(id);
+	      };
+	    };
+	  // Rest old browsers
+	  } else {
+	    defer = function(id){
+	      setTimeout(ctx(run, id, 1), 0);
+	    };
+	  }
+	}
+	module.exports = {
+	  set:   setTask,
+	  clear: clearTask
 	};
 
 /***/ },
@@ -42471,8 +42049,8 @@
 
 	'use strict';
 	var $      = __webpack_require__(84)
-	  , invoke = __webpack_require__(90)
-	  , assertFunction = __webpack_require__(92).fn;
+	  , invoke = __webpack_require__(91)
+	  , assertFunction = __webpack_require__(93).fn;
 	module.exports = function(/* ...pargs */){
 	  var fn     = assertFunction(this)
 	    , length = arguments.length
