@@ -4,6 +4,9 @@ var _ = require("underscore");
 require("babel-core/polyfill");
 
 var parser = require("./lang/parser");
+var compile = require("../src/lang/compiler");
+var vm = require("../src/lang/vm");
+
 var scope = require("./lang/scope");
 var createEditor = require("./editor");
 var createAnnotator = require("./annotator");
@@ -23,13 +26,11 @@ window.addEventListener("load", function() {
   });
 });
 
-function step(g) {
+function step(p) {
   try {
-    r.step(g);
+    return vm.step(p);
   } catch (e) {
-    if (e instanceof r.DoneError) {
-      console.log("Program complete.");
-    } else if (e instanceof r.RuntimeError) {
+    if (e instanceof vm.RuntimeError) {
       console.log(e.stack);
     } else {
       console.log(e.stack);
@@ -71,13 +72,14 @@ function start(editor, annotator) {
   annotator.clear();
 
   try {
-    var g = r(parse(code, annotator), env);
+    var p = vm.createProgram(compile(parse(code, annotator)), env);
     var lastEventLoopYield = new Date().getTime();
 
     var going = true;
     (function tick() {
-      if (going) {
-        step(g);
+      if (going && !vm.isComplete(p)) {
+        p = step(p);
+
         if (timeToYieldToEventLoop(lastEventLoopYield)) {
           requestAnimationFrame(function() {
             lastEventLoopYield = new Date().getTime();
