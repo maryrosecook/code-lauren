@@ -85,7 +85,7 @@ describe("bytecode interpreter", function() {
       expect(env.getLocalBinding("a")).toEqual(1);
     });
 
-    it("should assign literal to env at top level", function() {
+    it("should assign lambda to env at top level", function() {
       var fn = v(c(p("a: { 1 }"))).envStack[0].getLocalBinding("a");
       expect(fn.bc).toEqual([["push", 1],
                              ["return"]]);
