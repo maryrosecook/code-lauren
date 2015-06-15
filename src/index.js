@@ -57,7 +57,7 @@ function parse(code, annotator) {
   }
 };
 
-function timeToYieldToEventLoop(lastYield) {
+function isTimeToYieldToEventLoop(lastYield) {
   return new Date().getTime() - lastYield > 8;
 };
 
@@ -77,7 +77,7 @@ function start(editor, annotator) {
       if (going && !vm.isComplete(p)) {
         p = step(p);
 
-        if (timeToYieldToEventLoop(lastEventLoopYield)) {
+        if (isTimeToYieldToEventLoop(lastEventLoopYield)) {
           requestAnimationFrame(function() {
             lastEventLoopYield = new Date().getTime();
             tick();
