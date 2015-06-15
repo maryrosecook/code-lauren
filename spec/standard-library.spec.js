@@ -1,5 +1,4 @@
 var standardLibrary = require("../src/lang/standard-library.js");
-var r = require("../src/runner");
 
 describe("library", function() {
   describe("new-dictionary", function() {

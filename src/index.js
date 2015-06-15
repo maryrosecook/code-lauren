@@ -4,9 +4,7 @@ var _ = require("underscore");
 require("babel-core/polyfill");
 
 var parser = require("./lang/parser");
-var interpret = require("./lang/interpreter");
 var scope = require("./lang/scope");
-var r = require("./runner");
 var createEditor = require("./editor");
 var createAnnotator = require("./annotator");
 var createEnv = require("./env");

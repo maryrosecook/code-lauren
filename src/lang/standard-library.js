@@ -1,5 +1,4 @@
 var _ = require("underscore");
-var interpreter = require("./interpreter");
 
 var createStandardLibrary = module.exports = function () {
   var lib = {
@@ -16,15 +15,15 @@ var createStandardLibrary = module.exports = function () {
     },
 
     sine: function(x) {
-      return Math.sin(lib.radians(x).next().value);
+      return Math.sin(lib.radians(x));
     },
 
     cosine: function(x) {
-      return Math.cos(lib.radians(x).next().value);
+      return Math.cos(lib.radians(x));
     },
 
     tangent: function(x) {
-      return Math.tan(lib.radians(x).next().value);
+      return Math.tan(lib.radians(x));
     },
 
     radians: function(x) {
@@ -72,13 +71,6 @@ var createStandardLibrary = module.exports = function () {
       var output = _.map(arguments, function(x) { return x.toString(); }).join(" ");
       console.log(output);
       return output + "\n";
-    },
-
-    forever: function(fn) {
-      throw "broken for now until trampolining brought back!"
-      // while (true) {
-      //   yield* require("./interpreter").trampoline(yield* fn());
-      // }
     }
   };
 
