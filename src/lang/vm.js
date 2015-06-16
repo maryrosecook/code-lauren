@@ -45,12 +45,33 @@ function stepInvoke(ins, p) {
 
   if (fn.bc !== undefined) { // a lambda
     var lambdaEnv = scope(_.object(_.pluck(fn.ast.c[0], "c"), args), fn.closureEnv);
-    p.callStack.push(createCallFrame(fn.bc, lambdaEnv));
+
+    var recursiveIndex = previousRecursionCallFrameIndex(p, fn);
+    if (inTailPosition(currentCallFrame(p)) &&
+        recursiveIndex !== undefined) { // if tail position and a recursive call, then tco
+      p.callStack = p.callStack.slice(0, recursiveIndex + 1);
+      currentCallFrame(p).env = lambdaEnv; // tco
+      currentCallFrame(p).bcPointer = 0;
+    } else {
+      p.callStack.push(createCallFrame(fn.bc, lambdaEnv));
+    }
   } else { // is a JS function object
     p.stack.push(fn.apply(null, args));
   }
 
   return p;
+};
+
+function inTailPosition(callFrame) {
+  return callFrame.bcPointer === callFrame.bc.length - 2; // only ["return"] to go
+};
+
+function previousRecursionCallFrameIndex(p, fn) {
+  for (var i = p.callStack.length - 1; i >= 0; i--) {
+    if (p.callStack[i].bc === fn.bc) {
+      return i;
+    }
+  }
 };
 
 function stepIfNotTrueJump(ins, p) {
