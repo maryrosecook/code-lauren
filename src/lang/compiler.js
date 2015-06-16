@@ -63,7 +63,7 @@ function compileConditional(a) {
 
 function compileLambdaDef(a) {
   return [["push_lambda", {
-    bc: compile(util.getNodeAt(a, ["lambda", 1])).concat([["pop_env_scope"]]),
+    bc: compile(util.getNodeAt(a, ["lambda", 1])),
     ast: a
   }]];
 };

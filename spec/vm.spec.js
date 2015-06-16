@@ -81,15 +81,13 @@ describe("bytecode interpreter", function() {
 
   describe("assignment", function() {
     it("should assign literal to env at top level", function() {
-      var env = v(c(p("a: 1"))).envStack[0];
-      expect(env.getLocalBinding("a")).toEqual(1);
+      expect(v(c(p("a: 1 \n a"))).stack.pop()).toEqual(1);
     });
 
     it("should assign lambda to env at top level", function() {
-      var fn = v(c(p("a: { 1 }"))).envStack[0].getLocalBinding("a");
+      var fn = v(c(p("a: { 1 } \n a"))).stack.pop();
       expect(fn.bc).toEqual([["push", 1],
-                             ["return"],
-                             ["pop_env_scope"]]);
+                             ["return"]]);
       expect(fn.ast).toBeDefined();
     });
   });
@@ -129,6 +127,12 @@ describe("bytecode interpreter", function() {
 
     it("should not return else if previous condition is true", function() {
       expect(v(c(p('if false { 1 } elseif true { 2 } else { 3 }'))).stack.pop()).toEqual(2);
+    });
+
+    it("should be able to run nested conditionals", function() {
+      expect(v(c(p('if true { if true { 1 } else { 2 } }'))).stack.pop()).toEqual(1);
+      expect(v(c(p('if true { if false { 1 } else { 2 } }'))).stack.pop()).toEqual(2);
+      expect(v(c(p('if false { if false { 1 } else { 2 } } else { 3 }'))).stack.pop()).toEqual(3);
     });
   });
 
