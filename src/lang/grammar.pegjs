@@ -1,6 +1,6 @@
 {
   function node(tag, content, offset, syntax, raw) {
-    var node = { t: tag, c: content, i: offset };
+    var node = { t: tag, c: content, s: offset instanceof Function ? offset() : offset };
     if(syntax !== undefined) {
       node.syntax = syntax;
     }
@@ -58,7 +58,7 @@ parenthetical
 
 invocation
   = f:function applications:application+ _*
-    { var n = bundleApplications(f, applications); n.i = offset; return n; }
+    { var n = bundleApplications(f, applications); n.s = offset; return n; }
 
 function
   = all: lambda

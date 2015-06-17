@@ -8,7 +8,7 @@ var util = module.exports = {
   stripAst: function(obj) {
     if (typeof obj === "object") {
       delete obj.l;
-      delete obj.i;
+      delete obj.s;
       Object.keys(obj).forEach(function(k) { util.stripAst(obj[k]) });
     }
 
