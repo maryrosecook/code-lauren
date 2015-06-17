@@ -36,6 +36,10 @@ describe("bytecode interpreter", function() {
       expect(v(c(p("a: 1 \n { a }()"))).stack.pop()).toEqual(1);
     });
 
+    it("should be able to invoke an invocation with many applications", function() {
+      expect(v(c(p("{ { { 1 } } }()()()"))).stack.pop()).toEqual(1);
+    });
+
     it("should use new value for closed over var that changes after closure creation", function() {
       expect(v(c(p("a: 1 \n b:{ a } \n a: 2 \n b()"))).stack.pop()).toEqual(2);
     });
