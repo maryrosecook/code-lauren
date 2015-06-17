@@ -58,7 +58,7 @@ parenthetical
 
 invocation
   = f:function applications:application+ _*
-    { var n = bundleApplications(f, applications); n.s = offset; return n; }
+    { var n = bundleApplications(f, applications); n.s = offset(); return n; }
 
 function
   = all: lambda
