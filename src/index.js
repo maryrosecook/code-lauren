@@ -74,7 +74,7 @@ function start(editor, annotator) {
 
     var going = true;
     (function tick() {
-      if (going && !vm.isComplete(p)) {
+      while(going && !vm.isComplete(p)) {
         p = step(p);
 
         if (isTimeToYieldToEventLoop(lastEventLoopYield)) {
@@ -82,8 +82,8 @@ function start(editor, annotator) {
             lastEventLoopYield = new Date().getTime();
             tick();
           });
-        } else {
-          tick();
+
+          break;
         }
       }
     })();
