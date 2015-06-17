@@ -50,7 +50,7 @@ function stepInvoke(ins, p) {
     if (inTailPosition(currentCallFrame(p)) &&
         recursiveIndex !== undefined) { // if tail position and a recursive call, then tco
       p.callStack = p.callStack.slice(0, recursiveIndex + 1);
-      currentCallFrame(p).env = lambdaEnv; // tco
+      currentCallFrame(p).env = lambdaEnv;
       currentCallFrame(p).bcPointer = 0;
     } else {
       p.callStack.push(createCallFrame(fn.bc, lambdaEnv));
