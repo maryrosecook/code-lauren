@@ -443,4 +443,10 @@ describe("parser", function() {
       }).toThrow("You have specified a value, but you also need a label");
     });
   });
+
+  describe("offset annotation", function() {
+    it("should put start offset on every node with a .c attribute", function() {
+      parse.verifyAllAstNodesHaveStartIndex(parse("{?a ?b add(a b)\nsubtract(c d)}"));
+    });
+  });
 });

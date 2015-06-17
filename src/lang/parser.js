@@ -60,6 +60,33 @@ function balanceParentheses(codeStr) {
   }
 };
 
+function walkAstWith(ast, fn) {
+  if (ast !== undefined) {
+    fn(ast.c);
+
+    if (ast.c !== undefined) {
+      if (ast.c instanceof Array) {
+        for (var i = 0; i < ast.c.length; i++) {
+          walkAstWith(ast.c[i], fn);
+        }
+      } else {
+        walkAstWith(ast.c, fn);
+      }
+    }
+  }
+};
+
+function verifyAllAstNodesHaveStartIndex(ast) {
+  walkAstWith(ast, function(node) {
+    if (node !== undefined &&
+        node.c !== undefined &&
+        (node.s === undefined || typeof node.s !== 'number')) {
+      console.log(node);
+      throw new Error("All ast nodes should be annotated with a start index");
+    }
+  });
+};
+
 function indexToLineAndColumn(index, code) {
   var l = 1;
   var c = 1;
@@ -111,6 +138,7 @@ ParenthesisError.prototype = new Error();
 parse.indexToLineAndColumn = indexToLineAndColumn;
 parse.balanceParentheses = balanceParentheses;
 parse.rainbowParentheses = rainbowParentheses;
+parse.verifyAllAstNodesHaveStartIndex = verifyAllAstNodesHaveStartIndex;
 parse.parse = parse;
 parse.ParseError = ParseError;
 parse.ParenthesisError = ParenthesisError;
