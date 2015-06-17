@@ -14,6 +14,14 @@ var createStandardLibrary = module.exports = function () {
       return _.reduce(arguments, function(a, n) { return a * n; });
     },
 
+    divide: function(a, b) {
+      return _.reduce(arguments, function(a, n) { return a / n; });
+    },
+
+    modulus: function(a, b) {
+      return a % b;
+    },
+
     sine: function(x) {
       return Math.sin(lib.radians(x));
     },
