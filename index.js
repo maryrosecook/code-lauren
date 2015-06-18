@@ -46,9 +46,9 @@
 
 	"use strict";
 
-	var _ = __webpack_require__(8);
+	var _ = __webpack_require__(9);
 
-	__webpack_require__(9);
+	__webpack_require__(8);
 
 	var parser = __webpack_require__(1);
 	var compile = __webpack_require__(2);
@@ -159,11 +159,11 @@
 
 	var peg = __webpack_require__(20);
 
-	var _ = __webpack_require__(8);
+	var _ = __webpack_require__(9);
 	var util = __webpack_require__(15);
 	var parserStateError = __webpack_require__(17);
 
-	var pegParse = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, s: offset instanceof Function ? offset() : offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n\n  function wrapLastDoExpressionInReturn(expressions) {\n    var initial = expressions.slice(0, expressions.length - 1);\n    var last = expressions[expressions.length - 1];\n    return initial.concat(node(\"return\", last, last.s));\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }\n  / __*\n    { return node(\"do\", [node(\"return\", undefined, offset)], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.s = offset(); return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition,\n                                  node(\"invocation\", [lambda], offset)]\n                                    .concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, node(\"invocation\", [lambda], offset)].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, node(\"invocation\", [lambda], offset)]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
+	var pegParse = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, s: offset instanceof Function ? offset() : offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n\n  function wrapLastDoExpressionInReturn(expressions) {\n    var initial = expressions.slice(0, expressions.length - 1);\n    var last = expressions[expressions.length - 1];\n    return initial.concat(node(\"return\", last, last.s));\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }\n  / __*\n    { return node(\"do\", [node(\"return\", undefined, offset)], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = forever\n  / conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.s = offset(); return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition,\n                                  node(\"invocation\", [lambda], offset)]\n                                    .concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, node(\"invocation\", [lambda], offset)].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, node(\"invocation\", [lambda], offset)]; }\n\nforever\n  = 'forever' _* lambda: lambda\n    { return node(\"forever\", node(\"invocation\", [lambda], offset), offset); }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
 
 	function parse(codeStr) {
 	  try {
@@ -333,7 +333,7 @@
 
 	"use strict";
 
-	var _ = __webpack_require__(8);
+	var _ = __webpack_require__(9);
 
 	var util = __webpack_require__(15);
 
@@ -392,6 +392,12 @@
 	  return bc;
 	};
 
+	function compileForever(a) {
+	  var invocation = compile(a.c);
+	  var bc = invocation.concat([["jump", -3]]);
+	  return bc;
+	};
+
 	function compileLambdaDef(a) {
 	  return [["push_lambda", {
 	    bc: compile(util.getNodeAt(a, ["lambda", 1])),
@@ -424,6 +430,8 @@
 	    return compileAssignment(a);
 	  } else if (a.t === "conditional") {
 	    return compileConditional(a);
+	  } else if (a.t === "forever") {
+	    return compileForever(a);
 	  } else if (a.t === "label") {
 	    return compileLabel(a);
 	  } else if (a.t === "number" || a.t === "string" || a.t === "boolean") {
@@ -439,10 +447,10 @@
 
 	"use strict";
 
-	var _ = __webpack_require__(8);
+	var _ = __webpack_require__(9);
 
 	var util = __webpack_require__(15);
-	var standardLibrary = __webpack_require__(10);
+	var standardLibrary = __webpack_require__(13);
 	var scope = __webpack_require__(4);
 
 	function stepPush(ins, p) {
@@ -541,6 +549,7 @@
 	};
 
 	function step(p) {
+	  console.log(p.callStack.length);
 	  var callFrame = currentCallFrame(p);
 	  if (callFrame === undefined) {
 	    return p;
@@ -675,10 +684,10 @@
 	'use strict';
 
 	var ace = __webpack_require__(16);
-	__webpack_require__(12);
-	__webpack_require__(13);
+	__webpack_require__(10);
+	__webpack_require__(11);
 
-	__webpack_require__(14);
+	__webpack_require__(12);
 
 	var createEditor = module.exports = function (initialText) {
 	  var editor = ace.edit('editor');
@@ -710,7 +719,7 @@
 	"use strict";
 
 	var $ = __webpack_require__(18);
-	var _ = __webpack_require__(8);
+	var _ = __webpack_require__(9);
 	var range = ace.acequire("ace/range");
 
 	var parser = __webpack_require__(1);
@@ -793,11 +802,18 @@
 	    return library;
 	  };
 
-	  return mergeLibrary(__webpack_require__(10)(), __webpack_require__(11)(screen));
+	  return mergeLibrary(__webpack_require__(13)(), __webpack_require__(14)(screen));
 	};
 
 /***/ },
 /* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(19);
+
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.2
@@ -2339,19 +2355,138 @@
 
 
 /***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(19);
-
-
-/***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _ = __webpack_require__(8);
+	ace.define("ace/mode/scheme_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function (acequire, exports, module) {
+	  "use strict";
+
+	  var oop = acequire("../lib/oop");
+	  var TextHighlightRules = acequire("./text_highlight_rules").TextHighlightRules;
+
+	  var SchemeHighlightRules = function SchemeHighlightRules() {
+	    var keywordControl = "case|do|name|name|if|else|elseif|when";
+	    var keywordOperator = "eq?|eqv?|equal?|and|or|not|null?";
+	    var constantLanguage = "true|false";
+	    var supportFunctions = "add|multiply|subtract|divide|clear-screen|sine|cosine|draw-filled-circle";
+
+	    var keywordMapper = this.createKeywordMapper({
+	      "keyword.control": keywordControl,
+	      "keyword.operator": keywordOperator,
+	      "constant.language": constantLanguage,
+	      "support.function": supportFunctions
+	    }, "identifier", true);
+
+	    this.$rules = {
+	      start: [{
+	        token: "comment",
+	        regex: ";.*$"
+	      }, {
+	        token: ["storage.type.function-type.scheme", "text", "entity.name.function.scheme"],
+	        regex: "(?:\\b(?:(define|define-syntax|define-macro))\\b)(\\s+)((?:\\w|\\-|\\!|\\?)*)"
+	      }, {
+	        token: "punctuation.definition.constant.character.scheme",
+	        regex: "#:\\S+"
+	      }, {
+	        token: ["punctuation.definition.variable.scheme", "variable.other.global.scheme", "punctuation.definition.variable.scheme"],
+	        regex: "(\\*)(\\S*)(\\*)"
+	      }, {
+	        token: "constant.numeric", // hex
+	        regex: "#[xXoObB][0-9a-fA-F]+"
+	      }, {
+	        token: "constant.numeric", // float
+	        regex: "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?"
+	      }, {
+	        token: keywordMapper,
+	        regex: "[a-zA-Z_#][a-zA-Z0-9_\\-\\?\\!\\*]*"
+	      }, {
+	        token: "string",
+	        regex: "\"(?=.)",
+	        next: "qqstring"
+	      }],
+	      qqstring: [{
+	        token: "constant.character.escape.scheme",
+	        regex: "\\\\."
+	      }, {
+	        token: "string",
+	        regex: "[^\"\\\\]+",
+	        merge: true
+	      }, {
+	        token: "string",
+	        regex: "\\\\$",
+	        next: "qqstring",
+	        merge: true
+	      }, {
+	        token: "string",
+	        regex: "\"|$",
+	        next: "start",
+	        merge: true
+	      }]
+	    };
+	  };
+
+	  oop.inherits(SchemeHighlightRules, TextHighlightRules);
+
+	  exports.SchemeHighlightRules = SchemeHighlightRules;
+	});
+
+	ace.define("ace/mode/lauren", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/mode/scheme_highlight_rules"], function (acequire, exports, module) {
+	  "use strict";
+
+	  var oop = acequire("../lib/oop");
+	  var TextMode = acequire("./text").Mode;
+	  var SchemeHighlightRules = acequire("./scheme_highlight_rules").SchemeHighlightRules;
+
+	  var Mode = function Mode() {
+	    this.HighlightRules = SchemeHighlightRules;
+	  };
+	  oop.inherits(Mode, TextMode);
+
+	  (function () {
+
+	    this.lineCommentStart = ";";
+
+	    this.$id = "ace/mode/lauren";
+	  }).call(Mode.prototype);
+
+	  exports.Mode = Mode;
+	});
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	ace.define("ace/theme/lauren", ["require", "exports", "module", "ace/lib/dom"], function (acequire, exports, module) {
+
+	  exports.isDark = false;
+	  exports.cssClass = "ace-lauren";
+	  exports.cssText = ".ace-lauren .ace_gutter {background: #FFFFFF;color: rgb(255, 255, 255)}.ace-lauren .ace_print-margin {width: 1px;background: #ffffff}.ace-lauren {background-color: #002240;color: #FFFFFF}.ace-lauren .ace_marker-layer .ace_selection {background: rgba(200, 200, 255, 0.75)}.ace-lauren.ace_multiselect .ace_selection.ace_start {box-shadow: 0 0 3px 0px #002240;border-radius: 2px}.ace-lauren .ace_marker-layer .ace_step {background: rgb(127, 111, 19)}.ace-lauren .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid rgba(255, 255, 255, 0.15)}.ace-lauren .ace_marker-layer .ace_active-line {background: rgba(0, 0, 0, 0.35)}.ace-lauren .ace_gutter-active-line {background-color: rgba(0, 0, 0, 0.35)}.ace-lauren .ace_marker-layer .ace_selected-word {border: 1px solid rgba(179, 101, 57, 0.75)}.ace-lauren .ace_invisible {color: rgba(255, 255, 255, 0.15)}.ace-lauren .ace_keyword,.ace-lauren .ace_meta {color: #F2A844}.ace-lauren .ace_constant,.ace-lauren .ace_constant.ace_character,.ace-lauren .ace_constant.ace_character.ace_escape,.ace-lauren .ace_constant.ace_other {color: #FF5BAE}.ace-lauren .ace_invalid {color: #F8F8F8;background-color: #800F00}.ace-lauren .ace_support {color: #80FFBB}.ace-lauren .ace_support.ace_constant {color: #EB5B5A}.ace-lauren .ace_fold {background-color: #FF9D00;border-color: #FFFFFF}.ace-lauren .ace_support.ace_function {color: #4A9CC9}.ace-lauren .ace_storage {color: #FFEE80}.ace-lauren .ace_entity {color: #FFDD00}.ace-lauren .ace_string {color: #578622}.ace-lauren .ace_string.ace_regexp {color: #80FFC2}.ace-lauren .ace_comment {font-style: italic;color: #0088FF}.ace-lauren .ace_heading,.ace-lauren .ace_markup.ace_heading {color: #C8E4FD;background-color: #001221}.ace-lauren .ace_list,.ace-lauren .ace_markup.ace_list {background-color: #130D26}.ace-lauren .ace_variable {color: #CCCCCC}.ace-lauren .ace_variable.ace_language {color: #FF80E1}.ace-lauren .ace_meta.ace_tag {color: #9EFFFF}.ace-lauren .ace_indent-guide {background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWNgYGBgYHCLSvkPAAP3AgSDTRd4AAAAAElFTkSuQmCC) right repeat-y}";
+
+	  var dom = acequire("../lib/dom");
+	  dom.importCssString(exports.cssText, exports.cssClass);
+	});
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	;(function () {
+	  ace.acequire(["ace/range"], function () {});
+	})();
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _ = __webpack_require__(9);
 
 	var createStandardLibrary = module.exports = function () {
 	  var lib = {
@@ -2452,12 +2587,12 @@
 	};
 
 /***/ },
-/* 11 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _ = __webpack_require__(8);
+	var _ = __webpack_require__(9);
 
 	var canvasLibrary = module.exports = function (screen) {
 	  var drawOperations = [];
@@ -2517,138 +2652,12 @@
 	};
 
 /***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	ace.define("ace/mode/scheme_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function (acequire, exports, module) {
-	  "use strict";
-
-	  var oop = acequire("../lib/oop");
-	  var TextHighlightRules = acequire("./text_highlight_rules").TextHighlightRules;
-
-	  var SchemeHighlightRules = function SchemeHighlightRules() {
-	    var keywordControl = "case|do|name|name|if|else|elseif|when";
-	    var keywordOperator = "eq?|eqv?|equal?|and|or|not|null?";
-	    var constantLanguage = "true|false";
-	    var supportFunctions = "add|multiply|subtract|divide|clear-screen|sine|cosine|draw-filled-circle";
-
-	    var keywordMapper = this.createKeywordMapper({
-	      "keyword.control": keywordControl,
-	      "keyword.operator": keywordOperator,
-	      "constant.language": constantLanguage,
-	      "support.function": supportFunctions
-	    }, "identifier", true);
-
-	    this.$rules = {
-	      start: [{
-	        token: "comment",
-	        regex: ";.*$"
-	      }, {
-	        token: ["storage.type.function-type.scheme", "text", "entity.name.function.scheme"],
-	        regex: "(?:\\b(?:(define|define-syntax|define-macro))\\b)(\\s+)((?:\\w|\\-|\\!|\\?)*)"
-	      }, {
-	        token: "punctuation.definition.constant.character.scheme",
-	        regex: "#:\\S+"
-	      }, {
-	        token: ["punctuation.definition.variable.scheme", "variable.other.global.scheme", "punctuation.definition.variable.scheme"],
-	        regex: "(\\*)(\\S*)(\\*)"
-	      }, {
-	        token: "constant.numeric", // hex
-	        regex: "#[xXoObB][0-9a-fA-F]+"
-	      }, {
-	        token: "constant.numeric", // float
-	        regex: "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?"
-	      }, {
-	        token: keywordMapper,
-	        regex: "[a-zA-Z_#][a-zA-Z0-9_\\-\\?\\!\\*]*"
-	      }, {
-	        token: "string",
-	        regex: "\"(?=.)",
-	        next: "qqstring"
-	      }],
-	      qqstring: [{
-	        token: "constant.character.escape.scheme",
-	        regex: "\\\\."
-	      }, {
-	        token: "string",
-	        regex: "[^\"\\\\]+",
-	        merge: true
-	      }, {
-	        token: "string",
-	        regex: "\\\\$",
-	        next: "qqstring",
-	        merge: true
-	      }, {
-	        token: "string",
-	        regex: "\"|$",
-	        next: "start",
-	        merge: true
-	      }]
-	    };
-	  };
-
-	  oop.inherits(SchemeHighlightRules, TextHighlightRules);
-
-	  exports.SchemeHighlightRules = SchemeHighlightRules;
-	});
-
-	ace.define("ace/mode/lauren", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/mode/scheme_highlight_rules"], function (acequire, exports, module) {
-	  "use strict";
-
-	  var oop = acequire("../lib/oop");
-	  var TextMode = acequire("./text").Mode;
-	  var SchemeHighlightRules = acequire("./scheme_highlight_rules").SchemeHighlightRules;
-
-	  var Mode = function Mode() {
-	    this.HighlightRules = SchemeHighlightRules;
-	  };
-	  oop.inherits(Mode, TextMode);
-
-	  (function () {
-
-	    this.lineCommentStart = ";";
-
-	    this.$id = "ace/mode/lauren";
-	  }).call(Mode.prototype);
-
-	  exports.Mode = Mode;
-	});
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	ace.define("ace/theme/lauren", ["require", "exports", "module", "ace/lib/dom"], function (acequire, exports, module) {
-
-	  exports.isDark = false;
-	  exports.cssClass = "ace-lauren";
-	  exports.cssText = ".ace-lauren .ace_gutter {background: #FFFFFF;color: rgb(255, 255, 255)}.ace-lauren .ace_print-margin {width: 1px;background: #ffffff}.ace-lauren {background-color: #002240;color: #FFFFFF}.ace-lauren .ace_marker-layer .ace_selection {background: rgba(200, 200, 255, 0.75)}.ace-lauren.ace_multiselect .ace_selection.ace_start {box-shadow: 0 0 3px 0px #002240;border-radius: 2px}.ace-lauren .ace_marker-layer .ace_step {background: rgb(127, 111, 19)}.ace-lauren .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid rgba(255, 255, 255, 0.15)}.ace-lauren .ace_marker-layer .ace_active-line {background: rgba(0, 0, 0, 0.35)}.ace-lauren .ace_gutter-active-line {background-color: rgba(0, 0, 0, 0.35)}.ace-lauren .ace_marker-layer .ace_selected-word {border: 1px solid rgba(179, 101, 57, 0.75)}.ace-lauren .ace_invisible {color: rgba(255, 255, 255, 0.15)}.ace-lauren .ace_keyword,.ace-lauren .ace_meta {color: #F2A844}.ace-lauren .ace_constant,.ace-lauren .ace_constant.ace_character,.ace-lauren .ace_constant.ace_character.ace_escape,.ace-lauren .ace_constant.ace_other {color: #FF5BAE}.ace-lauren .ace_invalid {color: #F8F8F8;background-color: #800F00}.ace-lauren .ace_support {color: #80FFBB}.ace-lauren .ace_support.ace_constant {color: #EB5B5A}.ace-lauren .ace_fold {background-color: #FF9D00;border-color: #FFFFFF}.ace-lauren .ace_support.ace_function {color: #4A9CC9}.ace-lauren .ace_storage {color: #FFEE80}.ace-lauren .ace_entity {color: #FFDD00}.ace-lauren .ace_string {color: #578622}.ace-lauren .ace_string.ace_regexp {color: #80FFC2}.ace-lauren .ace_comment {font-style: italic;color: #0088FF}.ace-lauren .ace_heading,.ace-lauren .ace_markup.ace_heading {color: #C8E4FD;background-color: #001221}.ace-lauren .ace_list,.ace-lauren .ace_markup.ace_list {background-color: #130D26}.ace-lauren .ace_variable {color: #CCCCCC}.ace-lauren .ace_variable.ace_language {color: #FF80E1}.ace-lauren .ace_meta.ace_tag {color: #9EFFFF}.ace-lauren .ace_indent-guide {background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWNgYGBgYHCLSvkPAAP3AgSDTRd4AAAAAElFTkSuQmCC) right repeat-y}";
-
-	  var dom = acequire("../lib/dom");
-	  dom.importCssString(exports.cssText, exports.cssClass);
-	});
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	;(function () {
-	  ace.acequire(["ace/range"], function () {});
-	})();
-
-/***/ },
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _ = __webpack_require__(8);
+	var _ = __webpack_require__(9);
 
 	var util = module.exports = {
 	  pp: function pp(str) {
@@ -6239,7 +6248,7 @@
 	};
 	init(true);function init(packaged) {
 
-	    options.packaged = packaged || acequire.packaged || module.packaged || (global.define && __webpack_require__(26).packaged);
+	    options.packaged = packaged || acequire.packaged || module.packaged || (global.define && __webpack_require__(21).packaged);
 
 	    if (!global.document)
 	        return "";
@@ -18728,7 +18737,7 @@
 
 	    try {
 	            var workerSrc = mod.src;
-	    var Blob = __webpack_require__(27);
+	    var Blob = __webpack_require__(22);
 	    var blob = new Blob([ workerSrc ], { type: 'application/javascript' });
 	    var blobUrl = (window.URL || window.webkitURL).createObjectURL(blob);
 
@@ -20929,13 +20938,13 @@
 
 	var peg = __webpack_require__(20);
 
-	var _ = __webpack_require__(8);
+	var _ = __webpack_require__(9);
 
 	var examples = JSON.parse("{\n  \"examples\": [\n    {\n      \"code\":    \"a b\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"nextInput\":   \"[a-zA-Z0-9_\\\\-]+\",\n      \"message\": \"Expected this to be on a new line\"\n    },\n\n    {\n      \"code\":    \"a ()\",\n      \"stack\":   [\"do\", \"do_continue\", \"nl\"],\n      \"nextInput\":   \"\\\\(\\\\)\",\n      \"message\": \"There should be no spaces between\\nthe name of the action and the ()\"\n    },\n\n    {\n      \"code\":    \"a: \",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"nextInput\":   \"$\",\n      \"message\": \"You have specified a name, but you also need a value\"\n    },\n\n    {\n      \"code\":    \"a: \\n\",\n      \"stack\":   [\"assignment\", \"expression\", \"parenthetical\", \"invocation\",\n                  \"function\", \"label\", \"label_char\"],\n      \"nextInput\":   \"\\n\",\n      \"message\": \"You have specified a name, but you also need a value\"\n    },\n\n    {\n      \"code\":    \": 1\",\n      \"stack\":   [\"expression\", \"parenthetical\", \"invocation\", \"function\",\n                  \"label\", \"label_char\"],\n      \"nextInput\":   \":\",\n      \"message\": \"You have specified a value, but you also need a label\"\n    }\n  ]\n}\n").examples;
 
-	var pegParseTrace = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, s: offset instanceof Function ? offset() : offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n\n  function wrapLastDoExpressionInReturn(expressions) {\n    var initial = expressions.slice(0, expressions.length - 1);\n    var last = expressions[expressions.length - 1];\n    return initial.concat(node(\"return\", last, last.s));\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }\n  / __*\n    { return node(\"do\", [node(\"return\", undefined, offset)], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.s = offset(); return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition,\n                                  node(\"invocation\", [lambda], offset)]\n                                    .concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, node(\"invocation\", [lambda], offset)].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, node(\"invocation\", [lambda], offset)]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true, trace: true }).parse;
+	var pegParseTrace = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, s: offset instanceof Function ? offset() : offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n\n  function wrapLastDoExpressionInReturn(expressions) {\n    var initial = expressions.slice(0, expressions.length - 1);\n    var last = expressions[expressions.length - 1];\n    return initial.concat(node(\"return\", last, last.s));\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }\n  / __*\n    { return node(\"do\", [node(\"return\", undefined, offset)], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = forever\n  / conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.s = offset(); return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition,\n                                  node(\"invocation\", [lambda], offset)]\n                                    .concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, node(\"invocation\", [lambda], offset)].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, node(\"invocation\", [lambda], offset)]; }\n\nforever\n  = 'forever' _* lambda: lambda\n    { return node(\"forever\", node(\"invocation\", [lambda], offset), offset); }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true, trace: true }).parse;
 
-	var pegParseNoTrace = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, s: offset instanceof Function ? offset() : offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n\n  function wrapLastDoExpressionInReturn(expressions) {\n    var initial = expressions.slice(0, expressions.length - 1);\n    var last = expressions[expressions.length - 1];\n    return initial.concat(node(\"return\", last, last.s));\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }\n  / __*\n    { return node(\"do\", [node(\"return\", undefined, offset)], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.s = offset(); return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition,\n                                  node(\"invocation\", [lambda], offset)]\n                                    .concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, node(\"invocation\", [lambda], offset)].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, node(\"invocation\", [lambda], offset)]; }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
+	var pegParseNoTrace = peg.buildParser("{\n  function node(tag, content, offset, syntax, raw) {\n    var node = { t: tag, c: content, s: offset instanceof Function ? offset() : offset };\n    if(syntax !== undefined) {\n      node.syntax = syntax;\n    }\n\n    return node;\n  };\n\n  function flatten(arr) {\n    return arr.reduce(function(a, e) {\n      return a.concat(e instanceof Array ? flatten(e) : e);\n    }, []);\n  };\n\n  function bundleApplications(f, applications) {\n    if (applications.length > 0) {\n      return bundleApplications({ t: \"invocation\", c: [f].concat(applications[0]) },\n                                applications.slice(1));\n    } else {\n      return f;\n    }\n  }\n\n  function wrapLastDoExpressionInReturn(expressions) {\n    var initial = expressions.slice(0, expressions.length - 1);\n    var last = expressions[expressions.length - 1];\n    return initial.concat(node(\"return\", last, last.s));\n  }\n}\n\nstart\n  = all:top { return node(\"top\", all, offset); }\n\ntop\n  = do\n\ndo\n  = __* first:expression _* rest:do_continue* __*\n    { return node(\"do\", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }\n  / __*\n    { return node(\"do\", [node(\"return\", undefined, offset)], offset); }\n\ndo_continue\n  = _* nl __* all:expression _*\n    { return all }\n\nexpression\n  = forever\n  / conditional\n  / parenthetical\n  / assignment\n  / atom\n\nparenthetical\n  = invocation\n  / lambda\n\ninvocation\n  = f:function applications:application+ _*\n    { var n = bundleApplications(f, applications); n.s = offset(); return n; }\n\nfunction\n  = all: lambda\n  / all: label\n\napplication\n  = '(' arguments:argument* ')'\n    { return arguments; }\n\nargument\n  = __* expression:expression __*\n    { return expression }\n\nlambda\n  = '{' __? parameters:parameter* __? body:do '}'\n    { return node(\"lambda\", [parameters, body], offset); }\n\nassignment\n  = label:label ':' _* expression:expression\n    { return node(\"assignment\", [label, expression], offset); }\n\nconditional\n  = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return node(\"conditional\", [condition,\n                                  node(\"invocation\", [lambda], offset)]\n                                    .concat(rest ? rest : []), offset); }\n\nelseif\n  = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?\n    { return [condition, node(\"invocation\", [lambda], offset)].concat(rest ? rest : []); }\n\nelse\n  = 'else' _* lambda:lambda\n    { return [{ t: \"boolean\", c: true }, node(\"invocation\", [lambda], offset)]; }\n\nforever\n  = 'forever' _* lambda: lambda\n    { return node(\"forever\", node(\"invocation\", [lambda], offset), offset); }\n\natom\n  = number\n  / string\n  / boolean\n  / label\n\nparameter\n  = '?' label:label _*\n    { return node(\"parameter\", label.c, offset); }\n\nnumber\n  = a:[0-9]+ b:[.] c:[0-9]+\n    { return node(\"number\", parseFloat(a.join(\"\") + b + c.join(\"\"), 10), offset); }\n  / all:[0-9]+\n    { return node(\"number\", parseInt(all.join(\"\"), 10), offset); }\n\nstring\n  = '\"' all:[A-Za-z0-9.,# ]* '\"'\n    { return node('string', all.join(\"\"), offset); }\n\nboolean\n  = 'true'  { return node(\"boolean\", true, offset); }\n  / 'false' { return node(\"boolean\", false, offset); }\n\nlabel\n  = !keyword all: label_char+\n    { return node(\"label\", all.join(\"\"), offset); }\n\nlabel_char\n  = [a-zA-Z0-9_\\-]\n\nnl\n  = all:[\\n]+\n    { return node('nl', all, offset); }\n\n_\n  = [ \\t\\r]+\n\n__ \"\"\n  = [ \\t\\r\\n]+\n\nkeyword\n  = 'if' !label_char\n  / 'elseif' !label_char\n  / 'else' !label_char\n", { cache: true }).parse;
 
 	function parserStateError(code) {
 	  for (var i = 0; i < examples.length; i++) {
@@ -31466,16 +31475,16 @@
 /* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(21),
-	    objects = __webpack_require__(22);
+	var arrays  = __webpack_require__(23),
+	    objects = __webpack_require__(24);
 
 	var PEG = {
 	  /* PEG.js version (uses semantic versioning). */
 	  VERSION: "0.8.0",
 
-	  GrammarError: __webpack_require__(23),
-	  parser:       __webpack_require__(24),
-	  compiler:     __webpack_require__(25),
+	  GrammarError: __webpack_require__(25),
+	  parser:       __webpack_require__(26),
+	  compiler:     __webpack_require__(27),
 
 	  /*
 	   * Generates a parser from a specified grammar and returns it.
@@ -31523,6 +31532,48 @@
 
 /***/ },
 /* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = function() { throw new Error("define cannot be used indirect"); };
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = get_blob()
+
+	function get_blob() {
+	  if(global.Blob) {
+	    try {
+	      new Blob(['asdf'], {type: 'text/plain'})
+	      return Blob
+	    } catch(err) {}
+	  }
+
+	  var Builder = global.WebKitBlobBuilder ||
+	                global.MozBlobBuilder ||
+	                global.MSBlobBuilder
+
+	  return function(parts, bag) {
+	    var builder = new Builder
+	      , endings = bag.endings
+	      , type = bag.type
+
+	    if(endings) for(var i = 0, len = parts.length; i < len; ++i) {
+	      builder.append(parts[i], endings)
+	    } else for(var i = 0, len = parts.length; i < len; ++i) {
+	      builder.append(parts[i])
+	    }
+
+	    return type ? builder.getBlob(type) : builder.getBlob()
+	  }
+	}
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* Array utilities. */
@@ -31610,7 +31661,7 @@
 
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* Object utilities. */
@@ -31668,7 +31719,7 @@
 
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var classes = __webpack_require__(30);
@@ -31685,7 +31736,7 @@
 
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = (function() {
@@ -36595,11 +36646,11 @@
 
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(21),
-	    objects = __webpack_require__(22);
+	var arrays  = __webpack_require__(23),
+	    objects = __webpack_require__(24);
 
 	var compiler = {
 	  /*
@@ -36658,51 +36709,13 @@
 
 
 /***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = function() { throw new Error("define cannot be used indirect"); };
-
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {module.exports = get_blob()
-
-	function get_blob() {
-	  if(global.Blob) {
-	    try {
-	      new Blob(['asdf'], {type: 'text/plain'})
-	      return Blob
-	    } catch(err) {}
-	  }
-
-	  var Builder = global.WebKitBlobBuilder ||
-	                global.MozBlobBuilder ||
-	                global.MSBlobBuilder
-
-	  return function(parts, bag) {
-	    var builder = new Builder
-	      , endings = bag.endings
-	      , type = bag.type
-
-	    if(endings) for(var i = 0, len = parts.length; i < len; ++i) {
-	      builder.append(parts[i], endings)
-	    } else for(var i = 0, len = parts.length; i < len; ++i) {
-	      builder.append(parts[i])
-	    }
-
-	    return type ? builder.getBlob(type) : builder.getBlob()
-	  }
-	}
-
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
 /* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
+	__webpack_require__(36);
+	__webpack_require__(37);
+	__webpack_require__(38);
+	__webpack_require__(39);
 	__webpack_require__(40);
 	__webpack_require__(41);
 	__webpack_require__(42);
@@ -36743,11 +36756,7 @@
 	__webpack_require__(77);
 	__webpack_require__(78);
 	__webpack_require__(79);
-	__webpack_require__(80);
-	__webpack_require__(81);
-	__webpack_require__(82);
-	__webpack_require__(83);
-	module.exports = __webpack_require__(84).core;
+	module.exports = __webpack_require__(80).core;
 
 /***/ },
 /* 29 */
@@ -37340,9 +37349,9 @@
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var GrammarError = __webpack_require__(23),
-	    asts         = __webpack_require__(36),
-	    visitor      = __webpack_require__(37);
+	var GrammarError = __webpack_require__(25),
+	    asts         = __webpack_require__(81),
+	    visitor      = __webpack_require__(82);
 
 	/* Checks that all referenced rules exist. */
 	function reportMissingRules(ast) {
@@ -37366,10 +37375,10 @@
 /* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays       = __webpack_require__(21),
-	    GrammarError = __webpack_require__(23),
-	    asts         = __webpack_require__(36),
-	    visitor      = __webpack_require__(37);
+	var arrays       = __webpack_require__(23),
+	    GrammarError = __webpack_require__(25),
+	    asts         = __webpack_require__(81),
+	    visitor      = __webpack_require__(82);
 
 	/* Checks that no left recursion is present. */
 	function reportLeftRecursion(ast) {
@@ -37402,8 +37411,8 @@
 /* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(21),
-	    visitor = __webpack_require__(37);
+	var arrays  = __webpack_require__(23),
+	    visitor = __webpack_require__(82);
 
 	/*
 	 * Removes proxy rules -- that is, rules that only delegate to other rule.
@@ -37448,12 +37457,12 @@
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays  = __webpack_require__(21),
-	    objects = __webpack_require__(22),
-	    asts    = __webpack_require__(36),
-	    visitor = __webpack_require__(37),
-	    op      = __webpack_require__(38),
-	    js      = __webpack_require__(39);
+	var arrays  = __webpack_require__(23),
+	    objects = __webpack_require__(24),
+	    asts    = __webpack_require__(81),
+	    visitor = __webpack_require__(82),
+	    op      = __webpack_require__(83),
+	    js      = __webpack_require__(84);
 
 	/* Generates bytecode.
 	 *
@@ -38070,10 +38079,10 @@
 /* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays = __webpack_require__(21),
-	    asts   = __webpack_require__(36),
-	    op     = __webpack_require__(38),
-	    js     = __webpack_require__(39);
+	var arrays = __webpack_require__(23),
+	    asts   = __webpack_require__(81),
+	    op     = __webpack_require__(83),
+	    js     = __webpack_require__(84);
 
 	/* Generates parser JavaScript code. */
 	function generateJavascript(ast, options) {
@@ -39241,221 +39250,7 @@
 /* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrays = __webpack_require__(21);
-
-	/* AST utilities. */
-	var asts = {
-	  findRule: function(ast, name) {
-	    return arrays.find(ast.rules, function(r) { return r.name === name; });
-	  },
-
-	  indexOfRule: function(ast, name) {
-	    return arrays.indexOf(ast.rules, function(r) { return r.name === name; });
-	  }
-	};
-
-	module.exports = asts;
-
-
-/***/ },
-/* 37 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var objects = __webpack_require__(22),
-	    arrays  = __webpack_require__(21);
-
-	/* Simple AST node visitor builder. */
-	var visitor = {
-	  build: function(functions) {
-	    function visit(node) {
-	      return functions[node.type].apply(null, arguments);
-	    }
-
-	    function visitNop() { }
-
-	    function visitExpression(node) {
-	      var extraArgs = Array.prototype.slice.call(arguments, 1);
-
-	      visit.apply(null, [node.expression].concat(extraArgs));
-	    }
-
-	    function visitChildren(property) {
-	      return function(node) {
-	        var extraArgs = Array.prototype.slice.call(arguments, 1);
-
-	        arrays.each(node[property], function(child) {
-	          visit.apply(null, [child].concat(extraArgs));
-	        });
-	      };
-	    }
-
-	    var DEFAULT_FUNCTIONS = {
-	          grammar: function(node) {
-	            var extraArgs = Array.prototype.slice.call(arguments, 1);
-
-	            if (node.initializer) {
-	              visit.apply(null, [node.initializer].concat(extraArgs));
-	            }
-
-	            arrays.each(node.rules, function(rule) {
-	              visit.apply(null, [rule].concat(extraArgs));
-	            });
-	          },
-
-	          initializer:  visitNop,
-	          rule:         visitExpression,
-	          named:        visitExpression,
-	          choice:       visitChildren("alternatives"),
-	          action:       visitExpression,
-	          sequence:     visitChildren("elements"),
-	          labeled:      visitExpression,
-	          text:         visitExpression,
-	          simple_and:   visitExpression,
-	          simple_not:   visitExpression,
-	          optional:     visitExpression,
-	          zero_or_more: visitExpression,
-	          one_or_more:  visitExpression,
-	          semantic_and: visitNop,
-	          semantic_not: visitNop,
-	          rule_ref:     visitNop,
-	          literal:      visitNop,
-	          "class":      visitNop,
-	          any:          visitNop
-	        };
-
-	    objects.defaults(functions, DEFAULT_FUNCTIONS);
-
-	    return visit;
-	  }
-	};
-
-	module.exports = visitor;
-
-
-/***/ },
-/* 38 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* Bytecode instruction opcodes. */
-	var opcodes = {
-	  /* Stack Manipulation */
-
-	  PUSH:             0,    // PUSH c
-	  PUSH_UNDEFINED:   26,   // PUSH_UNDEFINED
-	  PUSH_NULL:        27,   // PUSH_NULL
-	  PUSH_FAILED:      28,   // PUSH_FAILED
-	  PUSH_EMPTY_ARRAY: 29,   // PUSH_EMPTY_ARRAY
-	  PUSH_CURR_POS:    1,    // PUSH_CURR_POS
-	  POP:              2,    // POP
-	  POP_CURR_POS:     3,    // POP_CURR_POS
-	  POP_N:            4,    // POP_N n
-	  NIP:              5,    // NIP
-	  APPEND:           6,    // APPEND
-	  WRAP:             7,    // WRAP n
-	  TEXT:             8,    // TEXT
-
-	  /* Conditions and Loops */
-
-	  IF:               9,    // IF t, f
-	  IF_ERROR:         10,   // IF_ERROR t, f
-	  IF_NOT_ERROR:     11,   // IF_NOT_ERROR t, f
-	  WHILE_NOT_ERROR:  12,   // WHILE_NOT_ERROR b
-
-	  /* Matching */
-
-	  MATCH_ANY:        13,   // MATCH_ANY a, f, ...
-	  MATCH_STRING:     14,   // MATCH_STRING s, a, f, ...
-	  MATCH_STRING_IC:  15,   // MATCH_STRING_IC s, a, f, ...
-	  MATCH_REGEXP:     16,   // MATCH_REGEXP r, a, f, ...
-	  ACCEPT_N:         17,   // ACCEPT_N n
-	  ACCEPT_STRING:    18,   // ACCEPT_STRING s
-	  FAIL:             19,   // FAIL e
-
-	  /* Calls */
-
-	  REPORT_SAVED_POS: 20,   // REPORT_SAVED_POS p
-	  REPORT_CURR_POS:  21,   // REPORT_CURR_POS
-	  CALL:             22,   // CALL f, n, pc, p1, p2, ..., pN
-
-	  /* Rules */
-
-	  RULE:             23,   // RULE r
-
-	  /* Failure Reporting */
-
-	  SILENT_FAILS_ON:  24,   // SILENT_FAILS_ON
-	  SILENT_FAILS_OFF: 25    // SILENT_FAILS_FF
-	};
-
-	module.exports = opcodes;
-
-
-/***/ },
-/* 39 */
-/***/ function(module, exports, __webpack_require__) {
-
-	function hex(ch) { return ch.charCodeAt(0).toString(16).toUpperCase(); }
-
-	/* JavaScript code generation helpers. */
-	var javascript = {
-	  stringEscape: function(s) {
-	    /*
-	     * ECMA-262, 5th ed., 7.8.4: All characters may appear literally in a string
-	     * literal except for the closing quote character, backslash, carriage
-	     * return, line separator, paragraph separator, and line feed. Any character
-	     * may appear in the form of an escape sequence.
-	     *
-	     * For portability, we also escape all control and non-ASCII characters.
-	     * Note that "\0" and "\v" escape sequences are not used because JSHint does
-	     * not like the first and IE the second.
-	     */
-	    return s
-	      .replace(/\\/g,   '\\\\')   // backslash
-	      .replace(/"/g,    '\\"')    // closing double quote
-	      .replace(/\x08/g, '\\b')    // backspace
-	      .replace(/\t/g,   '\\t')    // horizontal tab
-	      .replace(/\n/g,   '\\n')    // line feed
-	      .replace(/\f/g,   '\\f')    // form feed
-	      .replace(/\r/g,   '\\r')    // carriage return
-	      .replace(/[\x00-\x07\x0B\x0E\x0F]/g, function(ch) { return '\\x0' + hex(ch); })
-	      .replace(/[\x10-\x1F\x80-\xFF]/g,    function(ch) { return '\\x'  + hex(ch); })
-	      .replace(/[\u0100-\u0FFF]/g,         function(ch) { return '\\u0' + hex(ch); })
-	      .replace(/[\u1000-\uFFFF]/g,         function(ch) { return '\\u'  + hex(ch); });
-	  },
-
-	  regexpClassEscape: function(s) {
-	    /*
-	     * Based on ECMA-262, 5th ed., 7.8.5 & 15.10.1.
-	     *
-	     * For portability, we also escape all control and non-ASCII characters.
-	     */
-	    return s
-	      .replace(/\\/g, '\\\\')    // backslash
-	      .replace(/\//g, '\\/')     // closing slash
-	      .replace(/\]/g, '\\]')     // closing bracket
-	      .replace(/\^/g, '\\^')     // caret
-	      .replace(/-/g,  '\\-')     // dash
-	      .replace(/\0/g, '\\0')     // null
-	      .replace(/\t/g, '\\t')     // horizontal tab
-	      .replace(/\n/g, '\\n')     // line feed
-	      .replace(/\v/g, '\\x0B')   // vertical tab
-	      .replace(/\f/g, '\\f')     // form feed
-	      .replace(/\r/g, '\\r')     // carriage return
-	      .replace(/[\x00-\x08\x0E\x0F]/g,  function(ch) { return '\\x0' + hex(ch); })
-	      .replace(/[\x10-\x1F\x80-\xFF]/g, function(ch) { return '\\x'  + hex(ch); })
-	      .replace(/[\u0100-\u0FFF]/g,      function(ch) { return '\\u0' + hex(ch); })
-	      .replace(/[\u1000-\uFFFF]/g,      function(ch) { return '\\u'  + hex(ch); });
-	  }
-	};
-
-	module.exports = javascript;
-
-
-/***/ },
-/* 40 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var $                = __webpack_require__(84)
+	var $                = __webpack_require__(80)
 	  , cof              = __webpack_require__(85)
 	  , $def             = __webpack_require__(87)
 	  , invoke           = __webpack_require__(90)
@@ -39715,12 +39510,12 @@
 	};
 
 /***/ },
-/* 41 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// ECMAScript 6 symbols shim
-	var $        = __webpack_require__(84)
+	var $        = __webpack_require__(80)
 	  , setTag   = __webpack_require__(85).set
 	  , uid      = __webpack_require__(86)
 	  , $def     = __webpack_require__(87)
@@ -39821,7 +39616,7 @@
 	setTag($.g.JSON, 'JSON', true);
 
 /***/ },
-/* 42 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.3.1 Object.assign(target, source)
@@ -39829,7 +39624,7 @@
 	$def($def.S, 'Object', {assign: __webpack_require__(95)});
 
 /***/ },
-/* 43 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.3.10 Object.is(value1, value2)
@@ -39841,7 +39636,7 @@
 	});
 
 /***/ },
-/* 44 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.3.19 Object.setPrototypeOf(O, proto)
@@ -39849,12 +39644,12 @@
 	$def($def.S, 'Object', {setPrototypeOf: __webpack_require__(96).set});
 
 /***/ },
-/* 45 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// 19.1.3.6 Object.prototype.toString()
-	var $   = __webpack_require__(84)
+	var $   = __webpack_require__(80)
 	  , cof = __webpack_require__(85)
 	  , tmp = {};
 	tmp[__webpack_require__(89)('toStringTag')] = 'z';
@@ -39863,10 +39658,10 @@
 	});
 
 /***/ },
-/* 46 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $        = __webpack_require__(84)
+	var $        = __webpack_require__(80)
 	  , $def     = __webpack_require__(87)
 	  , isObject = $.isObject
 	  , toObject = $.toObject;
@@ -39906,11 +39701,11 @@
 	wrapObjectMethod('getOwnPropertyNames');
 
 /***/ },
-/* 47 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $    = __webpack_require__(84)
+	var $    = __webpack_require__(80)
 	  , NAME = 'name'
 	  , setDesc = $.setDesc
 	  , FunctionProto = Function.prototype;
@@ -39929,11 +39724,11 @@
 	});
 
 /***/ },
-/* 48 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $          = __webpack_require__(84)
+	var $          = __webpack_require__(80)
 	  , isObject   = $.isObject
 	  , isFunction = $.isFunction
 	  , NUMBER     = 'Number'
@@ -39978,10 +39773,10 @@
 	}
 
 /***/ },
-/* 49 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $     = __webpack_require__(84)
+	var $     = __webpack_require__(80)
 	  , $def  = __webpack_require__(87)
 	  , abs   = Math.abs
 	  , floor = Math.floor
@@ -40018,7 +39813,7 @@
 	});
 
 /***/ },
-/* 50 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Infinity = 1 / 0
@@ -40145,11 +39940,11 @@
 	});
 
 /***/ },
-/* 51 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $def    = __webpack_require__(87)
-	  , toIndex = __webpack_require__(84).toIndex
+	  , toIndex = __webpack_require__(80).toIndex
 	  , fromCharCode = String.fromCharCode;
 
 	$def($def.S, 'String', {
@@ -40171,10 +39966,10 @@
 	});
 
 /***/ },
-/* 52 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $    = __webpack_require__(84)
+	var $    = __webpack_require__(80)
 	  , $def = __webpack_require__(87);
 
 	$def($def.S, 'String', {
@@ -40193,10 +39988,10 @@
 	});
 
 /***/ },
-/* 53 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var set   = __webpack_require__(84).set
+	var set   = __webpack_require__(80).set
 	  , at    = __webpack_require__(97)(true)
 	  , ITER  = __webpack_require__(86).safe('iter')
 	  , $iter = __webpack_require__(98)
@@ -40218,7 +40013,7 @@
 	});
 
 /***/ },
-/* 54 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $def = __webpack_require__(87);
@@ -40228,11 +40023,11 @@
 	});
 
 /***/ },
-/* 55 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $    = __webpack_require__(84)
+	var $    = __webpack_require__(80)
 	  , cof  = __webpack_require__(85)
 	  , $def = __webpack_require__(87)
 	  , toLength = $.toLength;
@@ -40251,11 +40046,11 @@
 	});
 
 /***/ },
-/* 56 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $    = __webpack_require__(84)
+	var $    = __webpack_require__(80)
 	  , cof  = __webpack_require__(85)
 	  , $def = __webpack_require__(87);
 
@@ -40268,11 +40063,11 @@
 	});
 
 /***/ },
-/* 57 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $    = __webpack_require__(84)
+	var $    = __webpack_require__(80)
 	  , $def = __webpack_require__(87);
 
 	$def($def.P, 'String', {
@@ -40288,11 +40083,11 @@
 	});
 
 /***/ },
-/* 58 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $    = __webpack_require__(84)
+	var $    = __webpack_require__(80)
 	  , cof  = __webpack_require__(85)
 	  , $def = __webpack_require__(87);
 
@@ -40308,10 +40103,10 @@
 	});
 
 /***/ },
-/* 59 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $     = __webpack_require__(84)
+	var $     = __webpack_require__(80)
 	  , ctx   = __webpack_require__(99)
 	  , $def  = __webpack_require__(87)
 	  , $iter = __webpack_require__(98)
@@ -40345,7 +40140,7 @@
 	});
 
 /***/ },
-/* 60 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $def = __webpack_require__(87);
@@ -40363,10 +40158,10 @@
 	});
 
 /***/ },
-/* 61 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $          = __webpack_require__(84)
+	var $          = __webpack_require__(80)
 	  , setUnscope = __webpack_require__(101)
 	  , ITER       = __webpack_require__(86).safe('iter')
 	  , $iter      = __webpack_require__(98)
@@ -40402,17 +40197,17 @@
 	setUnscope('entries');
 
 /***/ },
-/* 62 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(102)(Array);
 
 /***/ },
-/* 63 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $       = __webpack_require__(84)
+	var $       = __webpack_require__(80)
 	  , $def    = __webpack_require__(87)
 	  , toIndex = $.toIndex;
 	$def($def.P, 'Array', {
@@ -40442,11 +40237,11 @@
 	__webpack_require__(101)('copyWithin');
 
 /***/ },
-/* 64 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $       = __webpack_require__(84)
+	var $       = __webpack_require__(80)
 	  , $def    = __webpack_require__(87)
 	  , toIndex = $.toIndex;
 	$def($def.P, 'Array', {
@@ -40464,7 +40259,7 @@
 	__webpack_require__(101)('fill');
 
 /***/ },
-/* 65 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $def = __webpack_require__(87);
@@ -40475,7 +40270,7 @@
 	__webpack_require__(101)('find');
 
 /***/ },
-/* 66 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $def = __webpack_require__(87);
@@ -40486,10 +40281,10 @@
 	__webpack_require__(101)('findIndex');
 
 /***/ },
-/* 67 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $      = __webpack_require__(84)
+	var $      = __webpack_require__(80)
 	  , cof    = __webpack_require__(85)
 	  , RegExp = $.g.RegExp
 	  , Base   = RegExp
@@ -40521,11 +40316,11 @@
 	__webpack_require__(102)(RegExp);
 
 /***/ },
-/* 68 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $       = __webpack_require__(84)
+	var $       = __webpack_require__(80)
 	  , ctx     = __webpack_require__(99)
 	  , cof     = __webpack_require__(85)
 	  , $def    = __webpack_require__(87)
@@ -40730,7 +40525,7 @@
 	});
 
 /***/ },
-/* 69 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40750,7 +40545,7 @@
 	}, strong, true);
 
 /***/ },
-/* 70 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40765,11 +40560,11 @@
 	}, strong);
 
 /***/ },
-/* 71 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $         = __webpack_require__(84)
+	var $         = __webpack_require__(80)
 	  , weak      = __webpack_require__(106)
 	  , leakStore = weak.leakStore
 	  , ID        = weak.ID
@@ -40810,7 +40605,7 @@
 	}
 
 /***/ },
-/* 72 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40825,10 +40620,10 @@
 	}, weak, false, true);
 
 /***/ },
-/* 73 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $         = __webpack_require__(84)
+	var $         = __webpack_require__(80)
 	  , $def      = __webpack_require__(87)
 	  , setProto  = __webpack_require__(96)
 	  , $iter     = __webpack_require__(98)
@@ -40962,7 +40757,7 @@
 	$def($def.S, 'Reflect', reflect);
 
 /***/ },
-/* 74 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://github.com/domenic/Array.prototype.includes
@@ -40973,7 +40768,7 @@
 	__webpack_require__(101)('includes');
 
 /***/ },
-/* 75 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://github.com/mathiasbynens/String.prototype.at
@@ -40983,7 +40778,7 @@
 	});
 
 /***/ },
-/* 76 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://gist.github.com/kangax/9698100
@@ -40993,11 +40788,11 @@
 	});
 
 /***/ },
-/* 77 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://gist.github.com/WebReflection/9353781
-	var $       = __webpack_require__(84)
+	var $       = __webpack_require__(80)
 	  , $def    = __webpack_require__(87)
 	  , ownKeys = __webpack_require__(107);
 
@@ -41013,11 +40808,11 @@
 	});
 
 /***/ },
-/* 78 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// http://goo.gl/XkBrjD
-	var $    = __webpack_require__(84)
+	var $    = __webpack_require__(80)
 	  , $def = __webpack_require__(87);
 	function createObjectToArray(isEntries){
 	  return function(object){
@@ -41038,7 +40833,7 @@
 	});
 
 /***/ },
-/* 79 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
@@ -41053,11 +40848,11 @@
 	});
 
 /***/ },
-/* 80 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// JavaScript 1.6 / Strawman array statics shim
-	var $       = __webpack_require__(84)
+	var $       = __webpack_require__(80)
 	  , $def    = __webpack_require__(87)
 	  , $Array  = $.core.Array || Array
 	  , statics = {};
@@ -41074,11 +40869,11 @@
 	$def($def.S, 'Array', statics);
 
 /***/ },
-/* 81 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// ie9- setTimeout & setInterval additional parameters fix
-	var $         = __webpack_require__(84)
+	var $         = __webpack_require__(80)
 	  , $def      = __webpack_require__(87)
 	  , invoke    = __webpack_require__(90)
 	  , partial   = __webpack_require__(108)
@@ -41099,7 +40894,7 @@
 	});
 
 /***/ },
-/* 82 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $def  = __webpack_require__(87)
@@ -41110,11 +40905,11 @@
 	});
 
 /***/ },
-/* 83 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(61);
-	var $           = __webpack_require__(84)
+	__webpack_require__(57);
+	var $           = __webpack_require__(80)
 	  , Iterators   = __webpack_require__(98).Iterators
 	  , ITERATOR    = __webpack_require__(89)('iterator')
 	  , ArrayValues = Iterators.Array
@@ -41125,7 +40920,7 @@
 	Iterators.NodeList = ArrayValues;
 
 /***/ },
-/* 84 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41231,10 +41026,224 @@
 	if(typeof __g != 'undefined')__g = global;
 
 /***/ },
+/* 81 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var arrays = __webpack_require__(23);
+
+	/* AST utilities. */
+	var asts = {
+	  findRule: function(ast, name) {
+	    return arrays.find(ast.rules, function(r) { return r.name === name; });
+	  },
+
+	  indexOfRule: function(ast, name) {
+	    return arrays.indexOf(ast.rules, function(r) { return r.name === name; });
+	  }
+	};
+
+	module.exports = asts;
+
+
+/***/ },
+/* 82 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var objects = __webpack_require__(24),
+	    arrays  = __webpack_require__(23);
+
+	/* Simple AST node visitor builder. */
+	var visitor = {
+	  build: function(functions) {
+	    function visit(node) {
+	      return functions[node.type].apply(null, arguments);
+	    }
+
+	    function visitNop() { }
+
+	    function visitExpression(node) {
+	      var extraArgs = Array.prototype.slice.call(arguments, 1);
+
+	      visit.apply(null, [node.expression].concat(extraArgs));
+	    }
+
+	    function visitChildren(property) {
+	      return function(node) {
+	        var extraArgs = Array.prototype.slice.call(arguments, 1);
+
+	        arrays.each(node[property], function(child) {
+	          visit.apply(null, [child].concat(extraArgs));
+	        });
+	      };
+	    }
+
+	    var DEFAULT_FUNCTIONS = {
+	          grammar: function(node) {
+	            var extraArgs = Array.prototype.slice.call(arguments, 1);
+
+	            if (node.initializer) {
+	              visit.apply(null, [node.initializer].concat(extraArgs));
+	            }
+
+	            arrays.each(node.rules, function(rule) {
+	              visit.apply(null, [rule].concat(extraArgs));
+	            });
+	          },
+
+	          initializer:  visitNop,
+	          rule:         visitExpression,
+	          named:        visitExpression,
+	          choice:       visitChildren("alternatives"),
+	          action:       visitExpression,
+	          sequence:     visitChildren("elements"),
+	          labeled:      visitExpression,
+	          text:         visitExpression,
+	          simple_and:   visitExpression,
+	          simple_not:   visitExpression,
+	          optional:     visitExpression,
+	          zero_or_more: visitExpression,
+	          one_or_more:  visitExpression,
+	          semantic_and: visitNop,
+	          semantic_not: visitNop,
+	          rule_ref:     visitNop,
+	          literal:      visitNop,
+	          "class":      visitNop,
+	          any:          visitNop
+	        };
+
+	    objects.defaults(functions, DEFAULT_FUNCTIONS);
+
+	    return visit;
+	  }
+	};
+
+	module.exports = visitor;
+
+
+/***/ },
+/* 83 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* Bytecode instruction opcodes. */
+	var opcodes = {
+	  /* Stack Manipulation */
+
+	  PUSH:             0,    // PUSH c
+	  PUSH_UNDEFINED:   26,   // PUSH_UNDEFINED
+	  PUSH_NULL:        27,   // PUSH_NULL
+	  PUSH_FAILED:      28,   // PUSH_FAILED
+	  PUSH_EMPTY_ARRAY: 29,   // PUSH_EMPTY_ARRAY
+	  PUSH_CURR_POS:    1,    // PUSH_CURR_POS
+	  POP:              2,    // POP
+	  POP_CURR_POS:     3,    // POP_CURR_POS
+	  POP_N:            4,    // POP_N n
+	  NIP:              5,    // NIP
+	  APPEND:           6,    // APPEND
+	  WRAP:             7,    // WRAP n
+	  TEXT:             8,    // TEXT
+
+	  /* Conditions and Loops */
+
+	  IF:               9,    // IF t, f
+	  IF_ERROR:         10,   // IF_ERROR t, f
+	  IF_NOT_ERROR:     11,   // IF_NOT_ERROR t, f
+	  WHILE_NOT_ERROR:  12,   // WHILE_NOT_ERROR b
+
+	  /* Matching */
+
+	  MATCH_ANY:        13,   // MATCH_ANY a, f, ...
+	  MATCH_STRING:     14,   // MATCH_STRING s, a, f, ...
+	  MATCH_STRING_IC:  15,   // MATCH_STRING_IC s, a, f, ...
+	  MATCH_REGEXP:     16,   // MATCH_REGEXP r, a, f, ...
+	  ACCEPT_N:         17,   // ACCEPT_N n
+	  ACCEPT_STRING:    18,   // ACCEPT_STRING s
+	  FAIL:             19,   // FAIL e
+
+	  /* Calls */
+
+	  REPORT_SAVED_POS: 20,   // REPORT_SAVED_POS p
+	  REPORT_CURR_POS:  21,   // REPORT_CURR_POS
+	  CALL:             22,   // CALL f, n, pc, p1, p2, ..., pN
+
+	  /* Rules */
+
+	  RULE:             23,   // RULE r
+
+	  /* Failure Reporting */
+
+	  SILENT_FAILS_ON:  24,   // SILENT_FAILS_ON
+	  SILENT_FAILS_OFF: 25    // SILENT_FAILS_FF
+	};
+
+	module.exports = opcodes;
+
+
+/***/ },
+/* 84 */
+/***/ function(module, exports, __webpack_require__) {
+
+	function hex(ch) { return ch.charCodeAt(0).toString(16).toUpperCase(); }
+
+	/* JavaScript code generation helpers. */
+	var javascript = {
+	  stringEscape: function(s) {
+	    /*
+	     * ECMA-262, 5th ed., 7.8.4: All characters may appear literally in a string
+	     * literal except for the closing quote character, backslash, carriage
+	     * return, line separator, paragraph separator, and line feed. Any character
+	     * may appear in the form of an escape sequence.
+	     *
+	     * For portability, we also escape all control and non-ASCII characters.
+	     * Note that "\0" and "\v" escape sequences are not used because JSHint does
+	     * not like the first and IE the second.
+	     */
+	    return s
+	      .replace(/\\/g,   '\\\\')   // backslash
+	      .replace(/"/g,    '\\"')    // closing double quote
+	      .replace(/\x08/g, '\\b')    // backspace
+	      .replace(/\t/g,   '\\t')    // horizontal tab
+	      .replace(/\n/g,   '\\n')    // line feed
+	      .replace(/\f/g,   '\\f')    // form feed
+	      .replace(/\r/g,   '\\r')    // carriage return
+	      .replace(/[\x00-\x07\x0B\x0E\x0F]/g, function(ch) { return '\\x0' + hex(ch); })
+	      .replace(/[\x10-\x1F\x80-\xFF]/g,    function(ch) { return '\\x'  + hex(ch); })
+	      .replace(/[\u0100-\u0FFF]/g,         function(ch) { return '\\u0' + hex(ch); })
+	      .replace(/[\u1000-\uFFFF]/g,         function(ch) { return '\\u'  + hex(ch); });
+	  },
+
+	  regexpClassEscape: function(s) {
+	    /*
+	     * Based on ECMA-262, 5th ed., 7.8.5 & 15.10.1.
+	     *
+	     * For portability, we also escape all control and non-ASCII characters.
+	     */
+	    return s
+	      .replace(/\\/g, '\\\\')    // backslash
+	      .replace(/\//g, '\\/')     // closing slash
+	      .replace(/\]/g, '\\]')     // closing bracket
+	      .replace(/\^/g, '\\^')     // caret
+	      .replace(/-/g,  '\\-')     // dash
+	      .replace(/\0/g, '\\0')     // null
+	      .replace(/\t/g, '\\t')     // horizontal tab
+	      .replace(/\n/g, '\\n')     // line feed
+	      .replace(/\v/g, '\\x0B')   // vertical tab
+	      .replace(/\f/g, '\\f')     // form feed
+	      .replace(/\r/g, '\\r')     // carriage return
+	      .replace(/[\x00-\x08\x0E\x0F]/g,  function(ch) { return '\\x0' + hex(ch); })
+	      .replace(/[\x10-\x1F\x80-\xFF]/g, function(ch) { return '\\x'  + hex(ch); })
+	      .replace(/[\u0100-\u0FFF]/g,      function(ch) { return '\\u0' + hex(ch); })
+	      .replace(/[\u1000-\uFFFF]/g,      function(ch) { return '\\u'  + hex(ch); });
+	  }
+	};
+
+	module.exports = javascript;
+
+
+/***/ },
 /* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $        = __webpack_require__(84)
+	var $        = __webpack_require__(80)
 	  , TAG      = __webpack_require__(89)('toStringTag')
 	  , toString = {}.toString;
 	function cof(it){
@@ -41258,14 +41267,14 @@
 	function uid(key){
 	  return 'Symbol(' + key + ')_' + (++sid + Math.random()).toString(36);
 	}
-	uid.safe = __webpack_require__(84).g.Symbol || uid;
+	uid.safe = __webpack_require__(80).g.Symbol || uid;
 	module.exports = uid;
 
 /***/ },
 /* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $          = __webpack_require__(84)
+	var $          = __webpack_require__(80)
 	  , global     = $.g
 	  , core       = $.core
 	  , isFunction = $.isFunction;
@@ -41312,7 +41321,7 @@
 /* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $ = __webpack_require__(84);
+	var $ = __webpack_require__(80);
 	module.exports = function(object, el){
 	  var O      = $.toObject(object)
 	    , keys   = $.getKeys(O)
@@ -41326,7 +41335,7 @@
 /* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global = __webpack_require__(84).g
+	var global = __webpack_require__(80).g
 	  , store  = {};
 	module.exports = function(name){
 	  return store[name] || (store[name] =
@@ -41369,7 +41378,7 @@
 	// 4 -> Array#every
 	// 5 -> Array#find
 	// 6 -> Array#findIndex
-	var $   = __webpack_require__(84)
+	var $   = __webpack_require__(80)
 	  , ctx = __webpack_require__(99);
 	module.exports = function(TYPE){
 	  var IS_MAP        = TYPE == 1
@@ -41407,7 +41416,7 @@
 /* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $ = __webpack_require__(84);
+	var $ = __webpack_require__(80);
 	function assert(condition, msg1, msg2){
 	  if(!condition)throw TypeError(msg2 ? msg1 + msg2 : msg1);
 	}
@@ -41433,7 +41442,7 @@
 	'use strict';
 	// false -> Array#indexOf
 	// true  -> Array#includes
-	var $ = __webpack_require__(84);
+	var $ = __webpack_require__(80);
 	module.exports = function(IS_INCLUDES){
 	  return function(el /*, fromIndex = 0 */){
 	    var O      = $.toObject(this)
@@ -41467,7 +41476,7 @@
 /* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $ = __webpack_require__(84);
+	var $ = __webpack_require__(80);
 	// 19.1.2.1 Object.assign(target, source, ...)
 	/*eslint-disable no-unused-vars */
 	module.exports = Object.assign || function assign(target, source){
@@ -41492,7 +41501,7 @@
 
 	// Works with __proto__ only. Old v8 can't work with null proto objects.
 	/*eslint-disable no-proto */
-	var $      = __webpack_require__(84)
+	var $      = __webpack_require__(80)
 	  , assert = __webpack_require__(92);
 	function check(O, proto){
 	  assert.obj(O);
@@ -41523,7 +41532,7 @@
 	'use strict';
 	// true  -> String#at
 	// false -> String#codePointAt
-	var $ = __webpack_require__(84);
+	var $ = __webpack_require__(80);
 	module.exports = function(TO_STRING){
 	  return function(pos){
 	    var s = String($.assertDefined(this))
@@ -41544,7 +41553,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $                 = __webpack_require__(84)
+	var $                 = __webpack_require__(80)
 	  , ctx               = __webpack_require__(99)
 	  , cof               = __webpack_require__(85)
 	  , $def              = __webpack_require__(87)
@@ -41710,7 +41719,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// 22.1.3.31 Array.prototype[@@unscopables]
-	var $           = __webpack_require__(84)
+	var $           = __webpack_require__(80)
 	  , UNSCOPABLES = __webpack_require__(89)('unscopables');
 	if($.FW && !(UNSCOPABLES in []))$.hide(Array.prototype, UNSCOPABLES, {});
 	module.exports = function(key){
@@ -41721,7 +41730,7 @@
 /* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $ = __webpack_require__(84);
+	var $ = __webpack_require__(80);
 	module.exports = function(C){
 	  if($.DESC && $.FW)$.setDesc(C, __webpack_require__(89)('species'), {
 	    configurable: true,
@@ -41734,7 +41743,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $      = __webpack_require__(84)
+	var $      = __webpack_require__(80)
 	  , ctx    = __webpack_require__(99)
 	  , cof    = __webpack_require__(85)
 	  , invoke = __webpack_require__(90)
@@ -41820,7 +41829,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $        = __webpack_require__(84)
+	var $        = __webpack_require__(80)
 	  , ctx      = __webpack_require__(99)
 	  , safe     = __webpack_require__(86).safe
 	  , assert   = __webpack_require__(92)
@@ -41979,7 +41988,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $     = __webpack_require__(84)
+	var $     = __webpack_require__(80)
 	  , $def  = __webpack_require__(87)
 	  , $iter = __webpack_require__(98)
 	  , assertInstance = __webpack_require__(92).inst;
@@ -42051,7 +42060,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $         = __webpack_require__(84)
+	var $         = __webpack_require__(80)
 	  , safe      = __webpack_require__(86).safe
 	  , assert    = __webpack_require__(92)
 	  , forOf     = __webpack_require__(98).forOf
@@ -42138,7 +42147,7 @@
 /* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $            = __webpack_require__(84)
+	var $            = __webpack_require__(80)
 	  , assertObject = __webpack_require__(92).obj;
 	module.exports = function ownKeys(it){
 	  assertObject(it);
@@ -42150,7 +42159,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $      = __webpack_require__(84)
+	var $      = __webpack_require__(80)
 	  , invoke = __webpack_require__(90)
 	  , assertFunction = __webpack_require__(92).fn;
 	module.exports = function(/* ...pargs */){
