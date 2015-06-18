@@ -47,7 +47,8 @@ do_continue
     { return all }
 
 expression
-  = conditional
+  = forever
+  / conditional
   / parenthetical
   / assignment
   / atom
@@ -93,6 +94,10 @@ elseif
 else
   = 'else' _* lambda:lambda
     { return [{ t: "boolean", c: true }, node("invocation", [lambda], offset)]; }
+
+forever
+  = 'forever' _* lambda: lambda
+    { return node("forever", node("invocation", [lambda], offset), offset); }
 
 atom
   = number

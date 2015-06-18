@@ -93,7 +93,8 @@ function stepJump(ins, p) {
 };
 
 function step(p) {
-  var callFrame = currentCallFrame(p)
+  console.log(p.callStack.length);
+  var callFrame = currentCallFrame(p);
   if (callFrame === undefined) {
     return p;
   } else {

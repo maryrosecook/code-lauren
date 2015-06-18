@@ -62,6 +62,12 @@ function compileConditional(a) {
   return bc;
 };
 
+function compileForever(a) {
+  var invocation = compile(a.c);
+  var bc = invocation.concat([["jump", -3]]);
+  return bc;
+};
+
 function compileLambdaDef(a) {
   return [["push_lambda", {
     bc: compile(util.getNodeAt(a, ["lambda", 1])),
@@ -95,6 +101,8 @@ function compile(a) {
     return compileAssignment(a);
   } else if (a.t === "conditional") {
     return compileConditional(a);
+  } else if (a.t === "forever") {
+    return compileForever(a);
   } else if (a.t === "label") {
     return compileLabel(a);
   } else if (a.t === "number" || a.t === "string" || a.t === "boolean") {

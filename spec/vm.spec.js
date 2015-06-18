@@ -96,6 +96,14 @@ describe("bytecode interpreter", function() {
     });
   });
 
+  describe("forever", function() {
+    it("should run for a long time", function() {
+      expect(function() {
+        v(c(p("n: 1 \n forever { n: add(n 1) \n if equals(n 100) { blowup() } }")));
+      }).toThrow("Cannot read property 'bc' of undefined");
+    });
+  });
+
   describe("conditionals", function() {
     it("should return first branch if true", function() {
       expect(v(c(p("if true { 1 }"))).stack.pop()).toEqual(1);
