@@ -82,15 +82,17 @@ assignment
 
 conditional
   = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
-    { return node("conditional", [condition, lambda].concat(rest ? rest : []), offset); }
+    { return node("conditional", [condition,
+                                  node("invocation", [lambda], offset)]
+                                    .concat(rest ? rest : []), offset); }
 
 elseif
   = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
-    { return [condition, lambda].concat(rest ? rest : []); }
+    { return [condition, node("invocation", [lambda], offset)].concat(rest ? rest : []); }
 
 else
   = 'else' _* lambda:lambda
-    { return [{ t: "boolean", c: true }, lambda]; }
+    { return [{ t: "boolean", c: true }, node("invocation", [lambda], offset)]; }
 
 atom
   = number

@@ -9,7 +9,9 @@ var pegParse = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "ut
 
 function parse(codeStr) {
   try {
-    return pegParse(codeStr);
+    var ast = pegParse(codeStr);
+    annotateTailCalls(ast);
+    return ast;
   } catch(e) {
     var niceError = parserStateError(codeStr);
     throw new ParseError(e.offset,
@@ -85,6 +87,30 @@ function verifyAllAstNodesHaveStartIndex(ast) {
       throw new Error("All ast nodes should be annotated with a start index");
     }
   });
+};
+
+function annotateTailCalls(ast, inTailPosition) {
+  inTailPosition = (inTailPosition === true ? true : false);
+
+  if (ast === undefined) {
+    return;
+  } else if (ast.t === "invocation") {
+    if (inTailPosition) {
+      ast.tail = true;
+    }
+
+    annotateTailCalls(ast.c[0], inTailPosition);
+  } else if (ast.t === "return") {
+    annotateTailCalls(ast.c, true);
+  } else if (ast.t === "conditional") {
+    ast.c
+      .filter(function(x, i) { return i % 2 === 1; })
+      .forEach(function(x) { annotateTailCalls(x, inTailPosition); });
+  } else if (ast instanceof Array) {
+    ast.forEach(function(x) { annotateTailCalls(x, inTailPosition); });
+  } else if (ast.c !== undefined) {
+    annotateTailCalls(ast.c, inTailPosition);
+  }
 };
 
 function indexToLineAndColumn(index, code) {

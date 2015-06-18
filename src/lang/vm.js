@@ -46,14 +46,13 @@ function stepInvoke(ins, p) {
   if (fn.bc !== undefined) { // a lambda
     var lambdaEnv = scope(_.object(_.pluck(fn.ast.c[0], "c"), args), fn.closureEnv);
 
-    var recursiveIndex = previousRecursionCallFrameIndex(p, fn);
-    if (inTailPosition(currentCallFrame(p)) &&
-        recursiveIndex !== undefined) { // if tail position and a recursive call, then tco
-      p.callStack = p.callStack.slice(0, recursiveIndex + 1);
+    var tailIndex = tailCallIndex(p.callStack, fn);
+    if (tailIndex !== undefined) { // if tails calls all the way to recursive call, then tco
+      p.callStack = p.callStack.slice(0, tailIndex + 1);
       currentCallFrame(p).env = lambdaEnv;
       currentCallFrame(p).bcPointer = 0;
     } else {
-      p.callStack.push(createCallFrame(fn.bc, lambdaEnv));
+      p.callStack.push(createCallFrame(fn.bc, lambdaEnv, ins[2]));
     }
   } else { // is a JS function object
     p.stack.push(fn.apply(null, args));
@@ -62,13 +61,19 @@ function stepInvoke(ins, p) {
   return p;
 };
 
-function inTailPosition(callFrame) {
-  return callFrame.bcPointer === callFrame.bc.length - 2; // only ["return"] to go
+function tailCallIndex(callStack, fn) {
+  var recursiveIndex = previousRecursionCallFrameIndex(callStack, fn);
+  if (recursiveIndex !== undefined) {
+    var calls = callStack.slice(recursiveIndex);
+    if (calls.length === calls.filter(function(c) { return c.tail === true; }).length) {
+      return recursiveIndex;
+    }
+  }
 };
 
-function previousRecursionCallFrameIndex(p, fn) {
-  for (var i = p.callStack.length - 1; i >= 0; i--) {
-    if (p.callStack[i].bc === fn.bc) {
+function previousRecursionCallFrameIndex(callStack, fn) {
+  for (var i = callStack.length - 1; i >= 0; i--) {
+    if (callStack[i].bc === fn.bc) {
       return i;
     }
   }
@@ -144,8 +149,8 @@ function createProgram(bc, env, stack) {
   };
 };
 
-function createCallFrame(bc, env) {
-  return { env: env, bc: bc, bcPointer: 0 };
+function createCallFrame(bc, env, tail) {
+  return { bc: bc, bcPointer: 0, env: env, tail: tail };
 };
 
 function createProgramAndComplete(bc, env, stack) {

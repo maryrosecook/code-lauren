@@ -34,7 +34,9 @@ function compileInvocation(a) {
   var aArgs = aInvocation.slice(1);
   var compiledArgs = util.mapCat(aArgs, compile);
   var compiledFn = compile(aInvocation[0]);
-  var code = compiledArgs.concat(compiledFn, [["invoke", aArgs.length]]);
+  var code = compiledArgs.concat(compiledFn, [["invoke",
+                                               aArgs.length,
+                                               a.tail === true ? true : false]]);
   return code;
 };
 
@@ -46,8 +48,7 @@ function compileConditional(a) {
     clauses.push(
       compile(parts[i]).concat( // put conditional value to evaluate on stack
         [["if_not_true_jump", 3]], // skip block if !condition
-        compile(parts[i + 1]), // push condition's lambda onto stack (skipped if !condition)
-        [["invoke", 0]] // invoke the lambda (skipped if !condition)
+        compile(parts[i + 1]) // push condition's lambda inv onto stack (skipped if !condition)
       )
     );
   }

@@ -3,7 +3,7 @@ var c = require("../src/lang/compiler");
 var util = require("../src/util");
 
 // just removes ast attribute values from fn objects for easier expectation writing
-function stripFnAsts(bc) {
+function stripAsts(bc) {
   bc.forEach(function(instruction) {
     if (instruction[0] === "push_lambda") {
       delete instruction[1].ast;
@@ -48,108 +48,108 @@ describe("bytecode compiler", function() {
 
   describe("conditionals", function() {
     it("should compile an if", function() {
-      expect(stripFnAsts(c(p("if true { 1 }"))))
+      expect(stripAsts(c(p("if true { 1 }"))))
         .toEqual([["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 0],
 
                   ["return"]]);
     });
 
     it("should compile an if/else", function() {
-      expect(stripFnAsts(c(p("if true { 1 } else { 2 }"))))
+      expect(stripAsts(c(p("if true { 1 } else { 2 }"))))
         .toEqual([["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 5],
 
                   ["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 0],
 
                   ["return"]]);
     });
 
     it("should compile an if/elseif/else", function() {
-      expect(stripFnAsts(c(p("if true { 1 } elseif false { 2 } else { 3 }"))))
+      expect(stripAsts(c(p("if true { 1 } elseif false { 2 } else { 3 }"))))
         .toEqual([["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 10],
 
                   ["push", false],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 5],
 
                   ["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 3],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 0],
 
                   ["return"]]);
     });
 
     it("should compile an if/elseif/elseif/else", function() {
-      expect(stripFnAsts(c(p("if true { 1 } elseif false { 2 } elseif true { 3 } else { 4 }"))))
+      expect(stripAsts(c(p("if true { 1 } elseif false { 2 } elseif true { 3 } else { 4 }"))))
         .toEqual([["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 15],
 
                   ["push", false],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 10],
 
                   ["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 3],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 5],
 
                   ["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 4],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 0],
 
                   ["return"]]);
     });
 
     it("should compile an if/elseif/elseif/else", function() {
-      expect(stripFnAsts(c(p("if true { 1 } elseif false { 2 }"))))
+      expect(stripAsts(c(p("if true { 1 } elseif false { 2 }"))))
         .toEqual([["push", true],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 5],
                   ["push", false],
                   ["if_not_true_jump", 3],
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["jump", 0],
 
                   ["return"]]);
@@ -178,28 +178,27 @@ describe("bytecode compiler", function() {
     });
 
     it("should compile lambda that contains an invocation on no arguments", function() {
-      expect(c(util.getNodeAt(p("{ a() }"), ["top", "do", 0, "return"]))[0][1].bc)
+      expect(stripAsts(c(util.getNodeAt(p("{ a() }"), ["top", "do", 0, "return"]))[0][1].bc))
         .toEqual([["get_env", "a"],
-                  ["invoke", 0],
+                  ["invoke", 0, true],
                   ["return"]]);
     });
 
     it("should compile lambda that contains an invocation with some arguments", function() {
-      expect(c(util.getNodeAt(p("{ a(1 2) }"), ["top", "do", 0, "return"]))[0][1].bc)
+      expect(stripAsts(c(util.getNodeAt(p("{ a(1 2) }"), ["top", "do", 0, "return"]))[0][1].bc))
         .toEqual([["push", 1],
                   ["push", 2],
                   ["get_env", "a"],
-                  ["invoke", 2],
+                  ["invoke", 2, true],
                   ["return"]]);
     });
 
     it("should compile invocation of lambda literal", function() {
-      var code = stripFnAsts(c(util.getNodeAt(p("{ {}() }"),
-                                              ["top", "do", 0, "return"]))[0][1].bc);
-
+      var code = stripAsts(c(util.getNodeAt(p("{ {}() }"),
+                                            ["top", "do", 0, "return"]))[0][1].bc);
       expect(code).toEqual([["push_lambda", { bc: [["push", undefined],
                                                    ["return"]] }],
-                            ["invoke", 0],
+                            ["invoke", 0, true],
                             ["return"]]);
     });
   });

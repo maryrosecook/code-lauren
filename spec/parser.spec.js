@@ -288,47 +288,55 @@ describe("parser", function() {
       var ast = parse("if true { 1 }");
       expect(util.stripAst(util.getNodeAt(ast, ["top", "do", 0, "return"])))
         .toEqual({ t: "conditional", c: [{ t: "boolean", c: true },
-                                         { t: "lambda",
-                                           c: [[],
-                                               { t: "do",
-                                                 c: [{ t: "return", c: { t: "number", c: 1 }}]}]}]});
+                                         { t: "invocation",
+                                           c: [{ t: "lambda",
+                                                 c: [[],
+                                                     { t: "do",
+                                                       c: [{ t: "return",
+                                                             c: { t: "number", c: 1 }}]}]}]}]});
     });
 
     it("should parse an conditional with if and else if", function() {
       var ast = parse("if true { 1 } elseif false { 2 }");
       expect(util.stripAst(util.getNodeAt(ast, ["top", "do", 0, "return"])))
         .toEqual({ t: "conditional", c: [{ t: "boolean", c: true },
-                                         { t: "lambda",
-                                           c: [[], { t: "do",
-                                                     c: [{ t: "return",
-                                                           c: { t: "number", c: 1 }}]}]},
+                                         { t: "invocation",
+                                           c: [{ t: "lambda",
+                                                 c: [[], { t: "do",
+                                                           c: [{ t: "return",
+                                                                 c: { t: "number", c: 1 }}]}]}]},
                                          { t: "boolean", c: false },
-                                         { t: "lambda",
-                                           c: [[], { t: "do",
-                                                     c: [{ t: "return",
-                                                           c: { t: "number", c: 2 }}]}]}]});
+                                         { t: "invocation",
+                                           c: [{ t: "lambda",
+                                                 c: [[], { t: "do",
+                                                           c: [{ t: "return",
+                                                                 c: { t: "number", c: 2 }}]}]}]}]});
     });
 
     it("should parse an conditional with an if, else if and else", function() {
       var ast = parse("if true { 1 } elseif false { 2 } else { 3 }");
       expect(util.stripAst(util.getNodeAt(ast, ["top", "do", 0, "return"])))
-        .toEqual({ t: "conditional", c: [{ t: "boolean", c: true },
-                                         { t: "lambda",
-                                           c: [[], { t: "do",
-                                                     c: [{ t: "return",
-                                                           c: { t: "number", c: 1 }}]}]},
+        .toEqual({ t: "conditional",
+                   c: [{ t: "boolean", c: true },
+                       { t: "invocation",
+                         c: [{ t: "lambda",
+                               c: [[], { t: "do",
+                                         c: [{ t: "return",
+                                               c: { t: "number", c: 1 }}]}]}]},
 
-                                         { t: "boolean", c: false },
-                                         { t: "lambda",
-                                           c: [[], { t: "do",
-                                                     c: [{ t: "return",
-                                                           c: { t: "number", c: 2 }}]}]},
+                       { t: "boolean", c: false },
+                       { t: "invocation",
+                         c: [{ t: "lambda",
+                               c: [[], { t: "do",
+                                         c: [{ t: "return",
+                                               c: { t: "number", c: 2 }}]}]}]},
 
-                                         { t: "boolean", c: true },
-                                         { t: "lambda",
-                                           c: [[], { t: "do",
-                                                     c: [{ t: "return",
-                                                           c: { t: "number", c: 3 }}]}]}]});
+                       { t: "boolean", c: true },
+                       { t: "invocation",
+                         c: [{ t: "lambda",
+                               c: [[], { t: "do",
+                                         c: [{ t: "return",
+                                               c: { t: "number", c: 3 }}]}]}]}]});
     });
 
     it("should not allow else with condition", function() {
@@ -339,32 +347,39 @@ describe("parser", function() {
       var ast = parse("if true { } elseif false { } elseif false { } else { }");
       expect(util.stripAst(util.getNodeAt(ast,
                                           ["top", "do", 0, "return"])))
-        .toEqual({ t: "conditional", c: [{ t: "boolean", c: true },
-                                         { t: "lambda",
-                                           c: [[], { t: "do", c: [{ t: "return" }]}]},
+        .toEqual({ t: "conditional",
+                   c: [{ t: "boolean", c: true },
+                       { t: "invocation",
+                         c: [{ t: "lambda",
+                               c: [[], { t: "do", c: [{ t: "return" }]}]}]},
 
-                                         { t: "boolean", c: false },
-                                         { t: "lambda",
-                                           c: [[], { t: "do", c: [{ t: "return" }]}]},
+                       { t: "boolean", c: false },
+                       { t: "invocation",
+                         c: [{ t: "lambda",
+                               c: [[], { t: "do", c: [{ t: "return" }]}]}]},
 
-                                         { t: "boolean", c: false },
-                                         { t: "lambda",
-                                           c: [[], { t: "do", c: [{ t: "return" }]}]},
+                       { t: "boolean", c: false },
+                       { t: "invocation",
+                         c: [{ t: "lambda",
+                               c: [[], { t: "do", c: [{ t: "return" }]}]}]},
 
-                                         { t: "boolean", c: true },
-                                         { t: "lambda",
-                                           c: [[], { t: "do", c: [{ t: "return" }]}]}]});
+                       { t: "boolean", c: true },
+                       { t: "invocation",
+                         c: [{ t: "lambda",
+                               c: [[], { t: "do", c: [{ t: "return" }]}]}]}]});
     });
 
     it("should parse an conditional with if w invoked conditional", function() {
       var ast = parse("if really(true) { }");
       expect(util.stripAst(util.getNodeAt(ast,
                                           ["top", "do", 0, "return"])))
-        .toEqual({ t: "conditional", c: [{ t: "invocation",
-                                           c: [{ t: "label", c: "really" },
-                                               { t: "boolean", c: true }]},
-                                         { t: "lambda", c: [[], { t: "do",
-                                                                  c: [{ t: "return" }]}]}]});
+        .toEqual({ t: "conditional",
+                   c: [{ t: "invocation",
+                         c: [{ t: "label", c: "really" },
+                             { t: "boolean", c: true }]},
+                       { t: "invocation",
+                         c: [{ t: "lambda", c: [[], { t: "do",
+                                                      c: [{ t: "return" }]}]}]}]});
     });
   });
 
@@ -447,6 +462,104 @@ describe("parser", function() {
   describe("offset annotation", function() {
     it("should put start offset on every node with a .c attribute", function() {
       parse.verifyAllAstNodesHaveStartIndex(parse("{?a ?b add(a b)\nsubtract(c d)}"));
+    });
+  });
+
+  describe("tail expression annotation", function() {
+    it("should annotate tail lambda invocation as a tail call", function() {
+      var ast = parse("{}()");
+      var tailCall = util.getNodeAt(ast, ["top", "do", 0, "return"]);
+      expect(tailCall.t).toEqual("invocation");
+      expect(tailCall.tail).toEqual(true);
+    });
+
+    it("should annotate both tail if and wrapped tail inv", function() {
+      var ast = parse("if true { {}() }");
+
+      var ifInvocation = util.getNodeAt(ast, ["top", "do", 0, "return", "conditional", 1]);
+      expect(ifInvocation.t).toEqual("invocation");
+      expect(ifInvocation.tail).toEqual(true);
+
+      var lambdaInvocation = util.getNodeAt(ifInvocation,
+                                            ["invocation", 0, "lambda", 1, "do", 0, "return"]);
+      expect(lambdaInvocation.t).toEqual("invocation");
+      expect(lambdaInvocation.tail).toEqual(true);
+    });
+
+    it("should annotate tail if, wrapped if and wrapped tail inv", function() {
+      var ast = parse("if true { if true { {}() } }");
+
+      var ifInvocation1 = util.getNodeAt(ast, ["top", "do", 0, "return", "conditional", 1]);
+      expect(ifInvocation1.t).toEqual("invocation");
+      expect(ifInvocation1.tail).toEqual(true);
+
+      var ifInvocation2 = util.getNodeAt(ifInvocation1,
+                                         ["invocation", 0, "lambda", 1, "do", 0, "return",
+                                          "conditional", 1]);
+      expect(ifInvocation2.t).toEqual("invocation");
+      expect(ifInvocation2.tail).toEqual(true);
+
+      var lambdaInvocation = util.getNodeAt(ifInvocation2,
+                                            ["invocation", 0, "lambda", 1, "do", 0, "return"]);
+      expect(lambdaInvocation.t).toEqual("invocation");
+      expect(lambdaInvocation.tail).toEqual(true);
+    });
+
+    it("should mark tail inv but not the invocation passed to it", function() {
+      var ast = parse("a(b())");
+
+      var tailCall = util.getNodeAt(ast, ["top", "do", 0, "return"]);
+      expect(tailCall.t).toEqual("invocation");
+      expect(tailCall.tail).toEqual(true);
+
+      var nonTailCall = util.getNodeAt(tailCall, ["invocation", 1]);
+      expect(nonTailCall.t).toEqual("invocation");
+      expect(nonTailCall.tail).toBeUndefined();
+    });
+
+    it("should mark tail inv and all chained invs", function() {
+      var ast = parse("a()()()");
+
+      var tailCall1 = util.getNodeAt(ast, ["top", "do", 0, "return"]);
+      expect(tailCall1.t).toEqual("invocation");
+      expect(tailCall1.tail).toEqual(true);
+
+      var tailCall2 = tailCall1.c[0];
+      expect(tailCall2.t).toEqual("invocation");
+      expect(tailCall2.tail).toEqual(true);
+
+      var tailCall3 = tailCall2.c[0];
+      expect(tailCall3.t).toEqual("invocation");
+      expect(tailCall3.tail).toEqual(true);
+    });
+
+    it("should annotate inv in if and else as tail call", function() {
+      var ast = parse("if true { {}() } else { {}() }");
+
+      var ifInvocation = util.getNodeAt(ast, ["top", "do", 0, "return", "conditional", 1]);
+      expect(ifInvocation.t).toEqual("invocation");
+      expect(ifInvocation.tail).toEqual(true);
+
+      var lambdaInv = util.getNodeAt(ifInvocation,
+                                     ["invocation", 0, "lambda", 1, "do", 0, "return"]);
+      expect(lambdaInv.t).toEqual("invocation");
+      expect(lambdaInv.tail).toEqual(true);
+
+      var elseInvocation = util.getNodeAt(ast, ["top", "do", 0, "return", "conditional", 3]);
+      expect(elseInvocation.t).toEqual("invocation");
+      expect(elseInvocation.tail).toEqual(true);
+    });
+
+    it("should second do expr as tail but not first", function() {
+      var ast = parse("a() \n b()");
+
+      var nonTailCall = util.getNodeAt(ast, ["top", "do", 0]);
+      expect(nonTailCall.t).toEqual("invocation");
+      expect(nonTailCall.tail).toBeUndefined();
+
+      var tailCall = util.getNodeAt(ast, ["top", "do", 1, "return"]);
+      expect(tailCall.t).toEqual("invocation");
+      expect(tailCall.tail).toEqual(true);
     });
   });
 });

@@ -141,7 +141,7 @@ describe("bytecode interpreter", function() {
   });
 
   describe("recursion", function() {
-    it("should trampoline a program where there is an if in the tail position", function() {
+    iit("should trampoline a program where there is an if in the tail position", function() {
       expect(v(c(p('tozero: { ?x if equals(x 0) { "done" } else { tozero(subtract(x 1)) } } \n tozero(20000)'))).stack.pop())
         .toEqual("done");
     });
