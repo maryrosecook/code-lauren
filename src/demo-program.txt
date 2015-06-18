@@ -10,7 +10,7 @@ draw: { ?x ?y
 
 angle: 0
 
-forever({
+forever {
   radius-of-circle-orbit: 100
   circle-angle-change: 0.1
 
@@ -18,4 +18,4 @@ forever({
 
   draw(multiply(radius-of-circle-orbit cosine(angle))
        multiply(radius-of-circle-orbit sine(angle)))
-})
+}
