@@ -1,5 +1,6 @@
 var fs = require("fs");
 var _ = require("underscore");
+var $ = require("jquery");
 
 require("babel-core/polyfill");
 
@@ -11,34 +12,23 @@ var scope = require("./lang/scope");
 var createEditor = require("./editor");
 var createAnnotator = require("./annotator");
 var createEnv = require("./env");
+var getPlayer = require("./program-player");
 
 window.addEventListener("load", function() {
+  var screen = document.getElementById("screen").getContext("2d");
   var editor = createEditor(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
   var annotator = createAnnotator(editor.getSession());
+  var player = setupPlayer();
 
-  var tickStop = start(editor, annotator);
+  player.setProgram(createProgram(parse(editor.getValue(), annotator), screen));
   editor.on("change", function() {
-    if (tickStop !== undefined) {
-      tickStop();
-    }
-
-    tickStop = start(editor, annotator);
+    player.setProgram(createProgram(parse(editor.getValue(), annotator), screen));
   });
 });
 
-function step(p) {
-  try {
-    return vm.step(p);
-  } catch (e) {
-    if (e instanceof vm.RuntimeError) {
-      console.log(e.stack);
-    } else {
-      console.log(e.stack);
-    }
-  }
-};
-
 function parse(code, annotator) {
+  annotator.clear();
+
   try {
     parser.balanceParentheses(code);
     return parser.parse(code);
@@ -52,48 +42,11 @@ function parse(code, annotator) {
 
       annotator.lineMessage(code, e.i, "error", e.message);
     }
-
-    throw e;
   }
 };
 
-function isTimeToYieldToEventLoop(lastYield) {
-  return new Date().getTime() - lastYield > 8;
-};
-
-function start(editor, annotator) {
-  var code = editor.getValue();
-  var screen = document.getElementById("screen").getContext("2d");
-  var env = scope(createEnv(screen));
-
-  annotator.clear();
-
-  try {
-    var p = vm.createProgram(compile(parse(code, annotator)), env);
-    var lastEventLoopYield = new Date().getTime();
-
-    var going = true;
-    (function tick() {
-      while(going && !vm.isComplete(p)) {
-        p = step(p);
-
-        if (isTimeToYieldToEventLoop(lastEventLoopYield)) {
-          requestAnimationFrame(function() {
-            lastEventLoopYield = new Date().getTime();
-            tick();
-          });
-
-          break;
-        }
-      }
-    })();
-
-    return function() {
-      going = false;
-    };
-  } catch (e) {
-    console.log(e.message);
-  }
+function createProgram(ast, screen) {
+  return vm.createProgram(compile(ast), scope(createEnv(screen)));
 };
 
 function displayRainbowParentheses(code, annotator) {
@@ -102,4 +55,29 @@ function displayRainbowParentheses(code, annotator) {
       p.map(function(offset) {
         annotator.codeHighlight(code, offset, "rainbow-" + i % 4);  });
     });
+};
+
+function setupPlayer() {
+  var player = getPlayer();
+
+  function play() {
+    $("#play-button").hide();
+    $("#pause-button").show();
+    player.unpause();
+  };
+
+  function pause() {
+    $("#pause-button").hide();
+    $("#play-button").show();
+    player.pause();
+  };
+
+  $("#play-button").click(play);
+  $("#pause-button").click(pause);
+  $("#step-forwards-button").click(function() {
+    pause();
+    player.step(10000);
+  });
+
+  return player;
 };
