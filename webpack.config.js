@@ -8,8 +8,13 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
-      { test: /\.js$/, loader: "transform/cacheable?brfs" }
+      { test: /\.js$/, loader: "transform/cacheable?brfs" },
+      { test: /\.jsx$/, loader: "jsx-loader?insertPragma=React.DOM&harmony" }
     ]
+  },
+
+  resolve: {
+    extensions: ['', '.js', '.jsx']
   },
 
   node: {
