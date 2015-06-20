@@ -8,8 +8,8 @@ require("babel-core/polyfill");
 var ProgramPlayer = require("./player-interface.jsx");
 
 var parser = require("./lang/parser");
-var compile = require("../src/lang/compiler");
-var vm = require("../src/lang/vm");
+var compile = require("./lang/compiler");
+var vm = require("./lang/vm");
 
 var scope = require("./lang/scope");
 var createEditor = require("./editor");
