@@ -5,7 +5,7 @@ var paused = false;
 (function tick(lastEventLoopYield) {
   while(true) {
     if (p !== undefined && !paused && !vm.isComplete(p)) {
-      player.step(1);
+      player.stepForwards(1);
     }
 
     if (isTimeToYieldToEventLoop(lastEventLoopYield)) {
@@ -16,6 +16,14 @@ var paused = false;
 })(new Date().getTime());
 
 var player = {
+  isPaused: function() {
+    return paused;
+  },
+
+  togglePause: function() {
+    paused = !paused;
+  },
+
   pause: function() {
     paused = true;
   },
@@ -24,11 +32,15 @@ var player = {
     paused = false;
   },
 
-  step: function(stepCount) {
+  stepForwards: function(stepCount) {
     stepCount = stepCount || 1;
     for (var i = 0; i < stepCount; i++) {
-      p = step(p);
+      p = stepForwards(p);
     }
+  },
+
+  stepBackwards: function() {
+    console.log("nothing yet");
   },
 
   setProgram: function(newP) {
@@ -44,7 +56,7 @@ function isTimeToYieldToEventLoop(lastYield) {
   return new Date().getTime() - lastYield > 8;
 };
 
-function step(p) {
+function stepForwards(p) {
   try {
     return vm.step(p);
   } catch (e) {

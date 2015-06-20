@@ -1,8 +1,11 @@
 var fs = require("fs");
 var _ = require("underscore");
 var $ = require("jquery");
+var React = require('react');
 
 require("babel-core/polyfill");
+
+var ProgramPlayer = require("./player-interface.jsx");
 
 var parser = require("./lang/parser");
 var compile = require("../src/lang/compiler");
@@ -19,6 +22,9 @@ window.addEventListener("load", function() {
   var editor = createEditor(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
   var annotator = createAnnotator(editor.getSession());
   var player = setupPlayer();
+
+  React.render(React.createElement(ProgramPlayer, { player: player }),
+               document.getElementById('programPlayer'));
 
   player.setProgram(createProgram(parse(editor.getValue(), annotator), screen));
   editor.on("change", function() {
