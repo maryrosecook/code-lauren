@@ -3,15 +3,15 @@ var _ = require("underscore");
 var util = require("../util");
 
 function compileLiteral(a) {
-  return [["push", a.c]];
+  return c(["push", a.c], a);
 };
 
 function compileLabel(a) {
-  return [["get_env", a.c]];
+  return c(["get_env", a.c], a);
 };
 
 function compileUndefined() {
-  return [["push", undefined]];
+  return c(["push", undefined]);
 };
 
 function compileTop(a) {
@@ -20,8 +20,8 @@ function compileTop(a) {
 
 function compileDo(a) {
   var nonTerminalExpressions = a.c.slice(0, -1);
-  var pops = _.range(nonTerminalExpressions.length)
-      .map(function() { return ["pop"]; });
+  var pops = util.mapCat(_.range(nonTerminalExpressions.length),
+                    function() { return c(["pop"]); });
   var compiledReturnExpression = compile(a.c[a.c.length - 1]);
 
   return util.mapCat(nonTerminalExpressions, compile)
@@ -34,20 +34,20 @@ function compileInvocation(a) {
   var aArgs = aInvocation.slice(1);
   var compiledArgs = util.mapCat(aArgs, compile);
   var compiledFn = compile(aInvocation[0]);
-  var code = compiledArgs.concat(compiledFn, [["invoke",
-                                               aArgs.length,
-                                               a.tail === true ? true : false]]);
+  var code = compiledArgs.concat(compiledFn, c(["invoke",
+                                                aArgs.length,
+                                                a.tail === true ? true : false], a));
   return code;
 };
 
 function compileConditional(a) {
   var parts = a.c;
 
-  var clauses = []
+  var clauses = [];
   for (var i = 0; i < parts.length; i += 2) {
     clauses.push(
       compile(parts[i]).concat( // put conditional value to evaluate on stack
-        [["if_not_true_jump", 3]], // skip block if !condition
+        c(["if_not_true_jump", 3]), // skip block if !condition
         compile(parts[i + 1]) // push condition's lambda inv onto stack (skipped if !condition)
       )
     );
@@ -55,8 +55,8 @@ function compileConditional(a) {
 
   var bc = [];
   for (var i = clauses.length - 1; i >= 0; i--) {
-    bc.unshift(["jump", bc.length]);
-    bc = clauses[i].concat(bc);
+    var bcLength = bc.length
+    bc = clauses[i].concat(c(["jump", bcLength]).concat(bc));
   };
 
   return bc;
@@ -64,24 +64,29 @@ function compileConditional(a) {
 
 function compileForever(a) {
   var invocation = compile(a.c);
-  var bc = invocation.concat([["jump", -3]]);
+  var bc = invocation.concat(c(["jump", -3]));
   return bc;
 };
 
 function compileLambdaDef(a) {
-  return [["push_lambda", {
+  return c(["push_lambda", {
     bc: compile(util.getNodeAt(a, ["lambda", 1])),
     ast: a
-  }]];
+  }]);
 };
 
 function compileReturn(a) {
-  return compile(a.c).concat([["return"]]);
+  return compile(a.c).concat(c(["return"]));
 };
 
 function compileAssignment(a) {
-  return compile(a.c[1]).concat([["set_env", a.c[0].c],
-                                 ["pop"]]);
+  return compile(a.c[1]).concat(c(["set_env", a.c[0].c]),
+                                c(["pop"]));
+};
+
+function c(c, ast) {
+  c.ast = ast;
+  return [c];
 };
 
 function compile(a) {

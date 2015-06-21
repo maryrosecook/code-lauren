@@ -90,6 +90,7 @@ describe("bytecode interpreter", function() {
 
     it("should assign lambda to env at top level", function() {
       var fn = v(c(p("a: { 1 } \n a"))).stack.pop();
+      util.stripBc(fn.bc);
       expect(fn.bc).toEqual([["push", 1],
                              ["return"]]);
       expect(fn.ast).toBeDefined();

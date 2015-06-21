@@ -16,6 +16,18 @@ var util = module.exports = {
     return obj
   },
 
+  stripBc: function(bc) {
+    bc.forEach(function(instruction) {
+      delete instruction.ast;
+      if (instruction[0] === "push_lambda") {
+        delete instruction[1].ast;
+        util.stripBc(instruction[1].bc);
+      }
+    });
+
+    return bc;
+  },
+
   copyException: function(from, to) {
     to.stack = from.stack;
     to.message = from.message;
