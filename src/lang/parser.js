@@ -13,10 +13,16 @@ function parse(codeStr) {
     annotateTailCalls(ast);
     return ast;
   } catch(e) {
-    var niceError = parserStateError(codeStr);
-    throw new ParseError(e.offset,
-                         niceError || e.message,
-                         e.stack);
+    if (e.name === "SyntaxError") { // pegjs syntax errors do not have a unique
+                                    // constructor so just look at data on exception
+                                    // to see if is peg syntax error
+      var niceError = parserStateError(codeStr);
+      throw new ParseError(e.offset,
+                           niceError || e.message,
+                           e.stack);
+    } else {
+      throw e;
+    }
   }
 };
 
