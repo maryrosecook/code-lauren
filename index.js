@@ -321,15 +321,15 @@
 	var util = __webpack_require__(18);
 
 	function compileLiteral(a) {
-	  return [["push", a.c]];
+	  return c(["push", a.c], a);
 	};
 
 	function compileLabel(a) {
-	  return [["get_env", a.c]];
+	  return c(["get_env", a.c], a);
 	};
 
 	function compileUndefined() {
-	  return [["push", undefined]];
+	  return c(["push", undefined]);
 	};
 
 	function compileTop(a) {
@@ -338,8 +338,8 @@
 
 	function compileDo(a) {
 	  var nonTerminalExpressions = a.c.slice(0, -1);
-	  var pops = _.range(nonTerminalExpressions.length).map(function () {
-	    return ["pop"];
+	  var pops = util.mapCat(_.range(nonTerminalExpressions.length), function (e) {
+	    return c(["pop"], e);
 	  });
 	  var compiledReturnExpression = compile(a.c[a.c.length - 1]);
 
@@ -351,7 +351,7 @@
 	  var aArgs = aInvocation.slice(1);
 	  var compiledArgs = util.mapCat(aArgs, compile);
 	  var compiledFn = compile(aInvocation[0]);
-	  var code = compiledArgs.concat(compiledFn, [["invoke", aArgs.length, a.tail === true ? true : false]]);
+	  var code = compiledArgs.concat(compiledFn, c(["invoke", aArgs.length, a.tail === true ? true : false], a));
 	  return code;
 	};
 
@@ -361,15 +361,15 @@
 	  var clauses = [];
 	  for (var i = 0; i < parts.length; i += 2) {
 	    clauses.push(compile(parts[i]).concat( // put conditional value to evaluate on stack
-	    [["if_not_true_jump", 3]], // skip block if !condition
+	    c(["if_not_true_jump", 3], parts[i]), // skip block if !condition
 	    compile(parts[i + 1]) // push condition's lambda inv onto stack (skipped if !condition)
 	    ));
 	  }
 
 	  var bc = [];
 	  for (var i = clauses.length - 1; i >= 0; i--) {
-	    bc.unshift(["jump", bc.length]);
-	    bc = clauses[i].concat(bc);
+	    var bcLength = bc.length;
+	    bc = clauses[i].concat(c(["jump", bcLength], clauses[i]).concat(bc));
 	  };
 
 	  return bc;
@@ -377,23 +377,28 @@
 
 	function compileForever(a) {
 	  var invocation = compile(a.c);
-	  var bc = invocation.concat([["jump", -3]]);
+	  var bc = invocation.concat(c(["jump", -3], a));
 	  return bc;
 	};
 
 	function compileLambdaDef(a) {
-	  return [["push_lambda", {
+	  return c(["push_lambda", {
 	    bc: compile(util.getNodeAt(a, ["lambda", 1])),
 	    ast: a
-	  }]];
+	  }], a);
 	};
 
 	function compileReturn(a) {
-	  return compile(a.c).concat([["return"]]);
+	  return compile(a.c).concat(c(["return"], a));
 	};
 
 	function compileAssignment(a) {
-	  return compile(a.c[1]).concat([["set_env", a.c[0].c], ["pop"]]);
+	  return compile(a.c[1]).concat(c(["set_env", a.c[0].c]), c(["pop"], a.c[0].c));
+	};
+
+	function c(c, ast) {
+	  c.ast = ast;
+	  return [c];
 	};
 
 	function compile(a) {
@@ -13144,6 +13149,18 @@
 	    }
 
 	    return obj;
+	  },
+
+	  stripBc: function stripBc(bc) {
+	    bc.forEach(function (instruction) {
+	      delete instruction.ast;
+	      if (instruction[0] === "push_lambda") {
+	        delete instruction[1].ast;
+	        util.stripBc(instruction[1].bc);
+	      }
+	    });
+
+	    return bc;
 	  },
 
 	  copyException: function copyException(from, to) {
