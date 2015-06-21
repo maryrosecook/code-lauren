@@ -5,7 +5,7 @@ var util = require("../src/util");
 describe("bytecode compiler", function() {
   describe("top level", function() {
     it("should compile an empty program", function() {
-      expect(c(p("")))
+      expect(util.stripBc(c(p(""))))
         .toEqual([["push", undefined],
                   ["return"]]);
     });
@@ -147,7 +147,7 @@ describe("bytecode compiler", function() {
 
   describe("lambdas", function() {
     it("should compile an empty lambda", function() {
-      expect(c(util.getNodeAt(p("{}"), ["top", "do", 0, "return"]))[0][1].bc)
+      expect(util.stripBc(c(util.getNodeAt(p("{}"), ["top", "do", 0, "return"]))[0][1].bc))
         .toEqual([["push", undefined],
                   ["return"]]);
     });

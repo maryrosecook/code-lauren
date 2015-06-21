@@ -21,7 +21,7 @@ function compileTop(a) {
 function compileDo(a) {
   var nonTerminalExpressions = a.c.slice(0, -1);
   var pops = util.mapCat(_.range(nonTerminalExpressions.length),
-                    function() { return c(["pop"]); });
+                         function(e) { return c(["pop"], e); });
   var compiledReturnExpression = compile(a.c[a.c.length - 1]);
 
   return util.mapCat(nonTerminalExpressions, compile)
@@ -47,7 +47,7 @@ function compileConditional(a) {
   for (var i = 0; i < parts.length; i += 2) {
     clauses.push(
       compile(parts[i]).concat( // put conditional value to evaluate on stack
-        c(["if_not_true_jump", 3]), // skip block if !condition
+        c(["if_not_true_jump", 3], parts[i]), // skip block if !condition
         compile(parts[i + 1]) // push condition's lambda inv onto stack (skipped if !condition)
       )
     );
@@ -56,7 +56,7 @@ function compileConditional(a) {
   var bc = [];
   for (var i = clauses.length - 1; i >= 0; i--) {
     var bcLength = bc.length
-    bc = clauses[i].concat(c(["jump", bcLength]).concat(bc));
+    bc = clauses[i].concat(c(["jump", bcLength], clauses[i]).concat(bc));
   };
 
   return bc;
@@ -64,7 +64,7 @@ function compileConditional(a) {
 
 function compileForever(a) {
   var invocation = compile(a.c);
-  var bc = invocation.concat(c(["jump", -3]));
+  var bc = invocation.concat(c(["jump", -3], a));
   return bc;
 };
 
@@ -72,16 +72,16 @@ function compileLambdaDef(a) {
   return c(["push_lambda", {
     bc: compile(util.getNodeAt(a, ["lambda", 1])),
     ast: a
-  }]);
+  }], a);
 };
 
 function compileReturn(a) {
-  return compile(a.c).concat(c(["return"]));
+  return compile(a.c).concat(c(["return"], a));
 };
 
 function compileAssignment(a) {
   return compile(a.c[1]).concat(c(["set_env", a.c[0].c]),
-                                c(["pop"]));
+                                c(["pop"], a.c[0].c));
 };
 
 function c(c, ast) {
