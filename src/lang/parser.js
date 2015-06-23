@@ -95,6 +95,21 @@ function verifyAllAstNodesHaveStartIndex(ast) {
   });
 };
 
+function annotateEndIndices(ast) {
+  if (ast === undefined || ast.c === undefined) {
+    return;
+  } else if (_.isString(ast.c) || _.isNumber(ast.c) || _.isBoolean(ast.c)) {
+    ast.e = ast.s + ast.c.toString().length;
+    return ast.e;
+  } else if (ast.c instanceof Array) {
+    ast.e = _.max(ast.c.map(annotateEndIndices).filter(_.negate(_.isUndefined)));
+    return ast.e;
+  } else if (ast.c instanceof Object) {
+    ast.e = annotateEndIndices(ast.c);
+    return ast.e;
+  }
+};
+
 function annotateTailCalls(ast, inTailPosition) {
   inTailPosition = (inTailPosition === true ? true : false);
 
@@ -171,6 +186,7 @@ parse.indexToLineAndColumn = indexToLineAndColumn;
 parse.balanceParentheses = balanceParentheses;
 parse.rainbowParentheses = rainbowParentheses;
 parse.verifyAllAstNodesHaveStartIndex = verifyAllAstNodesHaveStartIndex;
+parse.annotateEndIndices = annotateEndIndices;
 parse.parse = parse;
 parse.ParseError = ParseError;
 parse.ParenthesisError = ParenthesisError;

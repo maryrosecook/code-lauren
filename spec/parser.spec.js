@@ -562,4 +562,16 @@ describe("parser", function() {
       expect(tailCall.tail).toEqual(true);
     });
   });
+
+  describe("end index annotation", function() {
+    it("should annotate a literal with end position", function() {
+      var ast = parse("50");
+      parse.annotateEndIndices(ast);
+
+      expect(util.getNodeAt(ast, ["top", "do", 0, "return"]).e).toEqual(2);
+      expect(util.getNodeAt(ast, ["top", "do", 0]).e).toEqual(2);
+      expect(util.getNodeAt(ast, ["top"]).e).toEqual(2);
+      expect(ast.e).toEqual(2);
+    });
+  });
 });
