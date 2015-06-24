@@ -564,7 +564,7 @@ describe("parser", function() {
   });
 
   describe("end index annotation", function() {
-    it("should annotate a literal with end position", function() {
+    it("should annotate a literal with end positions", function() {
       var ast = parse("50");
       parse.annotateEndIndices(ast);
 
@@ -574,7 +574,7 @@ describe("parser", function() {
       expect(ast.e).toEqual(2);
     });
 
-    it("should annotate a literal with end position", function() {
+    it("should annotate an assignment with end positions", function() {
       var ast = parse("a: 50");
       parse.annotateEndIndices(ast);
 
