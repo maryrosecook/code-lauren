@@ -573,5 +573,18 @@ describe("parser", function() {
       expect(util.getNodeAt(ast, ["top"]).e).toEqual(2);
       expect(ast.e).toEqual(2);
     });
+
+    it("should annotate a literal with end position", function() {
+      var ast = parse("a: 50");
+      parse.annotateEndIndices(ast);
+
+      expect(util.getNodeAt(ast, ["top", "do", 0, "return", "assignment", 1]).e).toEqual(5);
+      expect(util.getNodeAt(ast, ["top", "do", 0, "return", "assignment", 0]).e).toEqual(1);
+      expect(util.getNodeAt(ast, ["top", "do", 0, "return"]).e).toEqual(5);
+      expect(util.getNodeAt(ast, ["top", "do", 0]).e).toEqual(5);
+      expect(util.getNodeAt(ast, ["top"]).e).toEqual(5);
+      expect(ast.e).toEqual(5);
+    });
+
   });
 });
