@@ -586,5 +586,9 @@ describe("parser", function() {
       expect(ast.e).toEqual(5);
     });
 
+    it("should throw away trailing whitespace when marking end of chunk of ast", function() {
+      var ast = parse("  a()   ");
+      expect(util.getNodeAt(ast, ["top", "do", 0, "return"]).e).toEqual(5);
+    });
   });
 });
