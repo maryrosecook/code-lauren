@@ -40,10 +40,10 @@ function parse(code, annotator) {
     return parser.parse(code);
   } catch(e) {
     if (e instanceof parser.ParseError) {
-      annotator.codeHighlight(code, e.i, "error");
+      annotator.codeHighlight(code, e.i, e.i + 1, "error");
       annotator.lineMessage(code, e.i, "error", e.message);
     } else if (e instanceof parser.ParenthesisError) {
-      annotator.codeHighlight(code, e.i, "error");
+      annotator.codeHighlight(code, e.i, e.i + 1, "error");
       displayRainbowParentheses(code, annotator);
 
       annotator.lineMessage(code, e.i, "error", e.message);
@@ -59,6 +59,6 @@ function displayRainbowParentheses(code, annotator) {
   parser.rainbowParentheses(code)
     .forEach(function(p, i) {
       p.map(function(offset) {
-        annotator.codeHighlight(code, offset, "rainbow-" + i % 4);  });
+        annotator.codeHighlight(code, offset, offset + 1, "rainbow-" + i % 4);  });
     });
 };

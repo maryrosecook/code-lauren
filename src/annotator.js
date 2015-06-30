@@ -11,20 +11,21 @@ module.exports = function createAnnotator(editSession) {
 function Annotator(editSession) {
   var markerIds = [];
 
-  this.codeHighlight = function(code, i, clazz) {
-    if (_.isNumber(i)) {
-      var lAndC = parser.indexToLineAndColumn(i, code);
+  this.codeHighlight = function(code, start, end, clazz) {
+    if (_.isNumber(start) && _.isNumber(end)) {
+      var startLAndC = parser.indexToLineAndColumn(start, code);
+      var endLAndC = parser.indexToLineAndColumn(end, code);
 
       // Add overhang if marked char is actually off end of line.
       // This happens because Ace doesn't support extending markers
       // outside text in this context and if we marked the first char
       // of the next line it would look a bit weird to the user.
-      var overhangClass = isOffEndOfLine(code, i) ? " overhang" : "";
+      var overhangClass = isOffEndOfLine(code, start) ? " overhang" : "";
 
-      var r = new range.Range(lAndC.line - 1,
-                              lAndC.column - 1,
-                              lAndC.line - 1,
-                              lAndC.column);
+      var r = new range.Range(startLAndC.line - 1,
+                              startLAndC.column - 1,
+                              endLAndC.line - 1,
+                              endLAndC.column - 1);
 
       markerIds.push(editSession.addMarker(r,
                                            "ace_code_highlight " +
