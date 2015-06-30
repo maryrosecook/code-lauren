@@ -20,7 +20,7 @@ function compileTop(a) {
 
 function compileDo(a) {
   var nonTerminalExpressions = a.c.slice(0, -1);
-  var pops = util.mapCat(_.range(nonTerminalExpressions.length),
+  var pops = util.mapCat(nonTerminalExpressions,
                          function(e) { return c(["pop"], e); });
   var compiledReturnExpression = compile(a.c[a.c.length - 1]);
 
@@ -80,8 +80,8 @@ function compileReturn(a) {
 };
 
 function compileAssignment(a) {
-  return compile(a.c[1]).concat(c(["set_env", a.c[0].c]),
-                                c(["pop"], a.c[0].c));
+  return compile(a.c[1]).concat(c(["set_env", a.c[0].c], a),
+                                c(["pop"], a));
 };
 
 function c(c, ast) {
