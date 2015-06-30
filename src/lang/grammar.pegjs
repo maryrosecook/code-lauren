@@ -1,6 +1,13 @@
 {
-  function node(tag, content, offset, syntax, raw) {
-    var node = { t: tag, c: content, s: offset instanceof Function ? offset() : offset };
+  function node(tag, content, s, text, syntax, raw) {
+    var node = {
+      t: tag,
+      c: content,
+      s: startOffset(s, text),
+      text: text,
+      e: endOffset(s, text)
+    };
+
     if(syntax !== undefined) {
       node.syntax = syntax;
     }
@@ -26,21 +33,30 @@
   function wrapLastDoExpressionInReturn(expressions) {
     var initial = expressions.slice(0, expressions.length - 1);
     var last = expressions[expressions.length - 1];
-    return initial.concat(node("return", last, last.s));
+    return initial.concat(node("return", last, last.s, last.text));
+  }
+
+  function startOffset(s, text) {
+    var leadingWhitespaceLength = text.length - text.replace(/^\s+/, "").length;
+    return s + leadingWhitespaceLength;
+  }
+
+  function endOffset(s, text) {
+    return s + text.trim().length;
   }
 }
 
 start
-  = all:top { return node("top", all, offset); }
+  = all:top { return node("top", all, offset(), text()); }
 
 top
   = do
 
 do
   = __* first:expression _* rest:do_continue* __*
-    { return node("do", wrapLastDoExpressionInReturn([first].concat(rest)), offset); }
+    { return node("do", wrapLastDoExpressionInReturn([first].concat(rest)), offset(), text()); }
   / __*
-    { return node("do", [node("return", undefined, offset)], offset); }
+    { return node("do", [node("return", undefined, offset(), text())], offset(), text()); }
 
 do_continue
   = _* nl __* all:expression _*
@@ -59,7 +75,13 @@ parenthetical
 
 invocation
   = f:function applications:application+ _*
-    { var n = bundleApplications(f, applications); n.s = offset(); return n; }
+    {
+      var n = bundleApplications(f, applications);
+      n.s = startOffset(offset(), text());
+      n.text = text();
+      n.e = endOffset(offset(), text());
+      return n; // refactor to use node()
+    }
 
 function
   = all: lambda
@@ -75,29 +97,29 @@ argument
 
 lambda
   = '{' __? parameters:parameter* __? body:do '}'
-    { return node("lambda", [parameters, body], offset); }
+    { return node("lambda", [parameters, body], offset(), text()); }
 
 assignment
   = label:label ':' _* expression:expression
-    { return node("assignment", [label, expression], offset); }
+    { return node("assignment", [label, expression], offset(), text()); }
 
 conditional
   = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
     { return node("conditional", [condition,
-                                  node("invocation", [lambda], offset)]
-                                    .concat(rest ? rest : []), offset); }
+                                  node("invocation", [lambda], offset(), text())]
+                                    .concat(rest ? rest : []), offset(), text()); }
 
 elseif
   = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
-    { return [condition, node("invocation", [lambda], offset)].concat(rest ? rest : []); }
+    { return [condition, node("invocation", [lambda], offset(), text())].concat(rest ? rest : []); }
 
 else
   = 'else' _* lambda:lambda
-    { return [{ t: "boolean", c: true }, node("invocation", [lambda], offset)]; }
+    { return [{ t: "boolean", c: true }, node("invocation", [lambda], offset(), text())]; }
 
 forever
   = 'forever' _* lambda: lambda
-    { return node("forever", node("invocation", [lambda], offset), offset); }
+    { return node("forever", node("invocation", [lambda], offset(), text()), offset(), text()); }
 
 atom
   = number
@@ -107,32 +129,32 @@ atom
 
 parameter
   = '?' label:label _*
-    { return node("parameter", label.c, offset); }
+    { return node("parameter", label.c, offset(), text()); }
 
 number
   = a:[0-9]+ b:[.] c:[0-9]+
-    { return node("number", parseFloat(a.join("") + b + c.join(""), 10), offset); }
+    { return node("number", parseFloat(a.join("") + b + c.join(""), 10), offset(), text()); }
   / all:[0-9]+
-    { return node("number", parseInt(all.join(""), 10), offset); }
+    { return node("number", parseInt(all.join(""), 10), offset(), text()); }
 
 string
   = '"' all:[A-Za-z0-9.,# ]* '"'
-    { return node('string', all.join(""), offset); }
+    { return node('string', all.join(""), offset(), text()); }
 
 boolean
-  = 'true'  { return node("boolean", true, offset); }
-  / 'false' { return node("boolean", false, offset); }
+  = 'true'  { return node("boolean", true, offset(), text()); }
+  / 'false' { return node("boolean", false, offset(), text()); }
 
 label
   = !keyword all: label_char+
-    { return node("label", all.join(""), offset); }
+    { return node("label", all.join(""), offset(), text()); }
 
 label_char
   = [a-zA-Z0-9_\-]
 
 nl
   = all:[\n]+
-    { return node('nl', all, offset); }
+    { return node('nl', all, offset(), text()); }
 
 _
   = [ \t\r]+

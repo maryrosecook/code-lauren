@@ -566,7 +566,6 @@ describe("parser", function() {
   describe("end index annotation", function() {
     it("should annotate a literal with end positions", function() {
       var ast = parse("50");
-      parse.annotateEndIndices(ast);
 
       expect(util.getNodeAt(ast, ["top", "do", 0, "return"]).e).toEqual(2);
       expect(util.getNodeAt(ast, ["top", "do", 0]).e).toEqual(2);
@@ -576,7 +575,6 @@ describe("parser", function() {
 
     it("should annotate an assignment with end positions", function() {
       var ast = parse("a: 50");
-      parse.annotateEndIndices(ast);
 
       expect(util.getNodeAt(ast, ["top", "do", 0, "return", "assignment", 1]).e).toEqual(5);
       expect(util.getNodeAt(ast, ["top", "do", 0, "return", "assignment", 0]).e).toEqual(1);
@@ -589,6 +587,29 @@ describe("parser", function() {
     it("should throw away trailing whitespace when marking end of chunk of ast", function() {
       var ast = parse("  a()   ");
       expect(util.getNodeAt(ast, ["top", "do", 0, "return"]).e).toEqual(5);
+    });
+
+    it("should throw away leading whitespace when marking start of chunk of ast", function() {
+      var ast = parse("  a()   ");
+      expect(util.getNodeAt(ast, ["top"]).s).toEqual(2);
+    });
+
+    it("should annotate a lambda literal with end positions", function() {
+      var ast = parse("{ a() }");
+
+      expect(util.getNodeAt(ast, ["top", "do", 0, "return", "lambda", 1]).e).toEqual(5);
+      expect(util.getNodeAt(ast, ["top", "do", 0, "return"]).e).toEqual(7);
+      expect(util.getNodeAt(ast, ["top", "do", 0]).e).toEqual(7);
+      expect(util.getNodeAt(ast, ["top"]).e).toEqual(7);
+      expect(ast.e).toEqual(7);
+    });
+
+    it("should annotate a subsequent line in a do block with end positions", function() {
+      var ast = parse("{ } \n\n 5");
+      expect(util.getNodeAt(ast, ["top", "do", 1, "return"]).e).toEqual(8);
+      expect(util.getNodeAt(ast, ["top", "do", 1]).e).toEqual(8);
+      expect(util.getNodeAt(ast, ["top"]).e).toEqual(8);
+      expect(ast.e).toEqual(8);
     });
   });
 });
