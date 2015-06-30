@@ -21,7 +21,7 @@ window.addEventListener("load", function() {
   var screen = document.getElementById("screen").getContext("2d");
   var editor = createEditor(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
   var annotator = createAnnotator(editor.getSession());
-  var player = setupPlayer();
+  var player = getPlayer();
 
   React.render(React.createElement(ProgramPlayer, { player: player }),
                document.getElementById('programPlayer'));
@@ -61,29 +61,4 @@ function displayRainbowParentheses(code, annotator) {
       p.map(function(offset) {
         annotator.codeHighlight(code, offset, "rainbow-" + i % 4);  });
     });
-};
-
-function setupPlayer() {
-  var player = getPlayer();
-
-  function play() {
-    $("#play-button").hide();
-    $("#pause-button").show();
-    player.unpause();
-  };
-
-  function pause() {
-    $("#pause-button").hide();
-    $("#play-button").show();
-    player.pause();
-  };
-
-  $("#play-button").click(play);
-  $("#pause-button").click(pause);
-  $("#step-forwards-button").click(function() {
-    pause();
-    player.step(10000);
-  });
-
-  return player;
 };
