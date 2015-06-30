@@ -100,26 +100,30 @@ function step(p) {
     var ins = callFrame.bc[callFrame.bcPointer];
     callFrame.bcPointer++;
 
-    if (ins[0] === "push") {
-      return stepPush(ins, p);
-    } else if (ins[0] === "push_lambda") {
-      return stepPushLambda(ins, p);
-    } else if (ins[0] === "pop") {
-      return stepPop(ins, p);
-    } else if (ins[0] === "get_env") {
-      return stepGetEnv(ins, p);
-    } else if (ins[0] === "set_env") {
-      return stepSetEnv(ins, p);
-    } else if (ins[0] === "invoke") {
-      return stepInvoke(ins, p);
-    } else if (ins[0] === "if_not_true_jump") {
-      return stepIfNotTrueJump(ins, p);
-    } else if (ins[0] === "jump") {
-      return stepJump(ins, p);
-    } else if (ins[0] === "return") {
-      return stepReturn(ins, p);
-    } else {
-      throw new Error("I don't know how to run this instruction: " + ins);
+    try {
+      if (ins[0] === "push") {
+        return stepPush(ins, p);
+      } else if (ins[0] === "push_lambda") {
+        return stepPushLambda(ins, p);
+      } else if (ins[0] === "pop") {
+        return stepPop(ins, p);
+      } else if (ins[0] === "get_env") {
+        return stepGetEnv(ins, p);
+      } else if (ins[0] === "set_env") {
+        return stepSetEnv(ins, p);
+      } else if (ins[0] === "invoke") {
+        return stepInvoke(ins, p);
+      } else if (ins[0] === "if_not_true_jump") {
+        return stepIfNotTrueJump(ins, p);
+      } else if (ins[0] === "jump") {
+        return stepJump(ins, p);
+      } else if (ins[0] === "return") {
+        return stepReturn(ins, p);
+      } else {
+        throw new Error("I don't know how to run this instruction: " + ins);
+      }
+    } catch (e) {
+      throw new RuntimeError(e);
     }
   }
 };
