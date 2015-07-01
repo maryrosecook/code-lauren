@@ -32,7 +32,6 @@ var ProgramPlayer = React.createClass({
         (this.state.player.isPaused() ? "playButton" : "pauseButton");
     return (
       <div className="programPlayer">
-        <button onClick={this.onStepBackwardsClick} className="playerButton stepBackwardsButton" />
         <button onClick={this.onPlayPauseClick} className={playPauseClassName} />
         <button onClick={this.onStepForwardsClick} className="playerButton stepForwardsButton" />
       </div>
