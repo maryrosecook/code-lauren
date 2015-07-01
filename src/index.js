@@ -15,15 +15,15 @@ var scope = require("./lang/scope");
 var createEditor = require("./editor");
 var createAnnotator = require("./annotator");
 var createEnv = require("./env");
-var getPlayer = require("./program-player");
+var setupPlayer = require("./program-player");
 
 window.addEventListener("load", function() {
   var screen = document.getElementById("screen").getContext("2d");
-  var editor = createEditor(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
+  var editor = createEditor();
   var annotator = createAnnotator(editor.getSession());
-  var player = getPlayer();
+  var player = setupPlayer();
 
-  React.render(React.createElement(ProgramPlayer, { player: player }),
+  React.render(React.createElement(ProgramPlayer, { player: player, annotator: annotator }),
                document.getElementById('programPlayer'));
 
   editor.on("change", function() {
@@ -52,8 +52,8 @@ function parse(code, annotator) {
   }
 };
 
-function createProgram(ast, screen) {
-  return vm.createProgram(compile(ast), scope(createEnv(screen)));
+function createProgram(code, annotator, screen) {
+  return vm.createProgram(code, compile(parse(code, annotator)), scope(createEnv(screen)));
 };
 
 function displayRainbowParentheses(code, annotator) {

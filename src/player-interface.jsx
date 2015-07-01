@@ -12,7 +12,12 @@ var ProgramPlayer = React.createClass({
 
   onStepForwardsClick: function() {
     this.state.player.pause();
-    this.state.player.stepForwards(10000);
+    this.state.player.stepForwards(1);
+
+    var p = this.state.player.getProgram();
+    this.props.annotator.clear();
+    this.props.annotator.codeHighlight(p.code, p.position.s, p.position.e, "currently-executing");
+
     this.setState(this.state);
   },
 
