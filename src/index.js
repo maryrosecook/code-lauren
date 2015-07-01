@@ -53,7 +53,10 @@ function parse(code, annotator) {
 };
 
 function createProgram(code, annotator, screen) {
-  return vm.createProgram(code, compile(parse(code, annotator)), scope(createEnv(screen)));
+  var ast = parse(code, annotator);
+  if (ast !== undefined) {
+    return vm.createProgram(code, compile(ast), scope(createEnv(screen)));
+  }
 };
 
 function displayRainbowParentheses(code, annotator) {
