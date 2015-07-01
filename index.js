@@ -12827,7 +12827,6 @@
 	        (this.state.player.isPaused() ? "playButton" : "pauseButton");
 	    return (
 	      React.createElement("div", {className: "programPlayer"}, 
-	        React.createElement("button", {onClick: this.onStepBackwardsClick, className: "playerButton stepBackwardsButton"}), 
 	        React.createElement("button", {onClick: this.onPlayPauseClick, className: playPauseClassName}), 
 	        React.createElement("button", {onClick: this.onStepForwardsClick, className: "playerButton stepForwardsButton"})
 	      )
