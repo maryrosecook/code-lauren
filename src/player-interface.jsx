@@ -1,5 +1,13 @@
 var React = require('react');
 
+function annotateCurrentInstruction(p, annotator) {
+  annotator.clear();
+  annotator.codeHighlight(p.code,
+                          p.currentInstruction.ast.s,
+                          p.currentInstruction.ast.e,
+                          "currently-executing");
+};
+
 var ProgramPlayer = React.createClass({
   getInitialState: function() {
     return { player: this.props.player };
@@ -8,17 +16,20 @@ var ProgramPlayer = React.createClass({
   onPlayPauseClick: function() {
     this.state.player.togglePause();
     this.setState(this.state);
+
+    if (this.state.player.isPaused()) {
+      annotateCurrentInstruction(this.state.player.getProgram(), this.props.annotator);
+    } else {
+      this.props.annotator.clear();
+    }
   },
 
   onStepForwardsClick: function() {
     this.state.player.pause();
     this.state.player.stepForwards(1);
-
-    var p = this.state.player.getProgram();
-    this.props.annotator.clear();
-    this.props.annotator.codeHighlight(p.code, p.position.s, p.position.e, "currently-executing");
-
     this.setState(this.state);
+
+    annotateCurrentInstruction(this.state.player.getProgram(), this.props.annotator);
   },
 
   onStepBackwardsClick: function() {

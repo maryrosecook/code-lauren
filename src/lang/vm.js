@@ -100,7 +100,7 @@ function step(p) {
     var ins = callFrame.bc[callFrame.bcPointer];
     callFrame.bcPointer++;
 
-    p.position = { s: ins.ast.s, e: ins.ast.e };
+    p.currentInstruction = ins;
 
     try {
       if (ins[0] === "push") {
@@ -152,7 +152,7 @@ function createProgram(code, bc, env, stack) {
   return {
     callStack: [createCallFrame(bc, env ? env : scope(standardLibrary()))],
     stack: stack || [],
-    position: undefined,
+    currentInstruction: undefined,
     code: code
   };
 };
