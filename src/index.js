@@ -26,10 +26,11 @@ window.addEventListener("load", function() {
   React.render(React.createElement(ProgramPlayer, { player: player }),
                document.getElementById('programPlayer'));
 
-  player.setProgram(createProgram(parse(editor.getValue(), annotator), screen));
   editor.on("change", function() {
-    player.setProgram(createProgram(parse(editor.getValue(), annotator), screen));
+    player.setProgram(createProgram(editor.getValue(), annotator, screen));
   });
+
+  editor.setValue(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
 });
 
 function parse(code, annotator) {

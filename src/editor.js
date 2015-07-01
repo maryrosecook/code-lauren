@@ -4,10 +4,8 @@ require('./theme-lauren');
 
 require('./ace-requires');
 
-var createEditor = module.exports = function(initialText) {
+var createEditor = module.exports = function() {
   var editor = ace.edit('editor');
-  editor.setValue(initialText);
-  editor.clearSelection(); // for some reason, setting the initial text selects everything
   editor.focus();
   editor.setTheme('ace/theme/lauren');
 
@@ -24,5 +22,16 @@ var createEditor = module.exports = function(initialText) {
   editor.setHighlightActiveLine(false);
   editor.setDisplayIndentGuides(false)
 
+  wrapSetValueToNotSelectAllText(editor);
+
   return editor;
+};
+
+function wrapSetValueToNotSelectAllText(editor) {
+  var realSetValue = editor.setValue;
+
+  editor.setValue = function(value) {
+    realSetValue.bind(editor)(value);
+    editor.clearSelection(); // for some reason, setting the initial text selects everything
+  };
 };
