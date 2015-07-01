@@ -10,8 +10,8 @@ function compileLabel(a) {
   return c(["get_env", a.c], a);
 };
 
-function compileUndefined() {
-  return c(["push", undefined]);
+function compileUndefined(a) {
+  return c(["push", undefined], a);
 };
 
 function compileTop(a) {
@@ -22,7 +22,8 @@ function compileDo(a) {
   var nonTerminalExpressions = a.c.slice(0, -1);
   var pops = util.mapCat(nonTerminalExpressions,
                          function(e) { return c(["pop"], e); });
-  var compiledReturnExpression = compile(a.c[a.c.length - 1]);
+  var returnExpression = a.c[a.c.length - 1];
+  var compiledReturnExpression = compile(returnExpression);
 
   return util.mapCat(nonTerminalExpressions, compile)
     .concat(pops)
@@ -90,8 +91,8 @@ function c(c, ast) {
 };
 
 function compile(a) {
-  if (a === undefined) {
-    return compileUndefined();
+  if (a.t === "undefined") {
+    return compileUndefined(a);
   } else if (a.t === "top") {
     return compileTop(a);
   } else if (a.t === "do") {

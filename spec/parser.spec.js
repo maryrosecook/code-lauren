@@ -37,7 +37,7 @@ describe("parser", function() {
     it("should allow an empty program", function() {
       var ast = parse("");
       expect(util.stripAst(util.getNodeAt(ast, ["top", "do"])))
-        .toEqual([{ t: "return" }]);
+        .toEqual([{ t: "return", c: { t: "undefined", c: undefined }  }]);
     });
 
     it("should allow a list of top level expressions on separate lines", function() {
@@ -185,8 +185,11 @@ describe("parser", function() {
                                c: [[], { t: "do",
                                          c: [{ t: "return",
                                                c: { t: "lambda",
-                                                    c: [[], { t: "do",
-                                                              c: [{ t: "return"}]}]}}]}]}]}]});
+                                                    c: [[],
+                                                        { t: "do",
+                                                          c: [{ t: "return",
+                                                                c: { t: "undefined",
+                                                                     c: undefined } }]}]}}]}]}]}]});
     });
   });
 
@@ -195,7 +198,8 @@ describe("parser", function() {
       var ast = parse("{}");
       expect(util.stripAst(util.getNodeAt(ast,
                                           ["top", "do", 0, "return"])))
-        .toEqual({ t: "lambda", c: [[], { t: "do", c: [{ t: "return" }]}]});
+        .toEqual({ t: "lambda", c: [[], { t: "do", c: [{ t: "return",
+                                                         c: { t: "undefined", c: undefined }  }]}]});
     });
 
     it("should parse an uninvoked lambda with two params and no body", function() {
@@ -203,7 +207,8 @@ describe("parser", function() {
       expect(util.stripAst(util.getNodeAt(ast, ["top", "do", 0, "return"])))
         .toEqual({ t: "lambda", c: [[{ t: "parameter", c: "name" },
                                      { t: "parameter", c: "height" }],
-                                    { t: "do", c: [{ t: "return" }]}]});
+                                    { t: "do", c: [{ t: "return",
+                                                     c: { t: "undefined", c: undefined }  }]}]});
     });
 
     it("should parse an uninvoked lambda with two params and two body exprs", function() {
@@ -351,22 +356,30 @@ describe("parser", function() {
                    c: [{ t: "boolean", c: true },
                        { t: "invocation",
                          c: [{ t: "lambda",
-                               c: [[], { t: "do", c: [{ t: "return" }]}]}]},
+                               c: [[], { t: "do", c: [{ t: "return",
+                                                        c: { t: "undefined",
+                                                             c: undefined }  }]}]}]},
 
                        { t: "boolean", c: false },
                        { t: "invocation",
                          c: [{ t: "lambda",
-                               c: [[], { t: "do", c: [{ t: "return" }]}]}]},
+                               c: [[], { t: "do", c: [{ t: "return",
+                                                        c: { t: "undefined",
+                                                             c: undefined }  }]}]}]},
 
                        { t: "boolean", c: false },
                        { t: "invocation",
                          c: [{ t: "lambda",
-                               c: [[], { t: "do", c: [{ t: "return" }]}]}]},
+                               c: [[], { t: "do", c: [{ t: "return",
+                                                        c: { t: "undefined",
+                                                             c: undefined }  }]}]}]},
 
                        { t: "boolean", c: true },
                        { t: "invocation",
                          c: [{ t: "lambda",
-                               c: [[], { t: "do", c: [{ t: "return" }]}]}]}]});
+                               c: [[], { t: "do", c: [{ t: "return",
+                                                        c: { t: "undefined",
+                                                             c: undefined }  }]}]}]}]});
     });
 
     it("should parse an conditional with if w invoked conditional", function() {
@@ -379,7 +392,9 @@ describe("parser", function() {
                              { t: "boolean", c: true }]},
                        { t: "invocation",
                          c: [{ t: "lambda", c: [[], { t: "do",
-                                                      c: [{ t: "return" }]}]}]}]});
+                                                      c: [{ t: "return",
+                                                            c: { t: "undefined",
+                                                                 c: undefined } }]}]}]}]});
     });
   });
 

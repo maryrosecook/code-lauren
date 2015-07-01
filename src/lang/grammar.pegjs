@@ -56,7 +56,10 @@ do
   = __* first:expression _* rest:do_continue* __*
     { return node("do", wrapLastDoExpressionInReturn([first].concat(rest)), offset(), text()); }
   / __*
-    { return node("do", [node("return", undefined, offset(), text())], offset(), text()); }
+    { return node("do",
+                  wrapLastDoExpressionInReturn([node("undefined", undefined, offset(), text())]),
+                  offset(),
+                  text()); }
 
 do_continue
   = _* nl __* all:expression _*
@@ -106,20 +109,22 @@ assignment
 conditional
   = 'if' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
     { return node("conditional", [condition,
-                                  node("invocation", [lambda], offset(), text())]
+                                  node("invocation", [lambda], lambda.s, lambda.text)]
                                     .concat(rest ? rest : []), offset(), text()); }
 
 elseif
   = 'elseif' _* condition:expression _* lambda:lambda _* rest:(elseif / else)?
-    { return [condition, node("invocation", [lambda], offset(), text())].concat(rest ? rest : []); }
+    { return [condition, node("invocation", [lambda], lambda.s, lambda.text)]
+               .concat(rest ? rest : []); }
 
 else
   = 'else' _* lambda:lambda
-    { return [{ t: "boolean", c: true }, node("invocation", [lambda], offset(), text())]; }
+    { return [{ t: "boolean", c: true }, node("invocation", [lambda], lambda.s, lambda.text)]; }
 
 forever
   = 'forever' _* lambda: lambda
-    { return node("forever", node("invocation", [lambda], offset(), text()), offset(), text()); }
+    { return node("forever",
+                  node("invocation", [lambda], lambda.s, lambda.text), offset(), text()); }
 
 atom
   = number
