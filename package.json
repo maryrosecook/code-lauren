@@ -16,6 +16,7 @@
   "dependencies": {
     "brace": "0.5.0",
     "brfs": "^1.4.0",
+    "codemirror": "^5.4.0",
     "jquery": "^1.11.2",
     "live-server": "^0.7.1",
     "pegjs": "pegjs/pegjs#da57118a43a904f753d44d407994cf0b36358adc",
