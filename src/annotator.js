@@ -6,14 +6,27 @@ module.exports = function createAnnotator(editor) {
   return new Annotator(editor);
 };
 
-var zeroLengthMarker = document.createElement("span");
-zeroLengthMarker.className = "zero-width-mark currently-executing";
+function zeroLengthMarker() {
+  var zeroLengthMarker = document.createElement("span");
+  zeroLengthMarker.className = "zero-width-mark currently-executing";
+  return zeroLengthMarker;
+};
 
 function Annotator(editor) {
   var markers = [];
 
   this.codeHighlight = function(code, start, end, clazz) {
     if (_.isNumber(start) && _.isNumber(end)) {
+
+      // Mark any empty lines in the range.
+      // Mostly useful for marking the return of undefined from a do.
+      // But also useful for marking an empty line in a block of marked lines.
+      emptyLineIndices(code, start, end).forEach(function(i) {
+        var lAndC = parser.indexToLineAndColumn(i, code);
+        var pos = { line: lAndC.line - 1, ch: lAndC.column - 1 };
+        markers.push(editor.setBookmark(pos, { widget: zeroLengthMarker() }));
+      });
+
       var startLAndC = parser.indexToLineAndColumn(start, code);
       var startPos = { line: startLAndC.line - 1, ch: startLAndC.column - 1 };
 
@@ -22,17 +35,7 @@ function Annotator(editor) {
       } else {
         var endLAndC = parser.indexToLineAndColumn(end, code);
         var endPos = { line: endLAndC.line - 1, ch: endLAndC.column - 1 };
-
-        // Add overhang if marked char is actually off end of line.
-        // This happens because cm doesn't support extending markers
-        // outside text in this context and if we marked the first char
-        // of the next line it would look a bit weird to the user.
-        var overhangClass = isOffEndOfLine(code, start) || start === end ? " overhang" : "";
-
-        markers.push(editor.markText(startPos,
-                                     endPos,
-                                     { className: [clazz,
-                                                   overhangClass].join(" ") }));
+        markers.push(editor.markText(startPos, endPos, { className: clazz }));
       }
     }
   };
@@ -53,8 +56,17 @@ function Annotator(editor) {
   };
 };
 
-function isOffEndOfLine(code, i) {
-  var lAndC = parser.indexToLineAndColumn(i, code);
-  var lineStr = code.split("\n")[lAndC.line - 1];
-  return lineStr === undefined || lineStr[lAndC.column - 1] === undefined;
+function emptyLineIndices(code, start, end) {
+  var indices = [];
+  var lastC = "\n";
+  for (var i = start; i <= end; i++) {
+    var c = code[i];
+    if (c === "\n" && lastC === "\n") {
+      indices.push(i);
+    }
+
+    lastC = c;
+  }
+
+  return indices;
 };

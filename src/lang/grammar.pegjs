@@ -3,7 +3,7 @@
     var node = {
       t: tag,
       c: content,
-      s: startOffset(s, text),
+      s: s,
       text: text,
       e: endOffset(s, text)
     };
@@ -30,19 +30,14 @@
     }
   }
 
+  function endOffset(s, text) {
+    return s + text.length;
+  }
+
   function wrapLastDoExpressionInReturn(expressions) {
     var initial = expressions.slice(0, expressions.length - 1);
     var last = expressions[expressions.length - 1];
     return initial.concat(node("return", last, last.s, last.text));
-  }
-
-  function startOffset(s, text) {
-    var leadingWhitespaceLength = text.length - text.replace(/^\s+/, "").length;
-    return s + leadingWhitespaceLength;
-  }
-
-  function endOffset(s, text) {
-    return s + text.trim().length;
   }
 }
 
@@ -80,7 +75,7 @@ invocation
   = f:function applications:application+ _*
     {
       var n = bundleApplications(f, applications);
-      n.s = startOffset(offset(), text());
+      n.s = offset();
       n.text = text();
       n.e = endOffset(offset(), text());
       return n; // refactor to use node()
@@ -99,7 +94,7 @@ argument
     { return expression }
 
 lambda
-  = '{' __? parameters:parameter* __? body:do '}'
+  = '{' parameters:parameters body:do '}'
     { return node("lambda", [parameters, body], offset(), text()); }
 
 assignment
@@ -131,6 +126,12 @@ atom
   / string
   / boolean
   / label
+
+parameters
+  = __? parameters:parameter+
+    { return parameters }
+  / ''
+    { return []; /* match empty params w/o gobbling whitespace so do takes whitespace */ }
 
 parameter
   = '?' label:label _*
