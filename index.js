@@ -73,7 +73,7 @@
 	  React.render(React.createElement(ProgramPlayer, { player: player, annotator: annotator }), document.getElementById("programPlayer"));
 
 	  editor.on("change", function () {
-	    player.setProgram(createProgram(editor.getValue(), annotator, screen));
+	    player.setProgramState(createProgram(editor.getValue(), annotator, screen));
 	  });
 
 	  editor.setValue("draw: { ?x ?y\n  circle-radius: 20\n\n  clear-screen()\n  draw-filled-circle(add(220 x)\n                     add(200 y)\n                     circle-radius\n                     \"blue\")\n}\n\nangle: 0\n\nforever {\n  radius-of-circle-orbit: 100\n  circle-angle-change: 0.01\n\n  angle: add(angle circle-angle-change)\n\n  draw(multiply(radius-of-circle-orbit cosine(angle))\n       multiply(radius-of-circle-orbit sine(angle)))\n}\n");
@@ -826,7 +826,7 @@
 	var vm = __webpack_require__(3);
 
 	var player;
-	var p;
+	var ps;
 	var paused = false;
 
 	function setupPlayer() {
@@ -836,7 +836,7 @@
 
 	  (function tick(lastEventLoopYield) {
 	    while (true) {
-	      if (p !== undefined && !paused && !vm.isComplete(p)) {
+	      if (ps !== undefined && !paused && !vm.isComplete(ps)) {
 	        player.stepForwards(1);
 	      }
 
@@ -866,8 +866,8 @@
 	      paused = false;
 	    },
 
-	    getProgram: function getProgram() {
-	      return p;
+	    getProgramState: function getProgramState() {
+	      return ps;
 	    },
 
 	    stepForwards: function stepForwards(stepCount) {
@@ -875,7 +875,7 @@
 
 	      for (var i = 0; i < stepCount; i++) {
 	        try {
-	          p = vm.step(p);
+	          ps = vm.step(ps);
 	        } catch (e) {
 	          if (e instanceof vm.RuntimeError) {
 	            console.log(e.message, e.stack);
@@ -890,8 +890,8 @@
 	      console.log("nothing yet");
 	    },
 
-	    setProgram: function setProgram(newP) {
-	      p = newP;
+	    setProgramState: function setProgramState(newPs) {
+	      ps = newPs;
 	    }
 	  };
 
@@ -12820,19 +12820,19 @@
 	/** @jsx React.DOM */var React = __webpack_require__(12);
 	var compiler = __webpack_require__(2);
 
-	function annotateCurrentInstruction(p, annotator) {
+	function annotateCurrentInstruction(ps, annotator) {
 	  annotator.clear();
-	  annotator.codeHighlight(p.code,
-	                          p.currentInstruction.ast.s,
-	                          p.currentInstruction.ast.e,
+	  annotator.codeHighlight(ps.code,
+	                          ps.currentInstruction.ast.s,
+	                          ps.currentInstruction.ast.e,
 	                          "currently-executing");
 	};
 
 	function stepUntilReachAnnotatableInstruction(player) {
-	  var currentInstruction = player.getProgram().currentInstruction;
+	  var currentInstruction = player.getProgramState().currentInstruction;
 	  while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
 	    player.stepForwards(1);
-	    currentInstruction = player.getProgram().currentInstruction;
+	    currentInstruction = player.getProgramState().currentInstruction;
 	  }
 	};
 
@@ -12846,7 +12846,7 @@
 
 	    if (this.state.player.isPaused()) {
 	      stepUntilReachAnnotatableInstruction(this.state.player);
-	      annotateCurrentInstruction(this.state.player.getProgram(), this.props.annotator);
+	      annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
 	    } else {
 	      this.props.annotator.clear();
 	    }
@@ -12860,7 +12860,7 @@
 	    stepUntilReachAnnotatableInstruction(this.state.player);
 	    this.setState(this.state);
 
-	    annotateCurrentInstruction(this.state.player.getProgram(), this.props.annotator);
+	    annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
 	  },
 
 	  onStepBackwardsClick: function() {
