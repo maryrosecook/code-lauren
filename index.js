@@ -12821,7 +12821,6 @@
 	var compiler = __webpack_require__(2);
 
 	function annotateCurrentInstruction(p, annotator) {
-	  console.log(p.currentInstruction);
 	  annotator.clear();
 	  annotator.codeHighlight(p.code,
 	                          p.currentInstruction.ast.s,
