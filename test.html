@@ -1,11 +1,20 @@
-<!-- Create a simple CodeMirror instance -->
-<textarea id="demotext" style="display: none;"></textarea>
-<link rel="stylesheet" href="node_modules/codemirror/lib/codemirror.css">
-<link rel="stylesheet" href="resources/test.css">
+<!doctype html>
+<html>
+  <head>
+    <title>Lauren</title>
 
-<script src="node_modules/codemirror/lib/codemirror.js"></script>
-<script src="src/test-mode-lauren.js"></script>
-hi
-<div id="editor"></div>
+    <link rel="stylesheet" href="node_modules/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="resources/test.css">
+  </head>
 
-<script src="src/test.js"></script>
+  <body>
+    <textarea style="display: none;"></textarea>
+    <div id="line-messages"></div>
+    <div id="programPlayer"></div>
+    <canvas id="screen" width="500" height="500"></canvas>
+  </body>
+
+  <script src="node_modules/codemirror/lib/codemirror.js"></script>
+  <script src="src/test-mode-lauren.js"></script>
+  <script src="src/test.js" charset="utf-8"></script>
+</html>

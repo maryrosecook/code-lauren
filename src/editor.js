@@ -1,28 +1,17 @@
-var ace = require('brace');
+var CodeMirror = require('codemirror');
 require('./mode-lauren');
-require('./theme-lauren');
-
-require('./ace-requires');
 
 var createEditor = module.exports = function() {
-  var editor = ace.edit('editor');
-  editor.focus();
-  editor.setTheme('ace/theme/lauren');
-
-  editor.setOptions({
-    fontFamily: "courier",
-    fontSize: "14pt"
+  var editor = CodeMirror(document.body, {
+    mode:  "lauren",
+    tabSize: 2,
+    indentWithTabs: false,
+    undoDepth: 9999999999,
+    autofocus: true,
+    extraKeys: {
+      Tab: function(cm) { cm.execCommand("insertSoftTab"); }
+    }
   });
-
-  editor.renderer.setShowGutter(false);
-  editor.getSession().setTabSize(2);
-  editor.getSession().setUseSoftTabs(true);
-  editor.getSession().setMode("ace/mode/lauren");
-  editor.setShowPrintMargin(false);
-  editor.setHighlightActiveLine(false);
-  editor.setDisplayIndentGuides(false)
-
-  wrapSetValueToNotSelectAllText(editor);
 
   return editor;
 };

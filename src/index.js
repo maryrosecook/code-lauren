@@ -20,7 +20,7 @@ var setupPlayer = require("./program-player");
 window.addEventListener("load", function() {
   var screen = document.getElementById("screen").getContext("2d");
   var editor = createEditor();
-  var annotator = createAnnotator(editor.getSession());
+  var annotator = createAnnotator(editor);
   var player = setupPlayer();
 
   React.render(React.createElement(ProgramPlayer, { player: player, annotator: annotator }),

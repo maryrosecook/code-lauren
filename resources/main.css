@@ -7,15 +7,13 @@ body {
   overflow: hidden;
 }
 
-#editor {
+.CodeMirror {
+  font-family: "courier";
+  font-size: 14pt;
   width: 100%;
   height: 100vh;
   z-index: 1;
   background-color: rgba(255, 255, 255, 0);
-  color: #333333;
-}
-
-.ace_cursor {
   color: #333333;
 }
 
@@ -68,19 +66,14 @@ button:focus {
   outline: 0; /* removes blue outline that appears on button click */
 }
 
-.ace_code_highlight {
-  position: absolute;
-}
-
-.ace_code_highlight.error { background-color: rgba(255, 0, 0, 0.4); }
-.ace_code_highlight.currently-executing { background-color: rgba(0, 0, 255, 0.12); }
+.code_highlight.error { background-color: rgba(255, 0, 0, 0.4); }
 
 .ace_marker-layer .overhang { padding-right: 13px; }
 
-.ace_code_highlight.rainbow-0 { background-color: rgba(0, 255, 0, 0.12); }
-.ace_code_highlight.rainbow-1 { background-color: rgba(0, 0, 255, 0.12); }
-.ace_code_highlight.rainbow-2 { background-color: rgba(0, 255, 255, 0.12); }
-.ace_code_highlight.rainbow-3 { background-color: rgba(255, 0, 255, 0.12); }
+.code-highlight.rainbow-0 { background-color: rgba(0, 255, 0, 0.12); }
+.code-highlight.rainbow-1 { background-color: rgba(0, 0, 255, 0.12); }
+.code-highlight.rainbow-2 { background-color: rgba(0, 255, 255, 0.12); }
+.code-highlight.rainbow-3 { background-color: rgba(255, 0, 255, 0.12); }
 
 #line-messages {
   position: absolute;
@@ -102,3 +95,14 @@ button:focus {
   background-color: rgba(255, 0, 0, 0.4);
   padding: 0 4px;
 }
+
+.zero-width-mark {
+  background-color: rgba(0, 0, 255, 0.12);
+  padding: 0 1px;
+};
+
+.cm-s-default .cm-string { color: #578622; }
+.cm-s-default .cm-number { color: #FF5BAE; }
+.cm-s-default .cm-builtin { color: #4A9CC9; }
+
+.currently-executing { background-color: rgba(0, 0, 255, 0.12); }

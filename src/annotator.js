@@ -1,38 +1,39 @@
 var $ = require("jquery");
 var _ = require("underscore");
-var range = ace.acequire("ace/range");
-
 var parser = require("./lang/parser");
 
-module.exports = function createAnnotator(editSession) {
-  return new Annotator(editSession);
+module.exports = function createAnnotator(editor) {
+  return new Annotator(editor);
 };
 
-function Annotator(editSession) {
-  var markerIds = [];
+var zeroLengthMarker = document.createElement("span");
+zeroLengthMarker.className = "zero-width-mark currently-executing";
+
+function Annotator(editor) {
+  var markers = [];
 
   this.codeHighlight = function(code, start, end, clazz) {
     if (_.isNumber(start) && _.isNumber(end)) {
       var startLAndC = parser.indexToLineAndColumn(start, code);
-      var endLAndC = parser.indexToLineAndColumn(end, code);
+      var startPos = { line: startLAndC.line - 1, ch: startLAndC.column - 1 };
 
-      // Add overhang if marked char is actually off end of line.
-      // This happens because Ace doesn't support extending markers
-      // outside text in this context and if we marked the first char
-      // of the next line it would look a bit weird to the user.
-      var overhangClass = isOffEndOfLine(code, start) ? " overhang" : "";
+      if (start === end) {
+        markers.push(editor.setBookmark(startPos, { widget: zeroLengthMarker }));
+      } else {
+        var endLAndC = parser.indexToLineAndColumn(end, code);
+        var endPos = { line: endLAndC.line - 1, ch: endLAndC.column - 1 };
 
-      var r = new range.Range(startLAndC.line - 1,
-                              startLAndC.column - 1,
-                              endLAndC.line - 1,
-                              endLAndC.column - 1);
+        // Add overhang if marked char is actually off end of line.
+        // This happens because cm doesn't support extending markers
+        // outside text in this context and if we marked the first char
+        // of the next line it would look a bit weird to the user.
+        var overhangClass = isOffEndOfLine(code, start) || start === end ? " overhang" : "";
 
-      markerIds.push(editSession.addMarker(r,
-                                           "ace_code_highlight " +
-                                           clazz + " " +
-                                           overhangClass,
-                                           "text",
-                                           true));
+        markers.push(editor.markText(startPos,
+                                     endPos,
+                                     { className: [clazz,
+                                                   overhangClass].join(" ") }));
+      }
     }
   };
 
@@ -46,8 +47,8 @@ function Annotator(editSession) {
   };
 
   this.clear = function() {
-    markerIds.forEach(function(x) { editSession.removeMarker(x); });
-    markerIds = [];
+    markers.forEach(function(m) { m.clear(); });
+    markers = [];
     $("#line-messages").empty();
   };
 };

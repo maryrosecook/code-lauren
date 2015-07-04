@@ -7,10 +7,6 @@ body {
   overflow: hidden;
 }
 
-.ace_cursor {
-  color: #333333;
-}
-
 #screen {
   position: absolute;
   left: 0;
@@ -58,10 +54,6 @@ body {
 
 button:focus {
   outline: 0; /* removes blue outline that appears on button click */
-}
-
-.ace_code_highlight {
-  position: absolute;
 }
 
 .ace_code_highlight.error { background-color: rgba(255, 0, 0, 0.4); }
