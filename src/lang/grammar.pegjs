@@ -63,7 +63,7 @@ do
 
 do_continue
   = _* nl __* all:expression _*
-    { return all }
+    { return all; }
 
 expression
   = forever
