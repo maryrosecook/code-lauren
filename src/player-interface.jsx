@@ -1,8 +1,8 @@
 var React = require('react');
-
-var instructionsToNotAnnotate = ["pop", "return", "jump", "if_not_true_jump"];
+var compiler = require("./lang/compiler");
 
 function annotateCurrentInstruction(p, annotator) {
+  console.log(p.currentInstruction);
   annotator.clear();
   annotator.codeHighlight(p.code,
                           p.currentInstruction.ast.s,
@@ -10,14 +10,9 @@ function annotateCurrentInstruction(p, annotator) {
                           "currently-executing");
 };
 
-function isAnnotatableInstruction(ins) {
-  console.log(ins);
-  return instructionsToNotAnnotate.indexOf(ins[0]) === -1;
-};
-
 function stepUntilReachAnnotatableInstruction(player) {
   var currentInstruction = player.getProgram().currentInstruction;
-  while (!isAnnotatableInstruction(currentInstruction)) {
+  while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
     player.stepForwards(1);
     currentInstruction = player.getProgram().currentInstruction;
   }

@@ -19,10 +19,12 @@ var util = module.exports = {
   },
 
   stripBc: function(bc) {
-    bc.forEach(function(instruction) {
+     bc.forEach(function(instruction) {
       delete instruction.ast;
+      delete instruction.annotate;
       if (instruction[0] === "push_lambda") {
         delete instruction[1].ast;
+        delete instruction[1].annotate;
         util.stripBc(instruction[1].bc);
       }
     });

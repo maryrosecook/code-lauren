@@ -2,16 +2,19 @@ var _ = require("underscore");
 
 var util = require("../util");
 
+var ANNOTATE = true;
+var DO_NOT_ANNOTATE = false;
+
 function compileLiteral(a) {
-  return c(["push", a.c], a);
+  return c(["push", a.c], a, ANNOTATE);
 };
 
 function compileLabel(a) {
-  return c(["get_env", a.c], a);
+  return c(["get_env", a.c], a, ANNOTATE);
 };
 
 function compileUndefined(a) {
-  return c(["push", undefined], a);
+  return c(["push", undefined], a, ANNOTATE);
 };
 
 function compileTop(a) {
@@ -37,7 +40,9 @@ function compileInvocation(a) {
   var compiledFn = compile(aInvocation[0]);
   var code = compiledArgs.concat(compiledFn, c(["invoke",
                                                 aArgs.length,
-                                                a.tail === true ? true : false], a));
+                                                a.tail === true ? true : false],
+                                               a,
+                                               ANNOTATE));
   return code;
 };
 
@@ -65,6 +70,8 @@ function compileConditional(a) {
 
 function compileForever(a) {
   var invocation = compile(a.c);
+  invocation[0].annotate = DO_NOT_ANNOTATE; // push_lambda
+  invocation[1].annotate = DO_NOT_ANNOTATE; // invocation
   var bc = invocation.concat(c(["jump", -3], a));
   return bc;
 };
@@ -73,7 +80,7 @@ function compileLambdaDef(a) {
   return c(["push_lambda", {
     bc: compile(util.getNodeAt(a, ["lambda", 1])),
     ast: a
-  }], a);
+  }], a, ANNOTATE);
 };
 
 function compileReturn(a) {
@@ -81,12 +88,13 @@ function compileReturn(a) {
 };
 
 function compileAssignment(a) {
-  return compile(a.c[1]).concat(c(["set_env", a.c[0].c], a),
+  return compile(a.c[1]).concat(c(["set_env", a.c[0].c], a, ANNOTATE),
                                 c(["pop"], a));
 };
 
-function c(c, ast) {
+function c(c, ast, annotate) {
   c.ast = ast;
+  c.annotate = (annotate === true ? true : false);
   return [c];
 };
 
@@ -116,4 +124,6 @@ function compile(a) {
   }
 };
 
+compile.ANNOTATE = ANNOTATE;
+compile.DO_NOT_ANNOTATE = DO_NOT_ANNOTATE;
 module.exports = compile;
