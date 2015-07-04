@@ -2,7 +2,6 @@ var React = require('react');
 var compiler = require("./lang/compiler");
 
 function annotateCurrentInstruction(p, annotator) {
-  console.log(p.currentInstruction);
   annotator.clear();
   annotator.codeHighlight(p.code,
                           p.currentInstruction.ast.s,
