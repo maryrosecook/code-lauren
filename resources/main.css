@@ -66,8 +66,6 @@ button:focus {
   outline: 0; /* removes blue outline that appears on button click */
 }
 
-.code_highlight.error { background-color: rgba(255, 0, 0, 0.4); }
-
 .ace_marker-layer .overhang { padding-right: 13px; }
 
 .code-highlight.rainbow-0 { background-color: rgba(0, 255, 0, 0.12); }
@@ -98,7 +96,7 @@ button:focus {
 
 .zero-width-mark {
   background-color: rgba(0, 0, 255, 0.12);
-  padding: 0 1px;
+  padding: 0 5px;
 };
 
 .cm-s-default { color: #333; }
@@ -107,4 +105,5 @@ button:focus {
 .cm-s-default .cm-builtin { color: #4A9CC9; }
 .cm-s-default .cm-bracket { color: #333 }
 
+.error { background-color: rgba(255, 0, 0, 0.4); }
 .currently-executing { background-color: rgba(0, 0, 255, 0.12); }
