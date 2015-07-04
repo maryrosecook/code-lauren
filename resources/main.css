@@ -101,8 +101,10 @@ button:focus {
   padding: 0 1px;
 };
 
+.cm-s-default { color: #333; }
 .cm-s-default .cm-string { color: #578622; }
 .cm-s-default .cm-number { color: #FF5BAE; }
 .cm-s-default .cm-builtin { color: #4A9CC9; }
+.cm-s-default .cm-bracket { color: #333 }
 
 .currently-executing { background-color: rgba(0, 0, 255, 0.12); }
