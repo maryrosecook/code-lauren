@@ -599,20 +599,10 @@ describe("parser", function() {
       expect(ast.e).toEqual(5);
     });
 
-    it("should throw away trailing whitespace when marking end of chunk of ast", function() {
-      var ast = parse("  a()   ");
-      expect(util.getNodeAt(ast, ["top", "do", 0, "return"]).e).toEqual(5);
-    });
-
-    it("should throw away leading whitespace when marking start of chunk of ast", function() {
-      var ast = parse("  a()   ");
-      expect(util.getNodeAt(ast, ["top"]).s).toEqual(2);
-    });
-
     it("should annotate a lambda literal with end positions", function() {
       var ast = parse("{ a() }");
 
-      expect(util.getNodeAt(ast, ["top", "do", 0, "return", "lambda", 1]).e).toEqual(5);
+      expect(util.getNodeAt(ast, ["top", "do", 0, "return", "lambda", 1]).e).toEqual(6);
       expect(util.getNodeAt(ast, ["top", "do", 0, "return"]).e).toEqual(7);
       expect(util.getNodeAt(ast, ["top", "do", 0]).e).toEqual(7);
       expect(util.getNodeAt(ast, ["top"]).e).toEqual(7);
