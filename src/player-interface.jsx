@@ -1,19 +1,19 @@
 var React = require('react');
 var compiler = require("./lang/compiler");
 
-function annotateCurrentInstruction(p, annotator) {
+function annotateCurrentInstruction(ps, annotator) {
   annotator.clear();
-  annotator.codeHighlight(p.code,
-                          p.currentInstruction.ast.s,
-                          p.currentInstruction.ast.e,
+  annotator.codeHighlight(ps.code,
+                          ps.currentInstruction.ast.s,
+                          ps.currentInstruction.ast.e,
                           "currently-executing");
 };
 
 function stepUntilReachAnnotatableInstruction(player) {
-  var currentInstruction = player.getProgram().currentInstruction;
+  var currentInstruction = player.getProgramState().currentInstruction;
   while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
     player.stepForwards(1);
-    currentInstruction = player.getProgram().currentInstruction;
+    currentInstruction = player.getProgramState().currentInstruction;
   }
 };
 
@@ -27,7 +27,7 @@ var ProgramPlayer = React.createClass({
 
     if (this.state.player.isPaused()) {
       stepUntilReachAnnotatableInstruction(this.state.player);
-      annotateCurrentInstruction(this.state.player.getProgram(), this.props.annotator);
+      annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
     } else {
       this.props.annotator.clear();
     }
@@ -41,7 +41,7 @@ var ProgramPlayer = React.createClass({
     stepUntilReachAnnotatableInstruction(this.state.player);
     this.setState(this.state);
 
-    annotateCurrentInstruction(this.state.player.getProgram(), this.props.annotator);
+    annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
   },
 
   onStepBackwardsClick: function() {

@@ -1,7 +1,7 @@
 var vm = require("../src/lang/vm");
 
 var player;
-var p;
+var ps;
 var paused = false;
 
 function setupPlayer() {
@@ -9,7 +9,7 @@ function setupPlayer() {
 
   (function tick(lastEventLoopYield) {
     while(true) {
-      if (p !== undefined && !paused && !vm.isComplete(p)) {
+      if (ps !== undefined && !paused && !vm.isComplete(ps)) {
         player.stepForwards(1);
       }
 
@@ -37,8 +37,8 @@ function setupPlayer() {
       paused = false;
     },
 
-    getProgram: function() {
-      return p;
+    getProgramState: function() {
+      return ps;
     },
 
     stepForwards: function(stepCount) {
@@ -46,7 +46,7 @@ function setupPlayer() {
 
       for (var i = 0; i < stepCount; i++) {
         try {
-          p = vm.step(p);
+          ps = vm.step(ps);
         } catch (e) {
           if (e instanceof vm.RuntimeError) {
             console.log(e.message, e.stack);
@@ -61,8 +61,8 @@ function setupPlayer() {
       console.log("nothing yet");
     },
 
-    setProgram: function(newP) {
-      p = newP;
+    setProgramState: function(newPs) {
+      ps = newPs;
     }
   };
 
