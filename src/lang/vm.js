@@ -44,7 +44,7 @@ function stepInvoke(ins, p) {
   var args = _.range(arity).map(function() { return p.stack.pop(); }).reverse();
 
   if (fn.bc !== undefined) { // a lambda
-    var lambdaEnv = scope(_.object(_.pluck(fn.ast.c[0], "c"), args), fn.closureEnv);
+    var lambdaEnv = scope(_.object(fn.parameters, args), fn.closureEnv);
 
     var tailIndex = tailCallIndex(p.callStack, fn);
     if (tailIndex !== undefined) { // if tails calls all the way to recursive call, then tco

@@ -113,7 +113,7 @@ describe("bytecode interpreter", function() {
       util.stripBc(fn.bc);
       expect(fn.bc).toEqual([["push", 1],
                              ["return"]]);
-      expect(fn.ast).toBeDefined();
+      expect(fn.parameters).toBeDefined();
     });
   });
 

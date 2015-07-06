@@ -77,10 +77,10 @@ function compileForever(a) {
 };
 
 function compileLambdaDef(a) {
-  return ins(["push_lambda", {
-    bc: compile(util.getNodeAt(a, ["lambda", 1])),
-    ast: a
-  }], a, ANNOTATE);
+  return ins(["push_lambda", createLambda(compile(util.getNodeAt(a, ["lambda", 1])),
+                                          _.pluck(a.c[0], "c"))],
+             a,
+             ANNOTATE);
 };
 
 function compileReturn(a) {
