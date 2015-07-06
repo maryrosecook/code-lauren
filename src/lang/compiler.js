@@ -6,15 +6,15 @@ var ANNOTATE = true;
 var DO_NOT_ANNOTATE = false;
 
 function compileLiteral(a) {
-  return c(["push", a.c], a, ANNOTATE);
+  return ins(["push", a.c], a, ANNOTATE);
 };
 
 function compileLabel(a) {
-  return c(["get_env", a.c], a, ANNOTATE);
+  return ins(["get_env", a.c], a, ANNOTATE);
 };
 
 function compileUndefined(a) {
-  return c(["push", undefined], a, ANNOTATE);
+  return ins(["push", undefined], a, ANNOTATE);
 };
 
 function compileTop(a) {
@@ -24,7 +24,7 @@ function compileTop(a) {
 function compileDo(a) {
   var nonTerminalExpressions = a.c.slice(0, -1);
   var pops = util.mapCat(nonTerminalExpressions,
-                         function(e) { return c(["pop"], e); });
+                         function(e) { return ins(["pop"], e); });
   var returnExpression = a.c[a.c.length - 1];
   var compiledReturnExpression = compile(returnExpression);
 
@@ -38,7 +38,7 @@ function compileInvocation(a) {
   var aArgs = aInvocation.slice(1);
   var compiledArgs = util.mapCat(aArgs, compile);
   var compiledFn = compile(aInvocation[0]);
-  var code = compiledArgs.concat(compiledFn, c(["invoke",
+  var code = compiledArgs.concat(compiledFn, ins(["invoke",
                                                 aArgs.length,
                                                 a.tail === true ? true : false],
                                                a,
@@ -53,7 +53,7 @@ function compileConditional(a) {
   for (var i = 0; i < parts.length; i += 2) {
     clauses.push(
       compile(parts[i]).concat( // put conditional value to evaluate on stack
-        c(["if_not_true_jump", 3], parts[i]), // skip block if !condition
+        ins(["if_not_true_jump", 3], parts[i]), // skip block if !condition
         compile(parts[i + 1]) // push condition's lambda inv onto stack (skipped if !condition)
       )
     );
@@ -62,7 +62,7 @@ function compileConditional(a) {
   var bc = [];
   for (var i = clauses.length - 1; i >= 0; i--) {
     var bcLength = bc.length
-    bc = clauses[i].concat(c(["jump", bcLength], clauses[i]).concat(bc));
+    bc = clauses[i].concat(ins(["jump", bcLength], clauses[i]).concat(bc));
   };
 
   return bc;
@@ -72,30 +72,30 @@ function compileForever(a) {
   var invocation = compile(a.c);
   invocation[0].annotate = DO_NOT_ANNOTATE; // push_lambda
   invocation[1].annotate = DO_NOT_ANNOTATE; // invocation
-  var bc = invocation.concat(c(["jump", -3], a));
+  var bc = invocation.concat(ins(["jump", -3], a));
   return bc;
 };
 
 function compileLambdaDef(a) {
-  return c(["push_lambda", {
+  return ins(["push_lambda", {
     bc: compile(util.getNodeAt(a, ["lambda", 1])),
     ast: a
   }], a, ANNOTATE);
 };
 
 function compileReturn(a) {
-  return compile(a.c).concat(c(["return"], a));
+  return compile(a.c).concat(ins(["return"], a));
 };
 
 function compileAssignment(a) {
-  return compile(a.c[1]).concat(c(["set_env", a.c[0].c], a, ANNOTATE),
-                                c(["pop"], a));
+  return compile(a.c[1]).concat(ins(["set_env", a.c[0].c], a, ANNOTATE),
+                                ins(["pop"], a));
 };
 
-function c(c, ast, annotate) {
-  c.ast = ast;
-  c.annotate = (annotate === true ? true : false);
-  return [c];
+function ins(instruction, ast, annotate) {
+  instruction.ast = ast;
+  instruction.annotate = (annotate === true ? true : false);
+  return [instruction];
 };
 
 function compile(a) {
@@ -126,4 +126,5 @@ function compile(a) {
 
 compile.ANNOTATE = ANNOTATE;
 compile.DO_NOT_ANNOTATE = DO_NOT_ANNOTATE;
+compile.createInstruction = ins;
 module.exports = compile;
