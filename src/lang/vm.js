@@ -168,7 +168,7 @@ function createProgramAndComplete(bc, env, stack) {
 function RuntimeError(e) {
   util.copyException(e, this);
 };
-RuntimeError.prototype = new Error();
+RuntimeError.prototype = Object.create(Error.prototype);
 
 createProgramAndComplete.createProgramAndComplete = createProgramAndComplete;
 createProgramAndComplete.createProgram = createProgram;
