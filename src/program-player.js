@@ -10,7 +10,7 @@ function setupPlayer() {
   (function tick(lastEventLoopYield) {
     while(true) {
       if (ps !== undefined && !paused && !vm.isComplete(ps)) {
-        player.stepForwards(1);
+          player.stepForwards();
       }
 
       if (isTimeToYieldToEventLoop(lastEventLoopYield)) {
@@ -41,18 +41,16 @@ function setupPlayer() {
       return ps;
     },
 
-    stepForwards: function(stepCount) {
-      stepCount = stepCount || 1;
-
-      for (var i = 0; i < stepCount; i++) {
-        try {
+    stepForwards: function() {
+      try {
+        if (!vm.isComplete(ps)) {
           ps = vm.step(ps);
-        } catch (e) {
-          if (e instanceof vm.RuntimeError) {
-            console.log(e.message, e.stack);
-          } else {
-            console.log(e.stack);
-          }
+        }
+      } catch (e) {
+        if (e instanceof vm.RuntimeError) {
+          console.log(e.message, e.stack);
+        } else {
+          console.log(e.stack);
         }
       }
     },

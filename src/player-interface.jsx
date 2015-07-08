@@ -12,7 +12,7 @@ function annotateCurrentInstruction(ps, annotator) {
 function stepUntilReachAnnotatableInstruction(player) {
   var currentInstruction = player.getProgramState().currentInstruction;
   while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
-    player.stepForwards(1);
+    player.stepForwards();
     currentInstruction = player.getProgramState().currentInstruction;
   }
 };
@@ -37,7 +37,7 @@ var ProgramPlayer = React.createClass({
 
   onStepForwardsClick: function() {
     this.state.player.pause();
-    this.state.player.stepForwards(1);
+    this.state.player.stepForwards();
     stepUntilReachAnnotatableInstruction(this.state.player);
     this.setState(this.state);
 
