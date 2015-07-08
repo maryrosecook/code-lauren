@@ -14,7 +14,7 @@ var vm = require("./lang/vm");
 var scope = require("./lang/scope");
 var createEditor = require("./editor");
 var createAnnotator = require("./annotator");
-var createEnv = require("./env");
+var env = require("./env");
 var setupPlayer = require("./program-player");
 
 window.addEventListener("load", function() {
@@ -27,7 +27,8 @@ window.addEventListener("load", function() {
                document.getElementById('programPlayer'));
 
   editor.on("change", function() {
-    player.setProgramState(createProgram(editor.getValue(), annotator, screen));
+    var ps = initProgramState(editor.getValue(), annotator, screen);
+    player.setProgramState(ps);
   });
 
   editor.setValue(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
@@ -52,10 +53,14 @@ function parse(code, annotator) {
   }
 };
 
-function createProgram(code, annotator, screen) {
+function initProgramState(code, annotator, screen) {
   var ast = parse(code, annotator);
   if (ast !== undefined) {
-    return vm.createProgram(code, compile(ast), scope(createEnv(screen)));
+    var canvasEnv = env.createCanvasEnv(screen);
+    var programEnv = scope(env.mergeLibrary(canvasEnv, require("./lang/standard-library")()));
+    var ps = vm.initProgramState(code, compile(ast), programEnv);
+    ps.canvasEnv = canvasEnv;
+    return ps;
   }
 };
 

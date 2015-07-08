@@ -3,6 +3,7 @@ var _ = require("underscore");
 var util = require("../util");
 var standardLibrary = require("./standard-library");
 var scope = require("./scope");
+var copyProgramState = require("../copy-program-state");
 
 function stepPush(ins, p) {
   p.stack.push(ins[1]);
@@ -148,12 +149,12 @@ function isComplete(p) {
     callFrame.bcPointer === callFrame.bc.length;
 };
 
-function createProgram(code, bc, env, stack) {
+function initProgramState(code, bc, env, stack) {
   return {
-    callStack: [createCallFrame(bc, env ? env : scope(standardLibrary()))],
+    code: code,
+    callStack: [createCallFrame(bc, 0, env ? env : scope(standardLibrary()))],
     stack: stack || [],
-    currentInstruction: undefined,
-    code: code
+    currentInstruction: undefined
   };
 };
 
@@ -161,8 +162,8 @@ function createCallFrame(bc, bcPointer, env, tail) {
   return { bc: bc, bcPointer: bcPointer, env: env, tail: tail };
 };
 
-function createProgramAndComplete(bc, env, stack) {
-  return complete(createProgram(bc, env, stack));
+function initProgramStateAndComplete(bc, env, stack) {
+  return complete(initProgramState(bc, env, stack));
 };
 
 function RuntimeError(e) {
@@ -170,12 +171,12 @@ function RuntimeError(e) {
 };
 RuntimeError.prototype = Object.create(Error.prototype);
 
-createProgramAndComplete.createProgramAndComplete = createProgramAndComplete;
-createProgramAndComplete.createProgram = createProgram;
-createProgramAndComplete.step = step;
-createProgramAndComplete.complete = complete;
-createProgramAndComplete.isComplete = isComplete;
+initProgramStateAndComplete.initProgramStateAndComplete = initProgramStateAndComplete;
+initProgramStateAndComplete.initProgramState = initProgramState;
+initProgramStateAndComplete.step = step;
+initProgramStateAndComplete.complete = complete;
+initProgramStateAndComplete.isComplete = isComplete;
+initProgramStateAndComplete.createCallFrame = createCallFrame;
+initProgramStateAndComplete.RuntimeError = RuntimeError;
 
-createProgramAndComplete.RuntimeError = RuntimeError;
-
-module.exports = createProgramAndComplete;
+module.exports = initProgramStateAndComplete;

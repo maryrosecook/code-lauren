@@ -1,5 +1,6 @@
 var React = require('react');
 var compiler = require("./lang/compiler");
+var vm = require("./lang/vm");
 
 function annotateCurrentInstruction(ps, annotator) {
   annotator.clear();
@@ -25,7 +26,7 @@ var ProgramPlayer = React.createClass({
   onPlayPauseClick: function() {
     this.state.player.togglePause();
 
-    if (this.state.player.isPaused()) {
+    if (this.state.player.isPaused() && !vm.isComplete(this.state.player.getProgramState())) {
       stepUntilReachAnnotatableInstruction(this.state.player);
       annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
     } else {

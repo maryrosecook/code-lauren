@@ -9,8 +9,12 @@ function setupPlayer() {
 
   (function tick(lastEventLoopYield) {
     while(true) {
-      if (ps !== undefined && !paused && !vm.isComplete(ps)) {
+      if (ps !== undefined && !paused) {
+        if (vm.isComplete(ps)) {
+          ps.canvasEnv.flush();
+        } else {
           player.stepForwards();
+        }
       }
 
       if (isTimeToYieldToEventLoop(lastEventLoopYield)) {
