@@ -52,7 +52,7 @@ function stepInvoke(ins, p) {
       currentCallFrame(p).env = lambdaEnv;
       currentCallFrame(p).bcPointer = 0;
     } else {
-      p.callStack.push(createCallFrame(fn.bc, lambdaEnv, ins[2]));
+      p.callStack.push(createCallFrame(fn.bc, 0, lambdaEnv, ins[2]));
     }
   } else { // is a JS function object
     p.stack.push(fn.apply(null, args));
@@ -157,8 +157,8 @@ function createProgram(code, bc, env, stack) {
   };
 };
 
-function createCallFrame(bc, env, tail) {
-  return { bc: bc, bcPointer: 0, env: env, tail: tail };
+function createCallFrame(bc, bcPointer, env, tail) {
+  return { bc: bc, bcPointer: bcPointer, env: env, tail: tail };
 };
 
 function createProgramAndComplete(bc, env, stack) {
