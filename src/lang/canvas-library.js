@@ -8,6 +8,11 @@ var canvasLibrary = module.exports = function(screen) {
     drawOperations = [];
   };
 
+  // run any unflushed cached ops - might get left if draw ops done,
+  // program hasn't terminated and are outside a loop or loop has
+  // ended
+  setInterval(runCachedOperations, 100);
+
   return {
     flush: function() {
       runCachedOperations();
