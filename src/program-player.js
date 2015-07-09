@@ -1,6 +1,7 @@
 var _ = require("underscore");
 var vm = require("../src/lang/vm");
 var copyProgramState = require("../src/copy-program-state");
+var compiler = require("./lang/compiler");
 
 var player;
 var pses = [];
@@ -48,10 +49,31 @@ function setupPlayer() {
       return ps;
     },
 
+    stepForwardsUntilReachAnnotableInstruction: function() {
+      var currentInstruction = ps.currentInstruction;
+      while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
+        this.stepForwards();
+        currentInstruction = ps.currentInstruction;
+      }
+    },
+
+    stepBackwardsUntilReachAnnotableInstruction: function() {
+      var currentInstruction = ps.currentInstruction;
+      while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
+        this.stepBackwards();
+        currentInstruction = ps.currentInstruction;
+      }
+    },
+
     stepForwards: function() {
       try {
         if (!vm.isComplete(ps)) {
           pses.push(copyProgramState(ps));
+          if (pses.length > 1000) {
+            pses.shift();
+            ps.canvasLib.deleteOld();
+          }
+
           ps = vm.step(ps);
           ps.canvasLib.stepForwards();
         }
@@ -65,8 +87,10 @@ function setupPlayer() {
     },
 
     stepBackwards: function() {
-      ps = pses.pop();
-      ps.canvasLib.stepBackwards();
+      if (searchBackwardsForAnnotatableProgramState(pses.slice(0, -1)) !== undefined) {
+        ps = pses.pop();
+        ps.canvasLib.stepBackwards();
+      }
     },
 
     setProgramState: function(newPs) {
@@ -75,6 +99,14 @@ function setupPlayer() {
   };
 
   return player;
+};
+
+function searchBackwardsForAnnotatableProgramState(pses) {
+  for (var i = pses.length - 1; i >= 0; i--) {
+    if (pses[i].currentInstruction.annotate === compiler.ANNOTATE) {
+      return pses[i];
+    }
+  }
 };
 
 function isTimeToYieldToEventLoop(lastYield) {

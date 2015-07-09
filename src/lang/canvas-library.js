@@ -10,6 +10,13 @@ var canvasLibrary = module.exports = function(screen) {
     cachedDrawOperations = [];
   };
 
+  function addOperationToHistory(fn) {
+    allDrawOperations.push({ fn: fn, step: step });
+    if (allDrawOperations.length > 5000) {
+      allDrawOperations.shift();
+    }
+  };
+
   function rerunOperationsToCurrentStep() {
     var ops = [];
     for (var i = allDrawOperations.length - 1; i >= 0; i--) {
@@ -42,13 +49,20 @@ var canvasLibrary = module.exports = function(screen) {
       rerunOperationsToCurrentStep();
     },
 
+    deleteOld: function() {
+      var stopClearing = step - 1000;
+      while (allDrawOperations[0] !== undefined && allDrawOperations[0].step < stopClearing) {
+        allDrawOperations.shift();
+      }
+    },
+
     "clear-screen": function() {
       function op() {
         screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
       };
 
       op();
-      allDrawOperations.push({ fn: op, step: step });
+      addOperationToHistory(op);
 
       runCachedOperations();
     },
@@ -60,7 +74,7 @@ var canvasLibrary = module.exports = function(screen) {
         screen.fillText(str, x, y);
       };
 
-      allDrawOperations.push({ fn: op, step: step });
+      addOperationToHistory(op);
       cachedDrawOperations.push(op);
     },
 
@@ -73,7 +87,7 @@ var canvasLibrary = module.exports = function(screen) {
         screen.stroke();
       };
 
-      allDrawOperations.push({ fn: op, step: step });
+      addOperationToHistory(op);
       cachedDrawOperations.push(op);
     },
 
@@ -86,7 +100,7 @@ var canvasLibrary = module.exports = function(screen) {
         screen.fill();
       };
 
-      allDrawOperations.push({ fn: op, step: step });
+      addOperationToHistory(op);
       cachedDrawOperations.push(op);
     },
 
@@ -96,7 +110,7 @@ var canvasLibrary = module.exports = function(screen) {
         screen.strokeRect(x, y, width, height);
       };
 
-      allDrawOperations.push({ fn: op, step: step });
+      addOperationToHistory(op);
       cachedDrawOperations.push(op);
     },
 
@@ -106,7 +120,7 @@ var canvasLibrary = module.exports = function(screen) {
         screen.fillRect(x, y, width, height);
       };
 
-      allDrawOperations.push({ fn: op, step: step });
+      addOperationToHistory(op);
       cachedDrawOperations.push(op);
     }
   };
