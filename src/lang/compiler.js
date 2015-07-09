@@ -39,10 +39,10 @@ function compileInvocation(a) {
   var compiledArgs = util.mapCat(aArgs, compile);
   var compiledFn = compile(aInvocation[0]);
   var code = compiledArgs.concat(compiledFn, ins(["invoke",
-                                                aArgs.length,
-                                                a.tail === true ? true : false],
-                                               a,
-                                               ANNOTATE));
+                                                  aArgs.length,
+                                                  a.tail === true ? true : false],
+                                                 a,
+                                                 ANNOTATE));
   return code;
 };
 
@@ -96,6 +96,10 @@ function ins(instruction, ast, annotate) {
   instruction.ast = ast;
   instruction.annotate = (annotate === true ? true : false);
   return [instruction];
+};
+
+function createLambda(bc, parameters) {
+  return { bc: bc, parameters: parameters };
 };
 
 function compile(a) {
