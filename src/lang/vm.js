@@ -4,10 +4,14 @@ var util = require("../util");
 var standardLibrary = require("./standard-library");
 var envModule = require("../env");
 var scope = require("./scope");
-var copyProgramState = require("../copy-program-state");
+
+var copyProgramState;
+function getCopyProgramState() {
+  return copyProgramState = copyProgramState || require("../copy-program-state");
+};
 
 function stepPush(ins, p) {
-  p.stack.push(ins[1]);
+  p.stack.push(getCopyProgramState().copyValue(ins[1]));
   return p;
 };
 
