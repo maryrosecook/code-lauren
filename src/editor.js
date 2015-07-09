@@ -15,12 +15,3 @@ var createEditor = module.exports = function() {
 
   return editor;
 };
-
-function wrapSetValueToNotSelectAllText(editor) {
-  var realSetValue = editor.setValue;
-
-  editor.setValue = function(value) {
-    realSetValue.bind(editor)(value);
-    editor.clearSelection(); // for some reason, setting the initial text selects everything
-  };
-};
