@@ -11,7 +11,6 @@ var parser = require("./lang/parser");
 var compile = require("./lang/compiler");
 var vm = require("./lang/vm");
 
-var scope = require("./lang/scope");
 var createEditor = require("./editor");
 var createAnnotator = require("./annotator");
 var env = require("./env");
@@ -56,10 +55,11 @@ function parse(code, annotator) {
 function initProgramState(code, annotator, screen) {
   var ast = parse(code, annotator);
   if (ast !== undefined) {
-    var canvasEnv = env.createCanvasEnv(screen);
-    var programEnv = scope(env.mergeLibrary(canvasEnv, require("./lang/standard-library")()));
+    var canvasLib = env.setupCanvasLib(screen);
+    var programEnv = env.createEnv(env.mergeLibraries(canvasLib,
+                                                      require("./lang/standard-library")()));
     var ps = vm.initProgramState(code, compile(ast), programEnv);
-    ps.canvasEnv = canvasEnv;
+    ps.canvasLib = canvasLib;
     return ps;
   }
 };

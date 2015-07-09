@@ -2,6 +2,7 @@ var _ = require("underscore");
 
 var util = require("../util");
 var standardLibrary = require("./standard-library");
+var envModule = require("../env");
 var scope = require("./scope");
 var copyProgramState = require("../copy-program-state");
 
@@ -152,7 +153,7 @@ function isComplete(p) {
 function initProgramState(code, bc, env, stack) {
   return {
     code: code,
-    callStack: [createCallFrame(bc, 0, env ? env : scope(standardLibrary()))],
+    callStack: [createCallFrame(bc, 0, env ? env : envModule.createEnv(standardLibrary()))],
     stack: stack || [],
     currentInstruction: undefined
   };
