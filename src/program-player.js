@@ -1,6 +1,9 @@
+var _ = require("underscore");
 var vm = require("../src/lang/vm");
+var copyProgramState = require("../src/copy-program-state");
 
 var player;
+var pses = [];
 var ps;
 var paused = false;
 
@@ -11,7 +14,7 @@ function setupPlayer() {
     while(true) {
       if (ps !== undefined && !paused) {
         if (vm.isComplete(ps)) {
-          ps.canvasEnv.flush();
+          ps.canvasLib.flush();
         } else {
           player.stepForwards();
         }
@@ -48,7 +51,9 @@ function setupPlayer() {
     stepForwards: function() {
       try {
         if (!vm.isComplete(ps)) {
+          pses.push(copyProgramState(ps));
           ps = vm.step(ps);
+          ps.canvasLib.stepForwards();
         }
       } catch (e) {
         if (e instanceof vm.RuntimeError) {
@@ -60,7 +65,8 @@ function setupPlayer() {
     },
 
     stepBackwards: function() {
-      console.log("nothing yet");
+      ps = pses.pop();
+      ps.canvasLib.stepBackwards();
     },
 
     setProgramState: function(newPs) {

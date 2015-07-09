@@ -26,8 +26,7 @@ window.addEventListener("load", function() {
                document.getElementById('programPlayer'));
 
   editor.on("change", function() {
-    var ps = initProgramState(editor.getValue(), annotator, screen);
-    player.setProgramState(ps);
+    player.setProgramState(initProgramState(editor.getValue(), annotator, screen));
   });
 
   editor.setValue(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));

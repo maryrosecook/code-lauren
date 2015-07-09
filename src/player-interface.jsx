@@ -10,16 +10,41 @@ function annotateCurrentInstruction(ps, annotator) {
                           "currently-executing");
 };
 
-function stepUntilReachAnnotatableInstruction(player) {
+function untilReachAnnotatableInstruction(player, changeFn) {
   var currentInstruction = player.getProgramState().currentInstruction;
   while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
-    player.stepForwards();
+    changeFn(player);
     currentInstruction = player.getProgramState().currentInstruction;
   }
 };
 
+function onClickOrHoldDown(onClick) {
+  var firstClickTime;
+  var timerId;
+
+  return function(e) {
+    if (e.type === "mousedown" && firstClickTime === undefined) {
+      firstClickTime = new Date().getTime();
+      onClick();
+
+      timerId = setTimeout(function() {
+        timerId = setInterval(function() {
+          onClick();
+        }, 0);
+      }, 1000);
+    } else if (e.type === "mouseup") {
+      clearInterval(timerId);
+      timerId = undefined;
+      firstClickTime = undefined;
+    }
+  };
+};
+
 var ProgramPlayer = React.createClass({
   getInitialState: function() {
+    this.stepBackwardsClickHandler = onClickOrHoldDown(this.stepBackwards);
+    this.stepForwardsClickHandler = onClickOrHoldDown(this.stepForwards);
+
     return { player: this.props.player };
   },
 
@@ -27,7 +52,7 @@ var ProgramPlayer = React.createClass({
     this.state.player.togglePause();
 
     if (this.state.player.isPaused() && !vm.isComplete(this.state.player.getProgramState())) {
-      stepUntilReachAnnotatableInstruction(this.state.player);
+      untilReachAnnotatableInstruction(this.state.player, function(p) { p.stepForwards(); });
       annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
     } else {
       this.props.annotator.clear();
@@ -36,28 +61,39 @@ var ProgramPlayer = React.createClass({
     this.setState(this.state);
   },
 
-  onStepForwardsClick: function() {
+  stepForwards: function() {
     this.state.player.pause();
     this.state.player.stepForwards();
-    stepUntilReachAnnotatableInstruction(this.state.player);
+    untilReachAnnotatableInstruction(this.state.player, function(p) { p.stepForwards(); });
     this.setState(this.state);
 
     annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
   },
 
-  onStepBackwardsClick: function() {
+  stepBackwards: function() {
     this.state.player.pause();
     this.state.player.stepBackwards();
+    untilReachAnnotatableInstruction(this.state.player, function(p) { p.stepBackwards(); });
     this.setState(this.state);
+
+    annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
   },
 
   render: function() {
     var playPauseClassName = "playerButton " +
         (this.state.player.isPaused() ? "playButton" : "pauseButton");
+
     return (
       <div className="programPlayer">
+        <button onMouseDown={this.stepBackwardsClickHandler}
+                onMouseUp={this.stepBackwardsClickHandler}
+                className="playerButton stepBackwardsButton" />
+
         <button onClick={this.onPlayPauseClick} className={playPauseClassName} />
-        <button onClick={this.onStepForwardsClick} className="playerButton stepForwardsButton" />
+
+        <button onMouseDown={this.stepForwardsClickHandler}
+                onMouseUp={this.stepForwardsClickHandler}
+                className="playerButton stepForwardsButton" />
       </div>
     );
   }
