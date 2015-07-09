@@ -158,14 +158,14 @@ function ParseError(i, message, stack) {
   this.message = message;
   this.stack = stack;
 };
-ParseError.prototype = new Error();
+ParseError.prototype = Object.create(Error.prototype);
 
 function ParenthesisError(i, message, stack) {
   this.i = i;
   this.message = message;
   this.stack = stack;
 };
-ParenthesisError.prototype = new Error();
+ParenthesisError.prototype = Object.create(Error.prototype);
 
 parse.indexToLineAndColumn = indexToLineAndColumn;
 parse.balanceParentheses = balanceParentheses;
