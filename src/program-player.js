@@ -8,6 +8,8 @@ var pses = [];
 var ps;
 var paused = false;
 
+var STEP_TO_SAVE = 5000;
+
 function setupPlayer() {
   if (player !== undefined) { return; }
 
@@ -69,9 +71,9 @@ function setupPlayer() {
       try {
         if (!vm.isComplete(ps)) {
           pses.push(copyProgramState(ps));
-          if (pses.length > 1000) {
+          if (pses.length > STEP_TO_SAVE) {
             pses.shift();
-            ps.canvasLib.deleteOld();
+            ps.canvasLib.deleteOld(STEP_TO_SAVE);
           }
 
           ps = vm.step(ps);

@@ -49,8 +49,8 @@ var canvasLibrary = module.exports = function(screen) {
       rerunOperationsToCurrentStep();
     },
 
-    deleteOld: function() {
-      var stopClearing = step - 1000;
+    deleteOld: function(STEP_TO_SAVE) {
+      var stopClearing = step - STEP_TO_SAVE;
       while (allDrawOperations[0] !== undefined && allDrawOperations[0].step < stopClearing) {
         allDrawOperations.shift();
       }
