@@ -68,10 +68,10 @@ button:focus {
 
 .ace_marker-layer .overhang { padding-right: 13px; }
 
-.code-highlight.rainbow-0 { background-color: rgba(0, 255, 0, 0.12); }
-.code-highlight.rainbow-1 { background-color: rgba(0, 0, 255, 0.12); }
-.code-highlight.rainbow-2 { background-color: rgba(0, 255, 255, 0.12); }
-.code-highlight.rainbow-3 { background-color: rgba(255, 0, 255, 0.12); }
+.cm-bracket.rainbow-0 { background-color: rgba(0, 255, 0, 0.12); }
+.cm-bracket.rainbow-1 { background-color: rgba(0, 0, 255, 0.12); }
+.cm-bracket.rainbow-2 { background-color: rgba(0, 255, 255, 0.12); }
+.cm-bracket.rainbow-3 { background-color: rgba(255, 0, 255, 0.12); }
 
 #line-messages {
   position: absolute;
