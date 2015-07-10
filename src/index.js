@@ -21,12 +21,13 @@ window.addEventListener("load", function() {
   var editor = createEditor();
   var annotator = createAnnotator(editor);
   var player = setupPlayer();
+  var canvasLib = env.setupCanvasLib(screen);
 
   React.render(React.createElement(ProgramPlayer, { player: player, annotator: annotator }),
                document.getElementById('programPlayer'));
 
   editor.on("change", function() {
-    player.setProgramState(initProgramState(editor.getValue(), annotator, screen));
+    player.setProgramState(initProgramState(editor.getValue(), annotator, canvasLib));
   });
 
   editor.setValue(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
@@ -51,14 +52,14 @@ function parse(code, annotator) {
   }
 };
 
-function initProgramState(code, annotator, screen) {
+function initProgramState(code, annotator, canvasLib) {
   var ast = parse(code, annotator);
   if (ast !== undefined) {
-    var canvasLib = env.setupCanvasLib(screen);
-    var programEnv = env.createEnv(env.mergeLibraries(canvasLib,
-                                                      require("./lang/standard-library")()));
+    var programEnv = env.createEnv(env.mergeLibraries(require("./lang/standard-library")(),
+                                                      canvasLib.userFns));
     var ps = vm.initProgramState(code, compile(ast), programEnv);
-    ps.canvasLib = canvasLib;
+    canvasLib.programFns.reset();
+    ps.canvasLib = canvasLib.programFns;
     return ps;
   }
 };
