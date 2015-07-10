@@ -72,20 +72,20 @@ var ProgramPlayer = React.createClass({
   },
 
   render: function() {
-    var playPauseClassName = "playerButton " +
-        (this.state.player.isPaused() ? "playButton" : "pauseButton");
+    var playPauseClassName = "player-button " +
+        (this.state.player.isPaused() ? "play-button" : "pause-button");
 
     return (
-      <div className="programPlayer">
+      <div className="program-player">
         <button onMouseDown={this.stepBackwardsClickHandler}
                 onMouseUp={this.stepBackwardsClickHandler}
-                className="playerButton stepBackwardsButton" />
+                className="player-button step-backwards-button" />
 
         <button onClick={this.onPlayPauseClick} className={playPauseClassName} />
 
         <button onMouseDown={this.stepForwardsClickHandler}
                 onMouseUp={this.stepForwardsClickHandler}
-                className="playerButton stepForwardsButton" />
+                className="player-button step-forwards-button" />
       </div>
     );
   }

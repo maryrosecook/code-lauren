@@ -25,7 +25,7 @@ body {
   opacity: 0.5;
 }
 
-#programPlayer {
+#program-player {
   position: absolute;
   top: 0;
   right: 0;
@@ -33,7 +33,7 @@ body {
   z-index: 2;
 }
 
-.playerButton {
+.player-button {
   cursor: pointer;
   cursor: hand;
   border: 0;
@@ -42,22 +42,22 @@ body {
   margin: 10px;
 }
 
-.playButton {
+.play-button {
   background: url(images/play.png);
   background-size: 30px 30px;
 }
 
-.pauseButton {
+.pause-button {
   background: url(images/pause.png);
   background-size: 30px 30px;
 }
 
-.stepForwardsButton {
+.step-forwards-button {
   background: url(images/step-forwards.png);
   background-size: 30px 30px;
 }
 
-.stepBackwardsButton {
+.step-backwards-button {
   background: url(images/step-backwards.png);
   background-size: 30px 30px;
 }

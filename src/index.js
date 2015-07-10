@@ -24,7 +24,7 @@ window.addEventListener("load", function() {
   var canvasLib = env.setupCanvasLib(screen);
 
   React.render(React.createElement(ProgramPlayer, { player: player, annotator: annotator }),
-               document.getElementById('programPlayer'));
+               document.getElementById('program-player'));
 
   editor.on("change", function() {
     player.setProgramState(initProgramState(editor.getValue(), annotator, canvasLib));
