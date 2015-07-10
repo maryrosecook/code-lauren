@@ -23,7 +23,7 @@ function onClickOrHoldDown(onClick) {
         timerId = setInterval(function() {
           onClick();
         }, 0);
-      }, 1000);
+      }, 200);
     } else if (e.type === "mouseup") {
       clearInterval(timerId);
       timerId = undefined;
