@@ -9,15 +9,17 @@
   },
   "scripts": {
     "test": "node --harmony node_modules/jasmine-node/lib/jasmine-node/cli.js --color spec/",
-    "build": "webpack --progress --colors",
-    "watch": "webpack --progress --colors --watch",
-    "start": "live-server --port=4000"
+    "build": "npm run build-pages; webpack --progress --colors",
+    "watch": "npm run build-pages; webpack --progress --colors --watch",
+    "start": "live-server --port=4000",
+    "build-pages": "node scripts/build-pages.js"
   },
   "dependencies": {
     "brfs": "^1.4.0",
     "codemirror": "^5.4.0",
     "jquery": "^1.11.2",
     "live-server": "^0.7.1",
+    "marked": "^0.3.3",
     "pegjs": "pegjs/pegjs#da57118a43a904f753d44d407994cf0b36358adc",
     "react": "^0.13.3",
     "transform-loader": "^0.2.1",

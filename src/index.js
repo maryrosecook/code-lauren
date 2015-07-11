@@ -15,6 +15,7 @@ var createEditor = require("./editor");
 var createAnnotator = require("./annotator");
 var env = require("./env");
 var setupPlayer = require("./program-player");
+var pages = fs.readFileSync(__dirname + "/../pages/pages.json", "utf8");
 
 window.addEventListener("load", function() {
   var screen = document.getElementById("screen").getContext("2d");
