@@ -9,6 +9,7 @@ module.exports = {
     loaders: [
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
       { test: /\.js$/, loader: "transform/cacheable?brfs" },
+      { test: /src\/sidebar\.jsx$/, loader: "expose?sidebar" },
       { test: /\.jsx$/, loader: "jsx-loader?insertPragma=React.DOM&harmony" }
     ]
   },

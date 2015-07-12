@@ -6,7 +6,6 @@ var React = require('react');
 require("babel-core/polyfill");
 
 var ProgramPlayer = require("./player-interface.jsx");
-var Sidebar = require("./sidebar.jsx");
 
 var parser = require("./lang/parser");
 var compile = require("./lang/compiler");
@@ -18,16 +17,16 @@ var env = require("./env");
 var setupPlayer = require("./program-player");
 
 window.addEventListener("load", function() {
-  var screen = document.getElementById("screen").getContext("2d");
+  var screen = $("#screen")[0].getContext("2d");
   var editor = createEditor();
   var annotator = createAnnotator(editor);
   var player = setupPlayer();
   var canvasLib = env.setupCanvasLib(screen);
 
   // React.render(React.createElement(ProgramPlayer, { player: player, annotator: annotator }),
-  //              document.getElementById('program-player'));
+  //              $("program-player")[0]);
 
-  React.render(React.createElement(Sidebar), document.getElementById('sidebar'));
+  require("./sidebar.jsx");
 
   editor.on("change", function() {
     player.setProgramState(initProgramState(editor.getValue(), annotator, canvasLib));
