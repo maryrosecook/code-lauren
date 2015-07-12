@@ -10,7 +10,7 @@
   "scripts": {
     "test": "node --harmony node_modules/jasmine-node/lib/jasmine-node/cli.js --color spec/",
     "build": "npm run build-pages; webpack --progress --colors",
-    "watch": "npm run build-pages; webpack --progress --colors --watch",
+    "watch": "webpack --progress --colors --watch",
     "start": "live-server --port=4000",
     "build-pages": "node scripts/build-pages.js"
   },
