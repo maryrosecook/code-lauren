@@ -1,3 +1,7 @@
-hello
+# Code Lauren
 
-this is __strong__ yes
+Learn to code, step by step. No experience necessary.
+
+On the left is a cool example of what you can make.
+
+<a onclick="loadPage('tutorial1')" href="#">Start the tutorial</a>.
