@@ -79,7 +79,7 @@
 	    player.setProgramState(initProgramState(editor.getValue(), annotator, canvasLib));
 	  });
 
-	  editor.setValue("draw: { ?x ?y\n  circle-radius: 20\n\n  clear-screen()\n  draw-filled-circle(add(220 x)\n                     add(200 y)\n                     circle-radius\n                     \"blue\")\n}\n\nangle: 0\n\nforever {\n  radius-of-circle-orbit: 100\n  circle-angle-change: 0.2\n\n  angle: add(angle circle-angle-change)\n\n  draw(multiply(radius-of-circle-orbit cosine(angle))\n       multiply(radius-of-circle-orbit sine(angle)))\n}\n");
+	  editor.setValue("size: 0\n\nforever {\n  x: 200\n  y: 200\n  grow-speed: 0.2\n\n  size: add(size grow-speed)\n\n  clear-screen()\n  draw-filled-circle(x y size \"yellow\")\n}\n");
 	});
 
 	function parse(code, annotator) {
@@ -53550,7 +53550,7 @@
 	var player;
 	var pses = [];
 	var ps;
-	var paused = false;
+	var paused = true;
 
 	var STEP_TO_SAVE = 5000;
 
@@ -53688,6 +53688,7 @@
 	  },
 
 	  load: function(page) {
+	    // window.history.pushState("object or string", "Title", "/new-url");
 	    this.state.page = page;
 	    this.setState(this.state);
 	    return false;
@@ -53714,7 +53715,7 @@
 
 	"use strict";
 
-	module.exports = { home: "<h1 id=\"code-lauren\">Code Lauren</h1>\n<p>Learn to code, step by step. No experience necessary.</p>\n<p>On the left is a cool example of what you can make.</p>\n<p><a onclick=\"return sidebar.load('tutorial1')\" href=\"\">Start the tutorial</a>.</p>\n", tutorial1: "<h1 id=\"tutorial-1\">Tutorial 1</h1>\n" };
+	module.exports = { circle: "<h1 id=\"1-a-circle\">1. A circle</h1>\n<p>Let&#39;s write your first program.</p>\n<h2 id=\"make\">Make</h2>\n", home: "<h1 id=\"code-lauren\">Code Lauren</h1>\n<p>Learn to code, step by step. No experience necessary.</p>\n<p>On the left is a cool example of what you can make.</p>\n<p><a href=\"\"onclick=\"return sidebar.load('circle');\">Start the tutorial</a>.</p>\n" };
 
 /***/ }
 /******/ ]);
