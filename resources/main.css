@@ -50,8 +50,15 @@ body {
 }
 
 #sidebar h1 {
-  font-size: 16px;
+  font-size: 18px;
   margin-bottom: 7px;
+  font-weight: normal;
+}
+
+#sidebar h2 {
+  font-size: 14px;
+  margin-bottom: 7px;
+  font-weight: normal;
 }
 
 #sidebar p {
