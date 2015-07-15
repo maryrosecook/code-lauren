@@ -23,8 +23,8 @@ window.addEventListener("load", function() {
   var player = setupPlayer();
   var canvasLib = env.setupCanvasLib(screen);
 
-  // React.render(React.createElement(ProgramPlayer, { player: player, annotator: annotator }),
-  //              $("program-player")[0]);
+  React.render(React.createElement(ProgramPlayer, { player: player, annotator: annotator }),
+               $("#program-player")[0]);
 
   require("./sidebar.jsx");
 

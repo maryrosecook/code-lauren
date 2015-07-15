@@ -28,7 +28,7 @@ body {
 #program-player {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 30%;
   padding: 2px 2px 0 0;
   z-index: 2;
 }
