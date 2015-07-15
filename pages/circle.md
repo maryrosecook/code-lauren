@@ -2,12 +2,22 @@
 
 Let's write your first program.
 
-## Make a circle
+Delete all the code in the area on the left.
 
-Click in the blank area on the left.  Type the code below into the area on the left.
+Type in the code below.
 
 ```
-draw-filled-circle(10 20 30 "blue")
+draw-filled-circle(100 200 30 "blue")
 ```
 
-Next tutorial: [Draw a rectangle](#rectangle)
+Do you see a blue circle?
+
+## Change the color
+
+Try changing the color to `"red"` or `"green"` or your favorite color.
+
+## Change the position and size
+
+Try changing the numbers. One controls how far to the right the circle is. One controls how far down the circle is. One controls how big the circle is. Which one is which?
+
+Next tutorial: [Draw lots of circles](#circles)
