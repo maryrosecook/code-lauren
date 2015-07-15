@@ -97,6 +97,7 @@ function setupPlayer() {
 
     setProgramState: function(newPs) {
       ps = newPs;
+      player.unpause();
     }
   };
 

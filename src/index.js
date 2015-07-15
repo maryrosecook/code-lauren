@@ -20,11 +20,11 @@ window.addEventListener("load", function() {
   var screen = $("#screen")[0].getContext("2d");
   var editor = createEditor();
   var annotator = createAnnotator(editor);
-  var player = setupPlayer();
   var canvasLib = env.setupCanvasLib(screen);
 
-  React.render(React.createElement(ProgramPlayer, { player: player, annotator: annotator }),
-               $("#program-player")[0]);
+  var player = React.render(React.createElement(ProgramPlayer,
+                                                { player: setupPlayer(), annotator: annotator }),
+                        $("#program-player")[0]);
 
   require("./sidebar.jsx");
 

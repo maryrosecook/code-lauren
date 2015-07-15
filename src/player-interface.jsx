@@ -53,6 +53,11 @@ var ProgramPlayer = React.createClass({
     this.setState(this.state);
   },
 
+  setProgramState: function(ps) {
+    this.state.player.setProgramState(ps);
+    this.setState(this.state);
+  },
+
   stepForwards: function() {
     this.state.player.pause();
     this.state.player.stepForwards();
