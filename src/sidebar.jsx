@@ -5,23 +5,47 @@ var pageContent = require("../pages/all-pages");
 
 var Sidebar = React.createClass({
   getInitialState: function() {
-    return { page: "home" };
+    var self = this;
+    $(window).on('hashchange', function(e) {
+      self.load(urlToPage(e.originalEvent.newURL));
+    });
+
+    var page = route(urlToPage(window.location.href));
+    history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), "/#" + page);
+    return { page: page };
   },
 
   load: function(page) {
-    this.state.page = page;
-    this.setState(this.state);
-    return false;
+    page = route(page);
+    if (page !== this.state.page) {
+      this.state.page = page;
+      this.setState(this.state);
+    }
   },
 
   render: function() {
     return (
       <div className="sidebar"
-           dangerouslySetInnerHTML={{ __html: pageContent[this.state.page] }}>
+           dangerouslySetInnerHTML={{ __html: pageContent[this.state.page] || pageContent["404"] }}>
       </div>
     );
   }
 });
+
+function urlToPage(url) {
+  var urlPageMatch = url.match(/#(.+)/);
+  if (urlPageMatch) {
+    return urlPageMatch[1];
+  }
+};
+
+function route(page) {
+  if (page === undefined) {
+    return "home";
+  } else {
+    return page;
+  }
+};
 
 // massive hack to make sidebar instance exportable as global
 // so its methods can be called from the JS bound to sidebar page content link onClicks (!)

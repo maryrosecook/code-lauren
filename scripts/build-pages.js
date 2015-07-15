@@ -5,7 +5,7 @@ var marked = require("marked");
 
 var PAGES_PATH = __dirname + "/../pages";
 
-(function buildPages() {
+function buildPages() {
   var pages = fs.readdirSync(PAGES_PATH)
       .filter(function(n) { return n.match(/\.md$/); })
       .map(function(n) { return path.join(PAGES_PATH, n); })
@@ -21,7 +21,7 @@ var PAGES_PATH = __dirname + "/../pages";
 
   fs.writeFileSync(path.join(PAGES_PATH, "/all-pages.js"),
                    "module.exports = " + JSON.stringify(pages));
-})();
+};
 
 function matchIndices(regex, str) {
   var match;
@@ -36,15 +36,16 @@ function matchIndices(regex, str) {
 };
 
 function maybeMarkdownLinkToOnClick(link) {
-  var pageName = link.match(/\(#([^\)]+)\)$/);
-  if (pageName) {
-    var text = link.match(/^\[([^\]]+)\]/);
-    return ['<a href=""',
+  var pageMatch = link.match(/\(#([^\)]+)\)$/);
+  if (pageMatch) {
+    var pageName = pageMatch[1];
+    var text = link.match(/^\[([^\]]+)\]/)[1];
+    return ['<a href="#', pageName, '"',
             'onclick="return sidebar.load(',
-            "'", pageName[1], "'",
-            ');"',
+            "'", pageName, "'",
+            '); return false;"',
             '>',
-            text[1],
+            text,
             "</a>"].join("");
   } else {
     return link;
@@ -66,6 +67,8 @@ function makeLinksOnClick(md) {
 
   return _.compact(_.flatten(_.zip(nonLinks, links))).join("");
 };
+
+buildPages();
 
 // rebuild pages when something in on change
 fs.watch(__dirname + "/../pages", function (event, filename) {
