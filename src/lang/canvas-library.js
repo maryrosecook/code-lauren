@@ -51,6 +51,7 @@ var programFns = {
     step = 0;
     allDrawOperations = [];
     cachedDrawOperations = [];
+    screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
   }
 };
 
