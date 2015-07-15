@@ -3,6 +3,9 @@ var $ = require("jquery");
 
 var pageContent = require("../pages/all-pages");
 
+require("./lib/jquery.jscrollpane.min.js"); // for sidebar
+require("./lib/jquery.mousewheel.js"); // enable sidebar mousewheel scrolling
+
 var Sidebar = React.createClass({
   getInitialState: function() {
     var self = this;
@@ -29,6 +32,10 @@ var Sidebar = React.createClass({
            dangerouslySetInnerHTML={{ __html: pageContent[this.state.page] || pageContent["404"] }}>
       </div>
     );
+  },
+
+  componentDidMount: function() {
+    $('.sidebar').jScrollPane();
   }
 });
 

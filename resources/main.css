@@ -10,7 +10,7 @@ body {
 .CodeMirror {
   font-family: "courier";
   font-size: 14pt;
-  width: 100%;
+  width: 70%;
   height: 100vh;
   z-index: 1;
   background-color: rgba(255, 255, 255, 0);
@@ -27,8 +27,7 @@ body {
 
 #program-player {
   position: absolute;
-  top: 0;
-  right: 30%;
+  right: 30.5%;
   padding: 2px 2px 0 0;
   z-index: 2;
 }
@@ -42,11 +41,13 @@ body {
   width: 30%;
   height: 100%;
   z-index: 2;
-  border-left: 1px solid black;
+  overflow: hidden;
 }
 
 .sidebar {
-  padding: 8px; /* put padding on this so don't throw off 70/30 split w line messages */
+  padding: 8px 0 0 8px; /* put padding on this so don't throw off 70/30 split w line messages */
+  margin: 0 8px 0 0;
+  height: 100%;
 }
 
 #sidebar h1 {
