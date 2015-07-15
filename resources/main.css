@@ -51,13 +51,13 @@ body {
 }
 
 #sidebar h1 {
-  font-size: 20px;
+  font-size: 22px;
   margin-bottom: 0.5em;
   font-weight: normal;
 }
 
 #sidebar h2 {
-  font-size: 17px;
+  font-size: 18px;
   margin-bottom: 0.5em;
   font-weight: normal;
 }
@@ -143,16 +143,19 @@ button:focus {
 .currently-executing { background-color: rgba(0, 0, 255, 0.12); }
 
 pre {
-  border-top:1px solid #bbb;
-  border-bottom:1px solid #bbb;
-  padding-left:-50px;
   margin: 0.5em 0 0.7em 0;
-  padding: 0.7em 0;
+  padding: 0.5em 0;
   overflow: scroll;
   font-family: courier;
   line-height: 1.4em;
+  background-color: #e7e7e7;
 }
 
 pre code {
+  padding-left: 8px;
   word-wrap: normal;
+}
+
+code {
+  background-color: #e7e7e7;
 }
