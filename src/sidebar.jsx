@@ -35,7 +35,7 @@ var Sidebar = React.createClass({
   },
 
   componentDidMount: function() {
-    $('.sidebar').jScrollPane();
+    $('#sidebar').jScrollPane();
   }
 });
 
