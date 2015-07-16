@@ -17,7 +17,7 @@ a { color: black; }
 a:hover { text-decoration: none; }
 
 .CodeMirror {
-  font-family: "PF Din Mono W01 Light";
+  font-family: "courier";
   font-size: 14pt;
   width: 70%;
   height: 100vh;
@@ -164,6 +164,7 @@ pre code {
 
 code {
   background-color: #e7e7e7;
-  font-family: "PF Din Mono W01 Light";
+  font-family: "courier";
   font-size: 14px;
+  color: #555;
 }
