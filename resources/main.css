@@ -115,6 +115,7 @@ button:focus {
 .cm-bracket.rainbow-3 { background-color: rgba(255, 0, 255, 0.12); }
 
 #line-messages {
+  font-family: "courier";
   position: absolute;
   top: 0;
   left: 0;
