@@ -24,7 +24,7 @@ window.addEventListener("load", function() {
 
   var player = React.render(React.createElement(ProgramPlayer,
                                                 { player: setupPlayer(), annotator: annotator }),
-                        $("#program-player")[0]);
+                            $("#program-player")[0]);
 
   require("./sidebar.jsx");
 
