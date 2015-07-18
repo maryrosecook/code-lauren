@@ -2,8 +2,6 @@
 
 Let's write your first program.
 
-Delete all the code in the area on the left.
-
 Type the code below into the area on the left.
 
 ```
