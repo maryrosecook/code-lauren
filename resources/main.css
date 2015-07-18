@@ -150,10 +150,10 @@ pre {
   padding: 0.5em 0;
   overflow: scroll;
   background-color: #e7e7e7;
+  padding-left: 8px;
 }
 
 pre code {
-  padding-left: 8px;
   word-wrap: normal;
 }
 
