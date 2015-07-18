@@ -44845,7 +44845,9 @@
 /* 261 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
+
+	var $ = __webpack_require__(2);
 
 	var CodeMirror = __webpack_require__(262);
 	__webpack_require__(269); // for codemirror scrollbars
@@ -44853,17 +44855,22 @@
 
 	var createEditor = module.exports = function () {
 	  var editor = CodeMirror(document.body, {
-	    mode: 'lauren',
+	    mode: "lauren",
 	    tabSize: 2,
 	    indentWithTabs: false,
 	    undoDepth: 9999999999,
 	    autofocus: true,
-	    scrollbarStyle: 'simple',
+	    scrollbarStyle: "simple",
 	    extraKeys: {
 	      Tab: function Tab(cm) {
-	        cm.execCommand('insertSoftTab');
+	        cm.execCommand("insertSoftTab");
 	      }
 	    }
+	  });
+
+	  // restore focus to editor if user ever starts typing
+	  $(window).on("keydown", function () {
+	    editor.focus();
 	  });
 
 	  return editor;
@@ -54175,7 +54182,7 @@
 
 	"use strict";
 
-	module.exports = { "404": "<h1 id=\"couldn-t-find-that-page\">Couldn&#39;t find that page</h1>\n<p>Sorry, this page doesn&#39;t seem to exist.</p>\n<p>Return to the <a href=\"#home\"onclick=\"return sidebar.load('home'); return false;\">help homepage</a>.</p>\n", circle: "<h1 id=\"draw-a-circle\">Draw a circle</h1>\n<p>Let&#39;s write your first program.</p>\n<p>Delete all the code in the area on the left.</p>\n<p>Type the code below into the area on the left.</p>\n<pre><code>draw-filled-circle(100 200 30 &quot;blue&quot;)\n</code></pre><p>Do you see a blue circle?</p>\n<h2 id=\"change-the-color\">Change the color</h2>\n<p>Try changing the color to <code>&quot;red&quot;</code> or <code>&quot;green&quot;</code> or your favorite color.</p>\n<h2 id=\"change-the-position-and-size\">Change the position and size</h2>\n<p>Try changing the numbers. One controls how far to the right the circle is. One controls how far down the circle is. One controls how big the circle is. Which one is which?</p>\n<p>Next tutorial: <a href=\"#circles\"onclick=\"return sidebar.load('circles'); return false;\">Draw lots of circles</a></p>\n", home: "<h1 id=\"code-lauren\">Code Lauren</h1>\n<p>Learn to code, step by step. No experience necessary.</p>\n<p>On the left is a cool example of what you can make.</p>\n<p><a href=\"#circle\"onclick=\"return sidebar.load('circle'); return false;\">Start the tutorial</a>.</p>\n", rectangle: "<h1 id=\"draw-a-rectangle\">Draw a rectangle</h1>\n<p><a href=\"#notthere\"onclick=\"return sidebar.load('notthere'); return false;\">notthere</a></p>\n" };
+	module.exports = { "404": "<h1 id=\"couldn-t-find-that-page\">Couldn&#39;t find that page</h1>\n<p>Sorry, this page doesn&#39;t seem to exist.</p>\n<p>Return to the <a href=\"#home\"onclick=\"return sidebar.load('home'); return false;\">help homepage</a>.</p>\n", circle: "<h1 id=\"draw-a-circle\">Draw a circle</h1>\n<p>Let&#39;s write your first program.</p>\n<p>Type the code below into the area on the left.</p>\n<pre><code>draw-filled-circle(100 200 30 &quot;blue&quot;)\n</code></pre><p>Do you see a blue circle?</p>\n<h2 id=\"change-the-color\">Change the color</h2>\n<p>Try changing the color to <code>&quot;red&quot;</code> or <code>&quot;green&quot;</code> or your favorite color.</p>\n<h2 id=\"change-the-position-and-size\">Change the position and size</h2>\n<p>Try changing the numbers. One controls how far to the right the circle is. One controls how far down the circle is. One controls how big the circle is. Which one is which?</p>\n<p>Next tutorial: <a href=\"#circles\"onclick=\"return sidebar.load('circles'); return false;\">Draw lots of circles</a></p>\n", home: "<h1 id=\"code-lauren\">Code Lauren</h1>\n<p>Learn to code, step by step. No experience necessary.</p>\n<p>On the left is a cool example of what you can make.</p>\n<p><a href=\"#circle\"onclick=\"return sidebar.load('circle'); return false;\">Start the tutorial</a>.</p>\n", rectangle: "<h1 id=\"draw-a-rectangle\">Draw a rectangle</h1>\n<p><a href=\"#notthere\"onclick=\"return sidebar.load('notthere'); return false;\">notthere</a></p>\n" };
 
 /***/ },
 /* 269 */
