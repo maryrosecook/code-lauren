@@ -54,7 +54,4 @@ function route(page) {
   }
 };
 
-// massive hack to make sidebar instance exportable as global
-// so its methods can be called from the JS bound to sidebar page content link onClicks (!)
-module.exports = React.render(React.createElement(Sidebar),
-                              $("#sidebar")[0]);
+module.exports = Sidebar;
