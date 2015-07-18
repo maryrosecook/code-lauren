@@ -6,11 +6,6 @@
 body {
   font-family: "Gill Sans W01 Light";
   overflow: hidden;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "kern";
-  -webkit-font-feature-settings: "kern";
-  -moz-font-feature-settings: "kern";
-  -moz-font-feature-settings: "kern=1";
 }
 
 a { color: black; }
@@ -36,6 +31,7 @@ a:hover { text-decoration: none; }
 
 #program-player {
   position: absolute;
+  top: 0;
   right: 30.5%;
   padding: 2px 2px 0 0;
   z-index: 2;
@@ -61,17 +57,16 @@ a:hover { text-decoration: none; }
 #sidebar h1 {
   font-size: 22px;
   margin-bottom: 0.5em;
-
 }
 
 #sidebar h2 {
   font-size: 18px;
-  margin-bottom: 0.5em;
-
+  margin-top: 0;
+  margin-bottom: 0.8em;
 }
 
 #sidebar p {
-  padding-bottom: 0.7em;
+  margin-bottom: 0.8em;
 }
 
 .player-button {
@@ -116,6 +111,7 @@ button:focus {
 
 #line-messages {
   font-family: "courier";
+  font-size: 14pt;
   position: absolute;
   top: 0;
   left: 0;
@@ -125,7 +121,6 @@ button:focus {
 }
 
 .line-message {
-  font-size: 14pt;
   text-align: right;
   margin-right: 0;
   padding-right: 10px; /* matches 8px padding on sidebar */
@@ -151,10 +146,9 @@ button:focus {
 .currently-executing { background-color: rgba(0, 0, 255, 0.12); }
 
 pre {
-  margin: 0em 0 1em 0;
+  margin: 1em 0 1em 0;
   padding: 0.5em 0;
   overflow: scroll;
-  line-height: 1.4em;
   background-color: #e7e7e7;
 }
 
@@ -168,4 +162,8 @@ code {
   font-family: "courier";
   font-size: 14px;
   color: #555;
+}
+
+.CodeMirror div.CodeMirror-cursor {
+  border-left: 2px solid black;
 }
