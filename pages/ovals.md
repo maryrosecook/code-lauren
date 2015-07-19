@@ -11,4 +11,4 @@ draw-oval(100 300 30 40 "filled" "green")
 
 Try and make a line of ovals.
 
-Next tutorial: [Draw a rectangle](#rectangle)
+Next: [Draw a rectangle](#rectangle)

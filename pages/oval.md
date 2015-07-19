@@ -31,4 +31,4 @@ Which one is which?
 
 Do the numbers that describe the position of the oval indicate its middle or top left?
 
-Next tutorial: [Draw lots of ovals](#ovals)
+Next: [Draw lots of ovals](#ovals)
