@@ -69,6 +69,10 @@ a:hover { text-decoration: none; }
   margin-bottom: 0.8em;
 }
 
+#sidebar ol { padding-bottom: 0.8em; }
+
+#sidebar li { margin-left: 30px; }
+
 .player-button {
   cursor: pointer;
   cursor: hand;
