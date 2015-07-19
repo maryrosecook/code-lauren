@@ -74,7 +74,8 @@
 	  var source = setupSource(editor);
 
 	  top.sidebar = React.render(React.createElement(Sidebar), $("#sidebar")[0]); // export globally
-	  var player = React.render(React.createElement(ProgramPlayer, { player: setupPlayer(), annotator: annotator }), $("#program-player")[0]);
+	  var player = React.render(React.createElement(ProgramPlayer, { player: setupPlayer(annotator),
+	    annotator: annotator }), $("#program-player")[0]);
 
 	  editor.on("change", function () {
 	    player.setProgramState(initProgramState(editor.getValue(), annotator, canvasLib));
@@ -104,11 +105,11 @@
 	};
 
 	function initProgramState(code, annotator, canvasLib) {
+	  canvasLib.programFns.reset();
 	  var ast = parse(code, annotator);
 	  if (ast !== undefined) {
 	    var programEnv = env.createEnv(env.mergeLibraries(__webpack_require__(240)(), canvasLib.userFns));
 	    var ps = vm.initProgramState(code, compile(ast), programEnv);
-	    canvasLib.programFns.reset();
 	    ps.canvasLib = canvasLib.programFns;
 	    return ps;
 	  }
@@ -36227,7 +36228,8 @@
 	        throw new Error("I don't know how to run this instruction: " + ins);
 	      }
 	    } catch (e) {
-	      throw new RuntimeError(e);
+	      p.crashed = true;
+	      throw new RuntimeError(ins, e);
 	    }
 	  }
 	};
@@ -36249,8 +36251,13 @@
 	  return callFrame === undefined || callFrame.bcPointer === callFrame.bc.length;
 	};
 
+	function isCrashed(p) {
+	  return p.crashed === true;
+	};
+
 	function initProgramState(code, bc, env, stack) {
 	  return {
+	    crashed: false,
 	    code: code,
 	    callStack: [createCallFrame(bc, 0, env ? env : envModule.createEnv(standardLibrary()))],
 	    stack: stack || [],
@@ -36266,8 +36273,10 @@
 	  return complete(initProgramState(bc, env, stack));
 	};
 
-	function RuntimeError(e) {
-	  util.copyException(e, this);
+	function RuntimeError(ins, exception) {
+	  this.s = ins.ast.s;
+	  this.e = ins.ast.e;
+	  util.copyException(exception, this);
 	};
 	RuntimeError.prototype = Object.create(Error.prototype);
 
@@ -36276,6 +36285,7 @@
 	initProgramStateAndComplete.step = step;
 	initProgramStateAndComplete.complete = complete;
 	initProgramStateAndComplete.isComplete = isComplete;
+	initProgramStateAndComplete.isCrashed = isCrashed;
 	initProgramStateAndComplete.createCallFrame = createCallFrame;
 	initProgramStateAndComplete.RuntimeError = RuntimeError;
 
@@ -36656,6 +36666,7 @@
 
 	function copyProgramState(o) {
 	  return {
+	    crashed: o.crashed,
 	    code: o.code,
 	    callStack: copyCallStack(o.callStack),
 	    stack: copyStack(o.stack),
@@ -53732,7 +53743,7 @@
 
 	var STEP_TO_SAVE = 5000;
 
-	function setupPlayer() {
+	function setupPlayer(annotator) {
 	  if (player !== undefined) {
 	    return;
 	  }
@@ -53795,7 +53806,7 @@
 
 	    stepForwards: function stepForwards() {
 	      try {
-	        if (!vm.isComplete(ps)) {
+	        if (!vm.isComplete(ps) && !vm.isCrashed(ps)) {
 	          pses.push(copyProgramState(ps));
 	          if (pses.length > STEP_TO_SAVE) {
 	            pses.shift();
@@ -53807,9 +53818,8 @@
 	        }
 	      } catch (e) {
 	        if (e instanceof vm.RuntimeError) {
-	          console.log(e.message, e.stack);
-	        } else {
-	          console.log(e.stack);
+	          annotator.codeHighlight(ps.code, e.s, e.e, "error");
+	          annotator.lineMessage(ps.code, e.s, "error", e.message);
 	        }
 	      }
 	    },
