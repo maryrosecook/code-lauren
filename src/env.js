@@ -2,8 +2,10 @@ var $ = require('jquery');
 var createScope = require("./lang/scope");
 
 function fillWindowWithScreen(screen) {
+  var imageData = screen.getImageData(0, 0, screen.canvas.width, screen.canvas.height);
   screen.canvas.width = $(document).width();
   screen.canvas.height = $(document).height();
+  screen.putImageData(imageData, 0, 0);
 };
 
 function mergeLibraries(library, libraryToAdd) {
