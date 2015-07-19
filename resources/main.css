@@ -117,7 +117,7 @@ button:focus {
   font-family: "courier";
   font-size: 14pt;
   position: absolute;
-  top: 0;
+  top: 4px;
   left: 0;
   width: 70%;
   height: 100vh;
