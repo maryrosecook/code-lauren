@@ -49,13 +49,13 @@ function parse(code, annotator) {
     return parser.parse(code);
   } catch(e) {
     if (e instanceof parser.ParseError) {
-      annotator.codeHighlight(code, e.i, e.i + 1, "error");
-      annotator.lineMessage(code, e.i, "error", e.message);
+      annotator.codeHighlight(code, e.s, e.e, "error");
+      annotator.lineMessage(code, e.s, "error", e.message);
     } else if (e instanceof parser.ParenthesisError) {
-      annotator.codeHighlight(code, e.i, e.i + 1, "error");
+      annotator.codeHighlight(code, e.s, e.e, "error");
       displayRainbowParentheses(code, annotator);
 
-      annotator.lineMessage(code, e.i, "error", e.message);
+      annotator.lineMessage(code, e.s, "error", e.message);
     }
   }
 };

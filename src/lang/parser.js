@@ -153,15 +153,17 @@ function rainbowParentheses(codeStr) {
   return pairs;
 };
 
-function ParseError(i, message, stack) {
-  this.i = i;
+function ParseError(s, message, stack) {
+  this.s = s;
+  this.e = s + 1;
   this.message = message;
   this.stack = stack;
 };
 ParseError.prototype = Object.create(Error.prototype);
 
-function ParenthesisError(i, message, stack) {
-  this.i = i;
+function ParenthesisError(s, message, stack) {
+  this.s = s;
+  this.e = s + 1;
   this.message = message;
   this.stack = stack;
 };
