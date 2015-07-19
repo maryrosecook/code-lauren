@@ -61,12 +61,12 @@ function parse(code, annotator) {
 };
 
 function initProgramState(code, annotator, canvasLib) {
+  canvasLib.programFns.reset();
   var ast = parse(code, annotator);
   if (ast !== undefined) {
     var programEnv = env.createEnv(env.mergeLibraries(require("./lang/standard-library")(),
                                                       canvasLib.userFns));
     var ps = vm.initProgramState(code, compile(ast), programEnv);
-    canvasLib.programFns.reset();
     ps.canvasLib = canvasLib.programFns;
     return ps;
   }
