@@ -152,7 +152,7 @@ button:focus {
 pre {
   margin: 1em 0 1em 0;
   padding: 0.5em 0;
-  overflow: scroll;
+  overflow: hidden;
   background-color: #e7e7e7;
   padding-left: 8px;
 }
