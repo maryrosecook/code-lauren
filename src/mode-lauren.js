@@ -26,7 +26,7 @@ CodeMirror.defineMode("lauren", function () {
         return obj;
     }
 
-    var keywords = makeKeywords("add multiply subtract divide clear-screen sine cosine draw-filled-circle forever");
+    var keywords = makeKeywords("add multiply subtract divide clear-screen sine cosine draw-filled-circle draw-filled-rectangle forever");
     var indentKeys = makeKeywords("define let letrec let* lambda");
 
     function stateStack(indent, type, prev) { // represents a state stack object
