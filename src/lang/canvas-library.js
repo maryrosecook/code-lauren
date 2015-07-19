@@ -79,11 +79,22 @@ var userFns = {
     cachedDrawOperations.push(op);
   },
 
-  "draw-circle": function(x, y, radius, filledStr, color) {
+  "draw-circle": function(x, y, w, h, filledStr, color) {
     function op() {
+      var kappa = 0.5522848;
+      var ox = (w / 2) * kappa; // control point offset horizontal
+      var oy = (h / 2) * kappa; // control point offset vertical
+      var xe = x + w;           // x-end
+      var ye = y + h;           // y-end
+      var xm = x + w / 2;       // x-middle
+      var ym = y + h / 2;       // y-middle
+
       screen.beginPath();
-      screen.arc(x, y, radius, 0, Math.PI * 2, true);
-      screen.closePath();
+      screen.moveTo(x, ym);
+      screen.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+      screen.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+      screen.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+      screen.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
 
       if (filledStr === "unfilled") {
         screen.strokeStyle = color;
