@@ -79,50 +79,38 @@ var userFns = {
     cachedDrawOperations.push(op);
   },
 
-  "draw-unfilled-circle": function(x, y, radius, color) {
+  "draw-circle": function(x, y, radius, filledStr, color) {
     function op() {
       screen.beginPath();
       screen.arc(x, y, radius, 0, Math.PI * 2, true);
       screen.closePath();
-      screen.strokeStyle = color;
-      screen.stroke();
-      screen.strokeStyle = "black";
+
+      if (filledStr === "unfilled") {
+        screen.strokeStyle = color;
+        screen.stroke();
+        screen.strokeStyle = "black";
+      } else if (filledStr === "filled") {
+        screen.fillStyle = color;
+        screen.fill();
+        screen.fillStyle = "black";
+      }
     };
 
     addOperationToHistory(op);
     cachedDrawOperations.push(op);
   },
 
-  "draw-filled-circle": function(x, y, radius, color) {
+  "draw-rectangle": function(x, y, width, height, filledStr, color) {
     function op() {
-      screen.beginPath();
-      screen.arc(x, y, radius, 0, Math.PI * 2, true);
-      screen.closePath();
-      screen.fillStyle = color;
-      screen.fill();
-      screen.fillStyle = "black";
-    };
-
-    addOperationToHistory(op);
-    cachedDrawOperations.push(op);
-  },
-
-  "draw-unfilled-rectangle": function(x, y, width, height, color) {
-    function op() {
-      screen.strokeStyle = color;
-      screen.strokeRect(x, y, width, height);
-      screen.strokeStyle = "black";
-    };
-
-    addOperationToHistory(op);
-    cachedDrawOperations.push(op);
-  },
-
-  "draw-filled-rectangle": function(x, y, width, height, color) {
-    function op() {
-      screen.fillStyle = color;
-      screen.fillRect(x, y, width, height);
-      screen.fillStyle = "black";
+      if (filledStr === "unfilled") {
+        screen.strokeStyle = color;
+        screen.strokeRect(x, y, width, height);
+        screen.strokeStyle = "black";
+      } else if (filledStr === "filled") {
+        screen.fillStyle = color;
+        screen.fillRect(x, y, width, height);
+        screen.fillStyle = "black";
+      }
     };
 
     addOperationToHistory(op);
