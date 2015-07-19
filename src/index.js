@@ -28,7 +28,8 @@ window.addEventListener("load", function() {
 
   top.sidebar = React.render(React.createElement(Sidebar), $("#sidebar")[0]); // export globally
   var player = React.render(React.createElement(ProgramPlayer,
-                                                { player: setupPlayer(), annotator: annotator }),
+                                                { player: setupPlayer(annotator),
+                                                  annotator: annotator }),
                             $("#program-player")[0]);
 
   editor.on("change", function() {

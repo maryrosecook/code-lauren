@@ -131,8 +131,8 @@ function step(p) {
         throw new Error("I don't know how to run this instruction: " + ins);
       }
     } catch (e) {
-      throw new RuntimeError(e);
       p.crashed = true;
+      throw new RuntimeError(ins, e);
     }
   }
 };
@@ -177,8 +177,10 @@ function initProgramStateAndComplete(bc, env, stack) {
   return complete(initProgramState(bc, env, stack));
 };
 
-function RuntimeError(e) {
-  util.copyException(e, this);
+function RuntimeError(ins, exception) {
+  this.s = ins.ast.s;
+  this.e = ins.ast.e;
+  util.copyException(exception, this);
 };
 RuntimeError.prototype = Object.create(Error.prototype);
 

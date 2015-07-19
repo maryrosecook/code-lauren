@@ -10,7 +10,7 @@ var paused = false;
 
 var STEP_TO_SAVE = 5000;
 
-function setupPlayer() {
+function setupPlayer(annotator) {
   if (player !== undefined) { return; }
 
   (function tick(lastEventLoopYield) {
@@ -81,9 +81,8 @@ function setupPlayer() {
         }
       } catch (e) {
         if (e instanceof vm.RuntimeError) {
-          console.log(e.message, e.stack);
-        } else {
-          console.log(e.stack);
+          annotator.codeHighlight(ps.code, e.s, e.e, "error");
+          annotator.lineMessage(ps.code, e.s, "error", e.message);
         }
       }
     },
