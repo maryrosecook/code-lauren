@@ -13,6 +13,9 @@ var Sidebar = React.createClass({
       self.load(urlToPage(e.originalEvent.newURL));
     });
 
+    var self = this;
+    $(window).resize(function() { self.scrollApi.reinitialise(); });
+
     var page = route(urlToPage(window.location.href));
     history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), "/#" + page);
     return { page: page };
@@ -35,7 +38,7 @@ var Sidebar = React.createClass({
   },
 
   componentDidMount: function() {
-    $('#sidebar').jScrollPane();
+    this.scrollApi = $('#sidebar').jScrollPane().data('jsp');
   }
 });
 
