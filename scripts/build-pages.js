@@ -6,21 +6,26 @@ var marked = require("marked");
 var PAGES_PATH = __dirname + "/../pages";
 
 function buildPages() {
-  var pages = fs.readdirSync(PAGES_PATH)
-      .filter(function(n) { return n.match(/\.md$/); })
-      .map(function(n) { return path.join(PAGES_PATH, n); })
-      .map(function(filePath) {
-        return {
-          name: filePath.match(/^.+\/([A-Za-z0-9-]+)\.md$/)[1],
-          string: marked(makeLinksOnClick(fs.readFileSync(filePath, "utf8")))
-        };
-      }).reduce(function(a, o) {
-        a[o.name] = o.string;
-        return a
-      }, {});
+  try {
+    var pages = fs.readdirSync(PAGES_PATH)
+        .filter(function(n) { return n.match(/\.md$/); })
+        .map(function(n) { return path.join(PAGES_PATH, n); })
+        .map(function(filePath) {
+          return {
+            name: filePath.match(/^.+\/([A-Za-z0-9-]+)\.md$/)[1],
+            string: marked(makeLinksOnClick(fs.readFileSync(filePath, "utf8")))
+          };
+        }).reduce(function(a, o) {
+          a[o.name] = o.string;
+          return a
+        }, {});
 
-  fs.writeFileSync(path.join(PAGES_PATH, "/all-pages.js"),
-                   "module.exports = " + JSON.stringify(pages));
+    fs.writeFileSync(path.join(PAGES_PATH, "/all-pages.js"),
+                     "module.exports = " + JSON.stringify(pages));
+    console.log("Rebuilt");
+  } catch (e) {
+    console.log("Rebuild failed:", e.message);
+  }
 };
 
 function matchIndices(regex, str) {
