@@ -79,7 +79,7 @@ var userFns = {
     cachedDrawOperations.push(op);
   },
 
-  "draw-circle": function(x, y, w, h, filledStr, color) {
+  "draw-oval": function(x, y, w, h, filledStr, color) {
     function op() {
       var kappa = 0.5522848;
       var ox = (w / 2) * kappa; // control point offset horizontal
