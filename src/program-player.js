@@ -69,7 +69,7 @@ function setupPlayer() {
 
     stepForwards: function() {
       try {
-        if (!vm.isComplete(ps)) {
+        if (!vm.isComplete(ps) && !vm.isCrashed(ps)) {
           pses.push(copyProgramState(ps));
           if (pses.length > STEP_TO_SAVE) {
             pses.shift();

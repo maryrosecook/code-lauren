@@ -132,6 +132,7 @@ function step(p) {
       }
     } catch (e) {
       throw new RuntimeError(e);
+      p.crashed = true;
     }
   }
 };
@@ -154,8 +155,13 @@ function isComplete(p) {
     callFrame.bcPointer === callFrame.bc.length;
 };
 
+function isCrashed(p) {
+  return p.crashed === true;
+};
+
 function initProgramState(code, bc, env, stack) {
   return {
+    crashed: false,
     code: code,
     callStack: [createCallFrame(bc, 0, env ? env : envModule.createEnv(standardLibrary()))],
     stack: stack || [],
@@ -181,6 +187,7 @@ initProgramStateAndComplete.initProgramState = initProgramState;
 initProgramStateAndComplete.step = step;
 initProgramStateAndComplete.complete = complete;
 initProgramStateAndComplete.isComplete = isComplete;
+initProgramStateAndComplete.isCrashed = isCrashed;
 initProgramStateAndComplete.createCallFrame = createCallFrame;
 initProgramStateAndComplete.RuntimeError = RuntimeError;
 

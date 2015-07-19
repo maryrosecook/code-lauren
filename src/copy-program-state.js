@@ -5,6 +5,7 @@ var _ = require("underscore");
 
 function copyProgramState(o) {
   return {
+    crashed: o.crashed,
     code: o.code,
     callStack: copyCallStack(o.callStack),
     stack: copyStack(o.stack),
