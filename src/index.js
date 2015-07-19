@@ -17,12 +17,14 @@ var createAnnotator = require("./annotator");
 var env = require("./env");
 var setupPlayer = require("./program-player");
 var Sidebar = require("./sidebar.jsx");
+var setupSource = require("./source");
 
 window.addEventListener("load", function() {
   var screen = $("#screen")[0].getContext("2d");
   var editor = createEditor();
   var annotator = createAnnotator(editor);
   var canvasLib = env.setupCanvasLib(screen);
+  var source = setupSource(editor);
 
   top.sidebar = React.render(React.createElement(Sidebar), $("#sidebar")[0]); // export globally
   var player = React.render(React.createElement(ProgramPlayer,
@@ -31,9 +33,12 @@ window.addEventListener("load", function() {
 
   editor.on("change", function() {
     player.setProgramState(initProgramState(editor.getValue(), annotator, canvasLib));
+    source.save();
   });
 
-  editor.setValue(fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
+  editor.setValue(source.get() !== undefined ?
+                  source.get() :
+                  fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
 });
 
 function parse(code, annotator) {
