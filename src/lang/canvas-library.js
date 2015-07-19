@@ -72,6 +72,7 @@ var userFns = {
       screen.font = "20px Georgia";
       screen.fillStyle = color;
       screen.fillText(str, x, y);
+      screen.fillStyle = "black";
     };
 
     addOperationToHistory(op);
@@ -85,6 +86,7 @@ var userFns = {
       screen.closePath();
       screen.strokeStyle = color;
       screen.stroke();
+      screen.strokeStyle = "black";
     };
 
     addOperationToHistory(op);
@@ -98,6 +100,7 @@ var userFns = {
       screen.closePath();
       screen.fillStyle = color;
       screen.fill();
+      screen.fillStyle = "black";
     };
 
     addOperationToHistory(op);
@@ -108,6 +111,7 @@ var userFns = {
     function op() {
       screen.strokeStyle = color;
       screen.strokeRect(x, y, width, height);
+      screen.strokeStyle = "black";
     };
 
     addOperationToHistory(op);
@@ -118,6 +122,7 @@ var userFns = {
     function op() {
       screen.fillStyle = color;
       screen.fillRect(x, y, width, height);
+      screen.fillStyle = "black";
     };
 
     addOperationToHistory(op);
