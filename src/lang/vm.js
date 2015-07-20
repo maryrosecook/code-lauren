@@ -6,12 +6,9 @@ var envModule = require("../env");
 var scope = require("./scope");
 
 var copyProgramState;
-function getCopyProgramState() {
-  return copyProgramState = copyProgramState || require("../copy-program-state");
-};
-
 function stepPush(ins, p) {
-  p.stack.push(getCopyProgramState().copyValue(ins[1]));
+  copyProgramState = copyProgramState || require("../copy-program-state");
+  p.stack.push(copyProgramState.copyValue(ins[1]));
   return p;
 };
 
