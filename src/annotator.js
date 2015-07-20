@@ -6,9 +6,9 @@ module.exports = function createAnnotator(editor) {
   return new Annotator(editor);
 };
 
-function zeroLengthMarker() {
+function zeroLengthMarker(clazz) {
   var zeroLengthMarker = document.createElement("span");
-  zeroLengthMarker.className = "zero-width-mark currently-executing";
+  zeroLengthMarker.className = "zero-width-mark " + clazz;
   return zeroLengthMarker;
 };
 
@@ -24,14 +24,14 @@ function Annotator(editor) {
       emptyLineIndices(code, start, end).forEach(function(i) {
         var lAndC = parser.indexToLineAndColumn(i, code);
         var pos = { line: lAndC.line - 1, ch: lAndC.column - 1 };
-        markers.push(editor.setBookmark(pos, { widget: zeroLengthMarker() }));
+        markers.push(editor.setBookmark(pos, { widget: zeroLengthMarker(clazz) }));
       });
 
       var startLAndC = parser.indexToLineAndColumn(start, code);
       var startPos = { line: startLAndC.line - 1, ch: startLAndC.column - 1 };
 
       if (start === end) {
-        markers.push(editor.setBookmark(startPos, { widget: zeroLengthMarker }));
+        markers.push(editor.setBookmark(startPos, { widget: zeroLengthMarker(clazz) }));
       } else {
         var endLAndC = parser.indexToLineAndColumn(end, code);
         var endPos = { line: endLAndC.line - 1, ch: endLAndC.column - 1 };
