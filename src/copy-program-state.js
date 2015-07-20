@@ -35,16 +35,16 @@ function copyEnv(o, visited) {
 
 // copies any value in the language
 function copyValue(o, visited) {
-  if (visited === undefined) {
+  if (_.isString(o) || _.isNumber(o) || _.isBoolean(o) || _.isFunction(o)) {
+    return o;
+  } else if (visited === undefined) {
     return copyValue(o, []);
   } else if (visited.indexOf(o) !== -1) {
     return visited[visited.indexOf(o)];
   } else {
     visited.push(o);
 
-    if (_.isString(o) || _.isNumber(o) || _.isBoolean(o) || _.isFunction(o)) {
-      return o;
-    } else if (isLambda(o)) {
+    if (isLambda(o)) {
       return { bc: o.bc, parameters: o.parameters, closureEnv: copyEnv(o.closureEnv, visited) };
     } else if (_.isObject(o)) {
       return Object.keys(o)
