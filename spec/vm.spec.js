@@ -122,7 +122,7 @@ describe("bytecode interpreter", function() {
       var code = "n: 1 \n forever { n: add(n 1) \n if equals(n 100) { blowup() } }";
       expect(function() {
         v(code, c(p(code)));
-      }).toThrow("Cannot read property 'bc' of undefined");
+      }).toThrow("Never heard of blowup");
     });
   });
 

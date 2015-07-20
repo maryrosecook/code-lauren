@@ -33,8 +33,13 @@ function stepReturn(ins, p) {
 };
 
 function stepGetEnv(ins, p) {
-  p.stack.push(currentCallFrame(p).env.getScopedBinding(ins[1]));
-  return p;
+  var value = currentCallFrame(p).env.getScopedBinding(ins[1]);
+  if (value === undefined) {
+    throw new Error("Never heard of " + ins[1]);
+  } else {
+    p.stack.push(value);
+    return p;
+  }
 };
 
 function stepSetEnv(ins, p) {
