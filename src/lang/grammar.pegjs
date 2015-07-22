@@ -152,8 +152,11 @@ boolean
   / 'false' { return node("boolean", false, offset(), text()); }
 
 label
-  = !keyword all: label_char+
-    { return node("label", all.join(""), offset(), text()); }
+  = !keyword first:start_label_char others:label_char*
+    { return node("label", [first].concat(others).join(""), offset(), text()); }
+
+start_label_char
+  = [a-zA-Z_]
 
 label_char
   = [a-zA-Z0-9_\-]

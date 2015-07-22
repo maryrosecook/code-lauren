@@ -4,7 +4,7 @@ var util = require("../src/util");
 
 describe("parser", function() {
   describe("atoms", function() {
-    iit("should parse an int", function() {
+    it("should parse an int", function() {
       expect(util.stripAst(util.getNodeAt(parse("1"), ["top", "do", 0, "return"])))
         .toEqual({ t: "number", c: 1 });
 
@@ -31,6 +31,11 @@ describe("parser", function() {
       expect(util.stripAst(util.getNodeAt(ast,
                                           ["top", "do", 0, "return"])))
         .toEqual({ t: "label", c: "person" });
+    });
+
+    it("should fail to pass a label that begins with an int", function() {
+      expect(function() { parse("1abc") })
+        .toThrow("Expected this to be on a new line")
     });
   });
 

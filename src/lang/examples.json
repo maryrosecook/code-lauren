@@ -17,7 +17,7 @@
     {
       "code":    "a: ",
       "stack":   ["assignment", "expression", "parenthetical", "invocation",
-                  "function", "label", "label_char"],
+                  "function", "label", "start_label_char"],
       "nextInput":   "$",
       "message": "You have specified a name, but you also need a value"
     },
@@ -25,7 +25,7 @@
     {
       "code":    "a: \n",
       "stack":   ["assignment", "expression", "parenthetical", "invocation",
-                  "function", "label", "label_char"],
+                  "function", "label", "start_label_char"],
       "nextInput":   "\n",
       "message": "You have specified a name, but you also need a value"
     },
@@ -33,7 +33,7 @@
     {
       "code":    ": 1",
       "stack":   ["expression", "parenthetical", "invocation", "function",
-                  "label", "label_char"],
+                  "label", "start_label_char"],
       "nextInput":   ":",
       "message": "You have specified a value, but you also need a label"
     }
