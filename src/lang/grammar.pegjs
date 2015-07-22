@@ -152,7 +152,7 @@ boolean
   / 'false' { return node("boolean", false, offset(), text()); }
 
 label
-  = !keyword first:start_label_char others:label_char*
+  = not_keyword first:start_label_char others:label_char*
     { return node("label", [first].concat(others).join(""), offset(), text()); }
 
 start_label_char
@@ -171,7 +171,7 @@ _
 __ ""
   = [ \t\r\n]+
 
-keyword
-  = 'if' !label_char
-  / 'elseif' !label_char
-  / 'else' !label_char
+not_keyword
+  = !('if' !label_char)
+  / !('elseif' !label_char)
+  / !('else' !label_char)
