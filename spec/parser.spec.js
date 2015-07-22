@@ -4,11 +4,12 @@ var util = require("../src/util");
 
 describe("parser", function() {
   describe("atoms", function() {
-    it("should parse an int", function() {
-      var ast = parse("1");
-      expect(util.stripAst(util.getNodeAt(ast,
-                                          ["top", "do", 0, "return"])))
+    iit("should parse an int", function() {
+      expect(util.stripAst(util.getNodeAt(parse("1"), ["top", "do", 0, "return"])))
         .toEqual({ t: "number", c: 1 });
+
+      expect(util.stripAst(util.getNodeAt(parse("123"), ["top", "do", 0, "return"])))
+        .toEqual({ t: "number", c: 123 });
     });
 
     it("should parse a float", function() {
