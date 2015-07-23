@@ -197,6 +197,20 @@ describe("parser", function() {
                                                                 c: { t: "undefined",
                                                                      c: undefined } }]}]}}]}]}]}]});
     });
+
+    it("should be able to invoke result of conditional", function() {
+      var ast = parse("if true { }()");
+      expect(util.stripAst(util.getNodeAt(ast, ["top", "do", 0, "return"])))
+        .toEqual({ t: "invocation",
+                   c: [{ t: "conditional",
+                         c: [{ t: "boolean", c: true },
+                             { t: "invocation",
+                               c: [{ t: "lambda",
+                                     c: [[], { t: "do",
+                                               c: [{ t : 'return',
+                                                     c : { t : 'undefined',
+                                                           c : undefined } }] }] }] }]}]});
+    });
   });
 
   describe("lambda", function() {

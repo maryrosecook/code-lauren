@@ -62,8 +62,8 @@ do_continue
 
 expression
   = forever
-  / conditional
   / parenthetical
+  / conditional
   / assignment
   / atom
 
@@ -83,6 +83,7 @@ invocation
 
 function
   = all: lambda
+  / all: conditional
   / all: label
 
 application

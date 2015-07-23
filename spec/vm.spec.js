@@ -55,6 +55,13 @@ describe("bytecode interpreter", function() {
     });
   });
 
+  describe("invocation of result of conditional", function() {
+    iit("should return ret val of invoked lambda returned by if block", function() {
+      var code = "if true { { 1 } }()";
+      expect(v(code, c(p(code))).stack.pop().v).toEqual(1);
+    });
+  });
+
   describe("builtin function invocation", function() {
     it("should run built in function with args", function() {
       var code = "print(1)";
