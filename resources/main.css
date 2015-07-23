@@ -146,7 +146,7 @@ button:focus {
 .cm-s-default .cm-builtin { color: #4A9CC9; }
 .cm-s-default .cm-bracket { color: #333 }
 
-.error { background-color: rgba(255, 0, 0, 0.4); }
+.error { background-color: rgba(255, 0, 0, 0.2); }
 .currently-executing { background-color: rgba(0, 0, 255, 0.12); }
 
 pre {
