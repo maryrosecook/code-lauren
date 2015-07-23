@@ -8,14 +8,14 @@ var scope = require("./scope");
 var copyProgramState;
 function stepPush(ins, p) {
   copyProgramState = copyProgramState || require("../copy-program-state");
-  p.stack.push(copyProgramState.copyValue(ins[1]));
+  p.stack.push({ v: copyProgramState.copyValue(ins[1]), ast: ins.ast });
   return p;
 };
 
 function stepPushLambda(ins, p) {
   var lambda = ins[1];
   lambda.closureEnv = currentCallFrame(p).env;
-  p.stack.push(lambda);
+  p.stack.push({ v: lambda, ast: ins.ast });
   return p;
 };
 
@@ -32,26 +32,28 @@ function stepReturn(ins, p) {
 function stepGetEnv(ins, p) {
   var value = currentCallFrame(p).env.getScopedBinding(ins[1]);
   if (value === undefined) {
-    throw new Error("Never heard of " + ins[1]);
+    p.crashed = true;
+    throw new RuntimeError("Never heard of " + ins[1], ins.ast);
   } else {
-    p.stack.push(value);
+    p.stack.push({ v: value, ast: ins.ast });
     return p;
   }
 };
 
 function stepSetEnv(ins, p) {
-  currentCallFrame(p).env.setGlobalBinding(ins[1], p.stack.pop());
+  currentCallFrame(p).env.setGlobalBinding(ins[1], p.stack.pop().v);
   return p;
 };
 
 function stepInvoke(ins, p) {
-  var fn = p.stack.pop();
+  var stackValue = p.stack.pop();
+  var fn = stackValue.v;
   var arity = ins[1];
 
   // TODO: raise errors for arity problems
-  var args = _.range(arity).map(function() { return p.stack.pop(); }).reverse();
+  var args = _.range(arity).map(function() { return p.stack.pop().v; }).reverse();
 
-  if (fn.bc !== undefined) { // a lambda
+  if (fn !== undefined && fn.bc !== undefined) { // a lambda
     var lambdaEnv = scope(_.object(fn.parameters, args), fn.closureEnv);
 
     var tailIndex = tailCallIndex(p.callStack, fn);
@@ -62,11 +64,15 @@ function stepInvoke(ins, p) {
     } else {
       p.callStack.push(createCallFrame(fn.bc, 0, lambdaEnv, ins[2]));
     }
-  } else { // is a JS function object
-    p.stack.push(fn.apply(null, args));
-  }
 
-  return p;
+    return p;
+  } else if (fn instanceof Function) { // is a JS function object
+    p.stack.push({ v: fn.apply(null, args), ast: ins.ast });
+    return p;
+  } else {
+    p.crashed = true;
+    throw new RuntimeError("This is not an action", stackValue.ast);
+  }
 };
 
 function tailCallIndex(callStack, fn) {
@@ -88,7 +94,7 @@ function previousRecursionCallFrameIndex(callStack, fn) {
 };
 
 function stepIfNotTrueJump(ins, p) {
-  if (p.stack.pop() !== true) {
+  if (p.stack.pop().v !== true) {
     currentCallFrame(p).bcPointer += ins[1];
   }
 
@@ -110,31 +116,27 @@ function step(p) {
 
     p.currentInstruction = ins;
 
-    try {
-      if (ins[0] === "push") {
-        return stepPush(ins, p);
-      } else if (ins[0] === "push_lambda") {
-        return stepPushLambda(ins, p);
-      } else if (ins[0] === "pop") {
-        return stepPop(ins, p);
-      } else if (ins[0] === "get_env") {
-        return stepGetEnv(ins, p);
-      } else if (ins[0] === "set_env") {
-        return stepSetEnv(ins, p);
-      } else if (ins[0] === "invoke") {
-        return stepInvoke(ins, p);
-      } else if (ins[0] === "if_not_true_jump") {
-        return stepIfNotTrueJump(ins, p);
-      } else if (ins[0] === "jump") {
-        return stepJump(ins, p);
-      } else if (ins[0] === "return") {
-        return stepReturn(ins, p);
-      } else {
-        throw new Error("I don't know how to run this instruction: " + ins);
-      }
-    } catch (e) {
+    if (ins[0] === "push") {
+      return stepPush(ins, p);
+    } else if (ins[0] === "push_lambda") {
+      return stepPushLambda(ins, p);
+    } else if (ins[0] === "pop") {
+      return stepPop(ins, p);
+    } else if (ins[0] === "get_env") {
+      return stepGetEnv(ins, p);
+    } else if (ins[0] === "set_env") {
+      return stepSetEnv(ins, p);
+    } else if (ins[0] === "invoke") {
+      return stepInvoke(ins, p);
+    } else if (ins[0] === "if_not_true_jump") {
+      return stepIfNotTrueJump(ins, p);
+    } else if (ins[0] === "jump") {
+      return stepJump(ins, p);
+    } else if (ins[0] === "return") {
+      return stepReturn(ins, p);
+    } else {
       p.crashed = true;
-      throw new RuntimeError(ins, e);
+      throw new RuntimeError("I don't know how to run this instruction: " + ins, ins.ast);
     }
   }
 };
@@ -179,10 +181,10 @@ function initProgramStateAndComplete(bc, env, stack) {
   return complete(initProgramState(bc, env, stack));
 };
 
-function RuntimeError(ins, exception) {
-  this.s = ins.ast.s;
-  this.e = ins.ast.e;
-  util.copyException(exception, this);
+function RuntimeError(message, ast) {
+  this.message = message;
+  this.s = ast.s;
+  this.e = ast.e;
 };
 RuntimeError.prototype = Object.create(Error.prototype);
 
