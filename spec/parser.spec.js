@@ -35,7 +35,7 @@ describe("parser", function() {
 
     it("should fail to pass a label that begins with an int", function() {
       expect(function() { parse("1abc") })
-        .toThrow("Expected this to be on a new line")
+        .toThrow("Can't have a name that starts with a number")
     });
   });
 
