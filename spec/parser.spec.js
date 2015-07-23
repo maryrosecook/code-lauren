@@ -442,6 +442,12 @@ describe("parser", function() {
       }).toThrow('Expected this to be on a new line');
     });
 
+    it("should report that can't invoke literals", function() {
+      expect(function() {
+        parse("1()");
+      }).toThrow("Can't run a number - it's not an action");
+    });
+
     it("should expect fn name and application separated by space to be together", function() {
       expect(function() {
         parse("a ()");
