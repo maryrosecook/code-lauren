@@ -1,41 +1,59 @@
 {
   "examples": [
     {
-      "code":    "a b",
-      "stack":   ["do", "do_continue", "nl"],
-      "nextInput":   "[a-zA-Z0-9_\\-]+",
-      "message": "Expected this to be on a new line"
+      "code":      "a b",
+      "stack":     ["_"],
+      "nextInput": "[a-zA-Z0-9_\\-]+",
+      "message":   "Expected this to be on a new line"
     },
 
     {
-      "code":    "a ()",
-      "stack":   ["do", "do_continue", "nl"],
-      "nextInput":   "\\(\\)",
-      "message": "There should be no spaces between\nthe name of the action and the ()"
+      "code":      "1a",
+      "stack":     ["number"],
+      "nextInput": "[a-zA-Z0-9_\\-]+",
+      "message":   "Can't have a name that starts with a number"
     },
 
     {
-      "code":    "a: ",
-      "stack":   ["assignment", "expression", "parenthetical", "invocation",
-                  "function", "label", "start_label_char"],
-      "nextInput":   "$",
-      "message": "You have specified a name, but you also need a value"
+      "code":      "1()",
+      "stack":     ["expression", "atom", "number"],
+      "nextInput": "\\(\\)",
+      "message":   "Can't run a number - it's not an action"
     },
 
     {
-      "code":    "a: \n",
-      "stack":   ["assignment", "expression", "parenthetical", "invocation",
-                  "function", "label", "start_label_char"],
-      "nextInput":   "\n",
-      "message": "You have specified a name, but you also need a value"
+      "code":      "a ()",
+      "stack":     ["_"],
+      "nextInput": "\\(\\)",
+      "message":   "There should be no spaces between\nthe name of the action and the ()"
     },
 
     {
-      "code":    ": 1",
-      "stack":   ["expression", "parenthetical", "invocation", "function",
-                  "label", "start_label_char"],
-      "nextInput":   ":",
-      "message": "You have specified a value, but you also need a label"
+      "code":      "a: ",
+      "stack":     ["assignment", "_"],
+      "nextInput": "$",
+      "message":   "You have specified a name, but you also need a value"
+    },
+
+    {
+      "code":      "a: ",
+      "stack":     ["assignment", "_"],
+      "nextInput": "\n",
+      "message":   "You have specified a name, but you also need a value"
+    },
+
+    {
+      "code":      ": 1",
+      "stack":     ["start"],
+      "nextInput": ":",
+      "message":   "You have specified a value, but you also need a label"
+    },
+
+    {
+      "code":      "a: 1\n: 1",
+      "stack":     ["nl"],
+      "nextInput": ":",
+      "message":   "You have specified a value, but you also need a label"
     }
   ]
 }
