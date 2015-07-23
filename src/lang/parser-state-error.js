@@ -47,23 +47,22 @@ function nextInput(code) {
 
 function eventsToTree(evs, node) {
   function createNode(ev, parent) {
-    return { rule: ev.rule, i: ev.offset, parent: parent, children: [] };
+    return { rule: ev.rule, i: ev.offset, type: ev.type, parent: parent, children: [] };
   };
 
   if (evs.length === 0) {
     return node;
   } else if (node === undefined) {
-    node = createNode(evs[0]);
-    eventsToTree(evs.slice(1), node);
+    node = createNode({ rule: "HOLDER", offset: "-", type: "-" });
+    eventsToTree(evs, node);
     return node;
   } else if (evs[0].type === "rule.enter") {
     var child = createNode(evs[0], node);
     node.children.push(child);
     return eventsToTree(evs.slice(1), child);
   } else if (evs[0].type === "rule.fail" || evs[0].type === "rule.match") {
+    node.parent.children.push(createNode(evs[0], node));
     return eventsToTree(evs.slice(1), node.parent);
-  } else {
-    throw "Unexpected rule type: " + evs[0].type;
   }
 };
 
@@ -73,32 +72,43 @@ function codeToFailedParseStack(code) {
     pegParseTrace(code, { tracer: eventGatherer });
   } catch(e) {
     var tree = eventsToTree(eventGatherer.getEvents());
-    var stack = deepestFailedStack(treeToStacks(tree));
-    return _.pluck(stack, "rule");
+    var match = deepestMatch(tree);
+
+    // start from parent cause match is a rule.match with rule.enter as its parent
+    return _.pluck(parentChain(match.parent), "rule");
   }
 };
 
-function deepestFailedStack(stacks) {
-  var furthestI = stacks.reduce(function(a, s) { return Math.max(a, _.last(s).i); }, 0);
-  var furthest = stacks.filter(function(s) { return _.last(s).i === furthestI; });
-  var greatestDepth = furthest.reduce(function(a, s) { return Math.max(a, s.length); }, 0);
-  return _.last(furthest.filter(function(s) { return s.length === greatestDepth; }));
+function parentChain(node) {
+  if (node === undefined) {
+    return [];
+  } else {
+    return parentChain(node.parent).concat(node);
+  }
 };
 
-function treeToStacks(node, stack, allStacks) {
-  if (stack === undefined && allStacks === undefined) {
-    allStacks = [];
-    treeToStacks(node, [], allStacks);
-    return allStacks;
-  } else {
-    stack = stack.concat(node);
-    if (node.children.length > 0) {
-      node.children.forEach(function(c) {
-        treeToStacks(c, stack, allStacks);
-      });
-    } else {
-      allStacks.push(stack);
+function deepestMatch(node, deepest) {
+  for (var i = 0; i < node.children.length; i++) {
+    if (node.type === "rule.enter" &&
+        (deepest === undefined || node.children[i].i > deepest.i)) {
+      deepest = node.children[i];
     }
+
+    deepest = deepestMatch(node.children[i], deepest);
+  }
+
+  return deepest;
+};
+
+function eventTypeSymbol(ev) {
+  if (ev.type === "rule.enter") {
+    return ">";
+  } else if (ev.type === "rule.fail") {
+    return "x";
+  } else if (ev.type === "rule.match") {
+    return "<";
+  } else {
+    return "-";
   }
 };
 
@@ -106,7 +116,7 @@ function printTree(node, depth) {
   if (depth === undefined) {
     return printTree(node, 1);
   } else {
-    console.log(Array(depth).join(" "), node.rule, node.i);
+    console.log(Array(depth).join(" "), eventTypeSymbol(node), node.rule, node.i);
     for (var i = 0; i < node.children.length; i++) {
       printTree(node.children[i], depth + 1);
     }
