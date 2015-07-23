@@ -56,9 +56,20 @@ describe("bytecode interpreter", function() {
   });
 
   describe("invocation of result of conditional", function() {
-    iit("should return ret val of invoked lambda returned by if block", function() {
+    it("should return ret val of invoked lambda returned by conditional", function() {
       var code = "if true { { 1 } }()";
       expect(v(code, c(p(code))).stack.pop().v).toEqual(1);
+
+      var code = "if false {  } else { { 1 } }()";
+      expect(v(code, c(p(code))).stack.pop().v).toEqual(1);
+
+      var code = "if false {  } elseif true { { 1 } }()";
+      expect(v(code, c(p(code))).stack.pop().v).toEqual(1);
+    });
+
+    it("should blow up if try to invoke the undefined returned by conditional", function() {
+      var code = "if true { }()";
+      expect(function() { v(code, c(p(code))) }).toThrow("This is not an action");
     });
   });
 
