@@ -98,7 +98,7 @@ lambda
     { return node("lambda", [parameters, body], offset(), text()); }
 
 assignment
-  = label:label ':' _* expression:expression
+  = label:label colon _* expression:expression
     { return node("assignment", [label, expression], offset(), text()); }
 
 conditional
@@ -165,6 +165,8 @@ nl
   = all:[\n]+
     { return node('nl', all, offset(), text()); }
 
+colon
+  = ':'
 _
   = [ \t\r]+
 
