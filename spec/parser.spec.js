@@ -460,25 +460,25 @@ describe("parser", function() {
       }).toThrow('Expected this to be on a new line');
     });
 
-    it("should expect missing value in assignment at end of input", function() {
+    it("should report missing value in assignment at end of input", function() {
       expect(function() {
         parse("a: ");
       }).toThrow("You have specified a name, but you also need a value");
     });
 
-    it("should expect missing value in assignment followed by newline", function() {
+    it("should report missing value in assignment followed by newline", function() {
       expect(function() {
         parse("a: \n");
       }).toThrow("You have specified a name, but you also need a value");
     });
 
-    it("should expect missing label followed in assignment", function() {
+    it("should report missing label in assignment", function() {
       expect(function() {
         parse(": 1");
       }).toThrow("You have specified a value, but you also need a label");
     });
 
-    it("should expect missing label followed in assignment after parsed expr", function() {
+    it("should report missing label in assignment after parsed expr", function() {
       // regression test
       expect(function() {
         parse("a: 1\n: 1");
