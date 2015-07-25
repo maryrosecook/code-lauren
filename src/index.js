@@ -3,6 +3,12 @@ var _ = require("underscore");
 var $ = require("jquery");
 var React = require('react');
 
+// require css
+require("../resources/jquery.jscrollpane.css");
+require("../resources/simplescrollbars.css");
+require("../resources/codemirror.css");
+require("../resources/main.css");
+
 require("babel-core/polyfill");
 require("./top");
 

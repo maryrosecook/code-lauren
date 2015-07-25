@@ -83,22 +83,22 @@ a:hover { text-decoration: none; }
 }
 
 .play-button {
-  background: url(images/play.png);
+  background: url(/resources/images/play.png);
   background-size: 30px 30px;
 }
 
 .pause-button {
-  background: url(images/pause.png);
+  background: url(/resources/images/pause.png);
   background-size: 30px 30px;
 }
 
 .step-forwards-button {
-  background: url(images/step-forwards.png);
+  background: url(/resources/images/step-forwards.png);
   background-size: 30px 30px;
 }
 
 .step-backwards-button {
-  background: url(images/step-backwards.png);
+  background: url(/resources/images/step-backwards.png);
   background-size: 30px 30px;
 }
 

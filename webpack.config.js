@@ -1,7 +1,9 @@
+var path = require("path");
+
 module.exports = {
   entry: "./src/index.js",
   output: {
-    path: __dirname,
+    path: path.join(__dirname, "build"),
     filename: "index.js"
   },
 
@@ -10,7 +12,9 @@ module.exports = {
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
       { test: /\.js$/, loader: "transform/cacheable?brfs" },
       { test: /src\/top\.js$/, loader: "expose?top" },
-      { test: /\.jsx$/, loader: "jsx-loader?insertPragma=React.DOM&harmony" }
+      { test: /\.jsx$/, loader: "jsx-loader?insertPragma=React.DOM&harmony" },
+      { test: /\.css$/, loader: "style-loader!css-loader" },
+      { test: /\.(png|jpg)$/, loader: 'file-loader?name=img-[hash:6].[ext]' }
     ]
   },
 
