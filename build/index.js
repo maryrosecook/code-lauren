@@ -44008,7 +44008,6 @@
 	var vm = __webpack_require__(270);
 
 	function annotateCurrentInstruction(ps, annotator) {
-	  console.log(ps.currentInstruction);
 	  annotator.clear();
 	  annotator.codeHighlight(ps.code,
 	                          ps.currentInstruction.ast.s,
@@ -44049,8 +44048,8 @@
 	  onPlayPauseClick: function() {
 	    this.state.player.togglePause();
 
-	    if (this.state.player.isPaused()) {
-	      this.state.player.stepBackwardsUntilReachAnnotableInstruction();
+	    if (this.state.player.isPaused() && !vm.isComplete(this.state.player.getProgramState())) {
+	      this.state.player.stepForwardsUntilReachAnnotableInstruction();
 	      annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
 	    } else {
 	      this.props.annotator.clear();
@@ -44066,6 +44065,7 @@
 
 	  stepForwards: function() {
 	    this.state.player.pause();
+	    this.state.player.stepForwards();
 	    this.state.player.stepForwardsUntilReachAnnotableInstruction();
 	    this.setState(this.state);
 
@@ -44074,6 +44074,7 @@
 
 	  stepBackwards: function() {
 	    this.state.player.pause();
+	    this.state.player.stepBackwards();
 	    this.state.player.stepBackwardsUntilReachAnnotableInstruction();
 	    this.setState(this.state);
 
@@ -54260,24 +54261,32 @@
 	    },
 
 	    stepForwardsUntilReachAnnotableInstruction: function stepForwardsUntilReachAnnotableInstruction() {
-	      while (!isAnnotatable(ps)) {
+	      var currentInstruction = ps.currentInstruction;
+	      while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
 	        this.stepForwards();
+	        currentInstruction = ps.currentInstruction;
 	      }
 	    },
 
 	    stepBackwardsUntilReachAnnotableInstruction: function stepBackwardsUntilReachAnnotableInstruction() {
-	      while (!isAnnotatable(ps)) {
+	      var currentInstruction = ps.currentInstruction;
+	      while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
 	        this.stepBackwards();
+	        currentInstruction = ps.currentInstruction;
 	      }
 	    },
 
 	    stepForwards: function stepForwards() {
-	      var curPs = ps;
-	      var newPses = [];
 	      try {
-	        while (!vm.isComplete(curPs) && !vm.isCrashed(curPs) && newPses.length === 0) {
-	          curPs = vm.step(copyProgramState(curPs));
-	          newPses.push(curPs);
+	        if (!vm.isComplete(ps) && !vm.isCrashed(ps)) {
+	          pses.push(copyProgramState(ps));
+	          if (pses.length > STEP_TO_SAVE) {
+	            pses.shift();
+	            ps.canvasLib.deleteOld(STEP_TO_SAVE);
+	          }
+
+	          ps = vm.step(ps);
+	          ps.canvasLib.stepForwards();
 	        }
 	      } catch (e) {
 	        if (e instanceof vm.RuntimeError) {
@@ -54285,20 +54294,10 @@
 	          annotator.lineMessage(ps.code, e.s, "error", e.message);
 	        }
 	      }
-
-	      if (curPs.currentInstruction !== undefined && curPs.currentInstruction.annotate === compiler.ANNOTATE) for (var i = 0; i < newPses.length; i++) {
-	        pses.push(newPses[i]);
-	        if (pses.length > STEP_TO_SAVE) {
-	          pses.shift();
-	          ps.canvasLib.deleteOld(STEP_TO_SAVE);
-	        }
-
-	        ps.canvasLib.stepForwards();
-	      }
 	    },
 
 	    stepBackwards: function stepBackwards() {
-	      if (searchBackwardsForAnnotatableProgramState(pses) !== undefined) {
+	      if (searchBackwardsForAnnotatableProgramState(pses.slice(0, -1)) !== undefined) {
 	        ps = pses.pop();
 	        ps.canvasLib.stepBackwards();
 	      }
@@ -54313,13 +54312,9 @@
 	  return player;
 	};
 
-	function isAnnotatable(ps) {
-	  return vm.isCrashed(ps) || ps.currentInstruction !== undefined && ps.currentInstruction.annotate === compiler.ANNOTATE;
-	};
-
 	function searchBackwardsForAnnotatableProgramState(pses) {
 	  for (var i = pses.length - 1; i >= 0; i--) {
-	    if (isAnnotatable(pses[i])) {
+	    if (pses[i].currentInstruction.annotate === compiler.ANNOTATE) {
 	      return pses[i];
 	    }
 	  }
