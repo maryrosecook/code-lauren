@@ -44048,8 +44048,7 @@
 	  onPlayPauseClick: function() {
 	    this.state.player.togglePause();
 
-	    if (this.state.player.isPaused() && !vm.isComplete(this.state.player.getProgramState())) {
-	      this.state.player.stepForwardsUntilReachAnnotableInstruction();
+	    if (this.state.player.isPaused()) {
 	      annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
 	    } else {
 	      this.props.annotator.clear();
@@ -44066,7 +44065,6 @@
 	  stepForwards: function() {
 	    this.state.player.pause();
 	    this.state.player.stepForwards();
-	    this.state.player.stepForwardsUntilReachAnnotableInstruction();
 	    this.setState(this.state);
 
 	    annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
@@ -44075,7 +44073,6 @@
 	  stepBackwards: function() {
 	    this.state.player.pause();
 	    this.state.player.stepBackwards();
-	    this.state.player.stepBackwardsUntilReachAnnotableInstruction();
 	    this.setState(this.state);
 
 	    annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
@@ -54209,9 +54206,9 @@
 	var compiler = __webpack_require__(269);
 
 	var player;
-	var pses = [];
+	var pses;
 	var ps;
-	var paused = false;
+	var paused;
 
 	var STEP_TO_SAVE = 5000;
 
@@ -54260,64 +54257,73 @@
 	      return ps;
 	    },
 
-	    stepForwardsUntilReachAnnotableInstruction: function stepForwardsUntilReachAnnotableInstruction() {
-	      var currentInstruction = ps.currentInstruction;
-	      while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
-	        this.stepForwards();
-	        currentInstruction = ps.currentInstruction;
-	      }
-	    },
-
-	    stepBackwardsUntilReachAnnotableInstruction: function stepBackwardsUntilReachAnnotableInstruction() {
-	      var currentInstruction = ps.currentInstruction;
-	      while (currentInstruction.annotate === compiler.DO_NOT_ANNOTATE) {
-	        this.stepBackwards();
-	        currentInstruction = ps.currentInstruction;
-	      }
-	    },
-
 	    stepForwards: function stepForwards() {
-	      try {
-	        if (!vm.isComplete(ps) && !vm.isCrashed(ps)) {
-	          pses.push(copyProgramState(ps));
-	          if (pses.length > STEP_TO_SAVE) {
-	            pses.shift();
-	            ps.canvasLib.deleteOld(STEP_TO_SAVE);
-	          }
+	      if (vm.isCrashed(ps) || vm.isComplete(ps)) {
+	        return;
+	      }
 
-	          ps = vm.step(ps);
-	          ps.canvasLib.stepForwards();
+	      var originalPs = ps;
+	      var newPses = [];
+	      while (true) {
+	        try {
+	          newPses.push(copyProgramState(ps));
+	          vm.step(ps);
+	        } catch (e) {
+	          if (e instanceof vm.RuntimeError) {
+	            annotator.codeHighlight(ps.code, e.s, e.e, "error");
+	            annotator.lineMessage(ps.code, e.s, "error", e.message);
+	          }
 	        }
-	      } catch (e) {
-	        if (e instanceof vm.RuntimeError) {
-	          annotator.codeHighlight(ps.code, e.s, e.e, "error");
-	          annotator.lineMessage(ps.code, e.s, "error", e.message);
+
+	        if (vm.isComplete(ps)) {
+	          newPses = [];
+	          ps = originalPs;
+	          break;
+	        } else if (vm.isCrashed(ps) || ps.currentInstruction !== undefined && ps.currentInstruction.annotate === compiler.ANNOTATE) {
+	          break;
 	        }
+	      }
+
+	      for (var i = 0; i < newPses.length; i++) {
+	        if (pses.length > STEP_TO_SAVE) {
+	          pses.shift();
+	          ps.canvasLib.deleteOld(STEP_TO_SAVE);
+	        }
+
+	        newPses[i].canvasLib.stepForwards();
+	        pses.push(newPses[i]);
 	      }
 	    },
 
 	    stepBackwards: function stepBackwards() {
-	      if (searchBackwardsForAnnotatableProgramState(pses.slice(0, -1)) !== undefined) {
-	        ps = pses.pop();
-	        ps.canvasLib.stepBackwards();
+	      var originalPs = ps;
+	      var i = pses.length - 1;
+	      while (true) {
+	        if (i === -1) {
+	          // couldn't find annotatable previous ps - don't step back
+	          ps = originalPs;
+	          break;
+	        } else if (pses[i].currentInstruction !== undefined && pses[i].currentInstruction.annotate === compiler.ANNOTATE) {
+	          for (var j = i; j < pses.length; j++) {
+	            ps = pses.pop();
+	            ps.canvasLib.stepBackwards();
+	          }
+
+	          break;
+	        }
+
+	        i--;
 	      }
 	    },
 
 	    setProgramState: function setProgramState(newPs) {
 	      ps = newPs;
-	      player.unpause();
+	      paused = false;
+	      pses = [];
 	    }
 	  };
 
 	  return player;
-	};
-
-	function searchBackwardsForAnnotatableProgramState(pses) {
-	  for (var i = pses.length - 1; i >= 0; i--) {
-	    if (pses[i].currentInstruction.annotate === compiler.ANNOTATE) {
-	      return pses[i];
-	    }
-	  }
 	};
 
 	function isTimeToYieldToEventLoop(lastYield) {
