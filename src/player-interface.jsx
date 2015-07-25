@@ -43,8 +43,7 @@ var ProgramPlayer = React.createClass({
   onPlayPauseClick: function() {
     this.state.player.togglePause();
 
-    if (this.state.player.isPaused() && !vm.isComplete(this.state.player.getProgramState())) {
-      this.state.player.stepForwardsUntilReachAnnotableInstruction();
+    if (this.state.player.isPaused()) {
       annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
     } else {
       this.props.annotator.clear();
@@ -61,7 +60,6 @@ var ProgramPlayer = React.createClass({
   stepForwards: function() {
     this.state.player.pause();
     this.state.player.stepForwards();
-    this.state.player.stepForwardsUntilReachAnnotableInstruction();
     this.setState(this.state);
 
     annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
@@ -70,7 +68,6 @@ var ProgramPlayer = React.createClass({
   stepBackwards: function() {
     this.state.player.pause();
     this.state.player.stepBackwards();
-    this.state.player.stepBackwardsUntilReachAnnotableInstruction();
     this.setState(this.state);
 
     annotateCurrentInstruction(this.state.player.getProgramState(), this.props.annotator);
