@@ -32,7 +32,7 @@ a:hover { text-decoration: none; }
 #program-player {
   position: absolute;
   top: 0;
-  right: 460px;
+  right: 448px;
   padding: 2px 2px 0 0;
   z-index: 2;
 }
