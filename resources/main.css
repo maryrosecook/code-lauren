@@ -125,9 +125,11 @@ button:focus {
 }
 
 .line-message {
+  float: right;
   text-align: right;
   margin-right: 0;
   padding-right: 10px; /* matches 8px padding on sidebar */
+  width: 400px;
 }
 
 .line-message span {
