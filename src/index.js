@@ -35,7 +35,10 @@ window.addEventListener("load", function() {
   var canvasLib = env.setupCanvasLib(screen);
   var source = setupSource(editor);
 
-  top.sidebar = React.render(React.createElement(Sidebar), $("#sidebar")[0]); // export globally
+  // export globally
+  top.pub.sidebar = React.render(React.createElement(Sidebar), $("#sidebar")[0]);
+  top.pub.editor = editor;
+
   var player = React.render(React.createElement(ProgramPlayer,
                                                 { player: setupPlayer(annotator),
                                                   annotator: annotator }),
