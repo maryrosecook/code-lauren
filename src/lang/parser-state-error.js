@@ -2,7 +2,7 @@ var peg = require("pegjs");
 var fs = require("fs");
 var _ = require("underscore");
 
-var examples = JSON.parse(fs.readFileSync(__dirname + "/examples.json", "utf8")).examples;
+var examples = require("./examples.json").examples;
 
 var pegParseTrace = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
                                     { cache: true, trace: true }).parse;

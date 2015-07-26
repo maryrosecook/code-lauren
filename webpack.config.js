@@ -14,6 +14,7 @@ module.exports = {
       { test: /src\/top\.js$/, loader: "expose?top" },
       { test: /\.jsx$/, loader: "jsx-loader?insertPragma=React.DOM&harmony" },
       { test: /\.css$/, loader: "style-loader!css-loader" },
+      { test: /\.json$/, loader: "json-loader" },
       { test: /\.(png|jpg)$/, loader: 'file-loader?name=img-[hash:6].[ext]' }
     ]
   },
