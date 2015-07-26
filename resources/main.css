@@ -137,7 +137,7 @@ button:focus {
 
 .zero-width-mark {
   background-color: rgba(0, 0, 255, 0.12);
-  padding: 0 5px;
+  padding: 0 2px;
 };
 
 .cm-s-default { color: #333; }
