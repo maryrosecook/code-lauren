@@ -9,6 +9,9 @@ require("../resources/simplescrollbars.css");
 require("../resources/codemirror.css");
 require("../resources/main.css");
 
+// analytics
+require("./analytics");
+
 require("babel-core/polyfill");
 require("./top");
 
