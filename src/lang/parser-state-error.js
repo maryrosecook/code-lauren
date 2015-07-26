@@ -1,6 +1,7 @@
 var peg = require("pegjs");
 var fs = require("fs");
 var _ = require("underscore");
+require("../top");
 
 var examples = require("./examples.json").examples;
 
@@ -139,3 +140,5 @@ function createEventGathererTracer() {
 
 parserStateError.codeToFailedParseStack = codeToFailedParseStack;
 module.exports = parserStateError;
+
+top.pub.codeToFailedParseStack = codeToFailedParseStack;

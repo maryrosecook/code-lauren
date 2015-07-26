@@ -11,7 +11,7 @@ module.exports = {
     loaders: [
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader'},
       { test: /\.js$/, loader: "transform/cacheable?brfs" },
-      { test: /src\/top\.js$/, loader: "expose?top" },
+      { test: /src\/top\.js$/, loader: "expose?pub" },
       { test: /\.jsx$/, loader: "jsx-loader?insertPragma=React.DOM&harmony" },
       { test: /\.css$/, loader: "style-loader!css-loader" },
       { test: /\.json$/, loader: "json-loader" },
