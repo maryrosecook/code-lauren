@@ -2,6 +2,8 @@
 
 Learn to code, step by step. No experience necessary.
 
-On the left is a cool example of what you can make.
+Try changing `"blue"` to `"red"` in the code on the left.
+
+Try some other colors.
 
 [Start the tutorial](#oval).
