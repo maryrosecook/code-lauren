@@ -18,7 +18,6 @@ a:hover { text-decoration: none; }
   height: 100vh;
   z-index: 1;
   background-color: rgba(255, 255, 255, 0);
-  color: #333333;
 }
 
 #screen {
@@ -140,11 +139,11 @@ button:focus {
   padding: 0 2px;
 };
 
-.cm-s-default { color: #333; }
+.cm-s-default { color: black; }
 .cm-s-default .cm-string { color: #578622; }
 .cm-s-default .cm-number { color: #FF5BAE; }
 .cm-s-default .cm-builtin { color: #4A9CC9; }
-.cm-s-default .cm-bracket { color: #333 }
+.cm-s-default .cm-bracket { color: black; }
 
 .error { background-color: rgba(255, 0, 0, 0.2); }
 .currently-executing { background-color: rgba(0, 0, 255, 0.12); }
@@ -165,7 +164,7 @@ code {
   background-color: #e7e7e7;
   font-family: "courier";
   font-size: 14px;
-  color: #555;
+  color: black;
 }
 
 .CodeMirror div.CodeMirror-cursor {
