@@ -78,12 +78,13 @@
 	  // export globally
 	  top.pub.sidebar = React.render(React.createElement(Sidebar), $("#sidebar")[0]);
 	  top.pub.editor = editor;
+	  top.pub.codeToFailedParseStack = __webpack_require__(272).codeToFailedParseStack;
 
 	  editor.on("change", function () {
 	    source.save();
 	  });
 
-	  editor.setValue(source.get() !== undefined ? source.get() : "draw-oval(200 200 30 30 \"filled\" \"blue\")\n");
+	  editor.setValue(source.get() !== undefined ? source.get() : "\ndraw-oval(200 200 30 30 \"filled\" \"blue\")\n");
 	});
 
 /***/ },
@@ -44765,7 +44766,6 @@
 	var peg = __webpack_require__(256);
 
 	var _ = __webpack_require__(1);
-	__webpack_require__(244);
 
 	var examples = __webpack_require__(273).examples;
 
@@ -44931,8 +44931,6 @@
 	parserStateError.codeToFailedParseStack = codeToFailedParseStack;
 	module.exports = parserStateError;
 
-	top.pub.codeToFailedParseStack = codeToFailedParseStack;
-
 /***/ },
 /* 273 */
 /***/ function(module, exports) {
@@ -44971,7 +44969,7 @@
 					"_"
 				],
 				"nextInput": "\\(\\)",
-				"message": "There should be no spaces between\nthe name of the action and the ()"
+				"message": "Should be no spaces between\nthe name of the action and the ()"
 			},
 			{
 				"code": "a: ",
@@ -44980,7 +44978,7 @@
 					"_"
 				],
 				"nextInput": "\n*$",
-				"message": "This name needs a value"
+				"message": "Name needs a value"
 			},
 			{
 				"code": "a:",
@@ -44989,7 +44987,7 @@
 					"colon"
 				],
 				"nextInput": "\n*$",
-				"message": "This name needs a value"
+				"message": "Name needs a value"
 			},
 			{
 				"code": ": 1",
@@ -44997,7 +44995,7 @@
 					"start"
 				],
 				"nextInput": ":",
-				"message": "This needs a name on the left and a value on the right"
+				"message": "Needs a name on the left and a value on the right"
 			},
 			{
 				"code": "a: 1\n: 1",
@@ -45005,7 +45003,7 @@
 					"nl"
 				],
 				"nextInput": ":",
-				"message": "This a name on the left and a value on the right"
+				"message": "Needs a name on the left and a value on the right"
 			}
 		]
 	}
