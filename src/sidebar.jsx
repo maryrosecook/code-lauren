@@ -28,6 +28,8 @@ var Sidebar = React.createClass({
       this.setState(this.state);
     }
 
+    localStorage["page"] = page;
+
     this.scrollApi.reinitialise(); // calc scrollbars for height of new content
   },
 
@@ -53,7 +55,7 @@ function urlToPage(url) {
 
 function route(page) {
   if (page === undefined) {
-    return "home";
+    return localStorage["page"] || "home";
   } else {
     return page;
   }
