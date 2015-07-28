@@ -9,7 +9,7 @@ var createEditor = module.exports = function() {
     mode:  "lauren",
     tabSize: 2,
     indentWithTabs: false,
-    undoDepth: 9999999999,
+    undoDepth: 1000,
     autofocus: true,
     scrollbarStyle: "simple",
     extraKeys: {
