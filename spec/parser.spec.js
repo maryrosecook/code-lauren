@@ -465,7 +465,7 @@ describe("parser", function() {
     it("should expect fn name and application separated by space to be together", function() {
       expect(function() {
         parse("a ()");
-      }).toThrow('There should be no spaces between\nthe name of the action and the ()');
+      }).toThrow('Should be no spaces between\nthe name of the action and the ()');
     });
 
     it("should expect expression on same line nested in lambda to be preceded by nl", function() {
@@ -477,26 +477,26 @@ describe("parser", function() {
     it("should report missing value in assignment at end of input", function() {
       expect(function() {
         parse("a: ");
-      }).toThrow("You have specified a name, but you also need a value");
+      }).toThrow("Name needs a value");
     });
 
     it("should report missing value in assignment followed by newline", function() {
       expect(function() {
         parse("a: \n");
-      }).toThrow("You have specified a name, but you also need a value");
+      }).toThrow("Name needs a value");
     });
 
     it("should report missing label in assignment", function() {
       expect(function() {
         parse(": 1");
-      }).toThrow("You have specified a value, but you also need a label");
+      }).toThrow("Needs a name on the left and a value on the right");
     });
 
     it("should report missing label in assignment after parsed expr", function() {
       // regression test
       expect(function() {
         parse("a: 1\n: 1");
-      }).toThrow("You have specified a value, but you also need a label");
+      }).toThrow("Needs a name on the left and a value on the right");
     });
   });
 

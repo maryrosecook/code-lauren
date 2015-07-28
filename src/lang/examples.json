@@ -25,35 +25,35 @@
       "code":      "a ()",
       "stack":     ["_"],
       "nextInput": "\\(\\)",
-      "message":   "There should be no spaces between\nthe name of the action and the ()"
+      "message":   "Should be no spaces between\nthe name of the action and the ()"
     },
 
     {
       "code":      "a: ",
       "stack":     ["assignment", "_"],
       "nextInput": "\n*$",
-      "message":   "This name needs a value"
+      "message":   "Name needs a value"
     },
 
     {
       "code":      "a:",
       "stack":     ["assignment", "colon"],
       "nextInput": "\n*$",
-      "message":   "This name needs a value"
+      "message":   "Name needs a value"
     },
 
     {
       "code":      ": 1",
       "stack":     ["start"],
       "nextInput": ":",
-      "message":   "This needs a name on the left and a value on the right"
+      "message":   "Needs a name on the left and a value on the right"
     },
 
     {
       "code":      "a: 1\n: 1",
       "stack":     ["nl"],
       "nextInput": ":",
-      "message":   "This a name on the left and a value on the right"
+      "message":   "Needs a name on the left and a value on the right"
     }
   ]
 }
