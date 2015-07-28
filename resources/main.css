@@ -11,6 +11,11 @@ body {
 a { color: black; }
 a:hover { text-decoration: none; }
 
+h1 a {
+  color: white;
+  text-decoration: none;
+}
+
 .CodeMirror {
   margin-top: 32px;
   font-family: "courier";
