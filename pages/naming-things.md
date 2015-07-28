@@ -1,6 +1,6 @@
 ## Naming things
 
-Earlier, I suggested you make a line of ovals. You might have noticed that you were repeating numbers. Look, for example, at this code.
+Earlier, I suggested you make a line of ovals. You might have noticed that you were repeating numbers. Look, for example, at this code:
 
 ```
 draw-oval(200 200 30 30 "filled" "blue")
@@ -8,7 +8,7 @@ draw-oval(250 200 30 30 "filled" "red")
 draw-oval(300 200 30 30 "filled" "yellow")
 ```
 
-`100`, the description of how far down to draw an oval, appears three times.  `30`, the width of the ovals, appears three times. The height appears three times, too.
+`200`, the description of how far down to draw an oval, appears three times.  `30`, the width of the ovals, appears three times. The height appears three times, too.
 
 ### Name the distance from the top
 
@@ -46,7 +46,7 @@ Notice how easy it was to move all the ovals at once.  You needed to change just
 
 ### Naming something describes it
 
-Notice how easy it was to figure out which number to change. Labels describe the meaning of the numbers they represent.
+Notice how easy it was to figure out which number to change. Names describe the meaning of the numbers they represent.
 
 ### Name the width
 
