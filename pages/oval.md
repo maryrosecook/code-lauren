@@ -1,4 +1,4 @@
-# Draw an oval
+## Draw an oval
 
 Let's write your first program.
 
@@ -10,15 +10,15 @@ draw-oval(100 200 30 40 "filled" "blue")
 
 Do you see a blue oval?
 
-## Change the color
+### Change the color
 
 Try changing the color to `"red"` or `"green"` or your favorite color.
 
-## Make the oval an outline
+### Make the oval an outline
 
 Try changing `"filled"` to `"unfilled"`.
 
-## Change the position and size
+### Change the position and size
 
 Try changing the numbers. They describe:
 
@@ -31,4 +31,4 @@ Which one is which?
 
 Do the numbers that describe the position of the oval indicate its middle or top left?
 
-Next: [Draw lots of ovals](#ovals)
+### Next: [Draw lots of ovals](#ovals)

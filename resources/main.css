@@ -75,13 +75,12 @@ h1 {
   width: 110px;
 }
 
-#sidebar h1 {
-  color: black;
-  background-color: white;
-  width: auto;
+#sidebar h2 {
+  font-size: 22px;
+  margin-bottom: 0.6em;
 }
 
-#sidebar h2 {
+#sidebar h3 {
   font-size: 18px;
   margin-top: 0;
   margin-bottom: 0.8em;

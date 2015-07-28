@@ -1,4 +1,4 @@
-# Draw a rectangle
+## Draw a rectangle
 
 Type in the code below to draw a rectangle:
 
@@ -6,7 +6,7 @@ Type in the code below to draw a rectangle:
 draw-rectangle(100 200 50 150 "filled" "gray")
 ```
 
-## Ordering the items in the description of a shape
+### Ordering the items in the description of a shape
 
 In the line of code you wrote to describe the rectangle, swap the places of `100` and `"gray"`.  The line of code should now look like this:
 
