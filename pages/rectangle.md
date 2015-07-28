@@ -18,4 +18,4 @@ What happened?
 
 Yep, the rectangle is gone. Ordering matters. `draw-rectangle` expected the first item it its description to be a number that says how far from the left the rectangle is.  Instead, it got a color. Without understanding all the pieces of the description, it couldn't do its job.
 
-<!-- Next: [Naming things](#naming-things) -->
+### Next: [Naming things](#naming-things)
