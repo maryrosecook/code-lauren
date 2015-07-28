@@ -158,13 +158,14 @@ pre {
 
 pre code {
   word-wrap: normal;
+  color: #333;
 }
 
 code {
   background-color: #e7e7e7;
   font-family: "courier";
   font-size: 14px;
-  color: black;
+  color: #333;
 }
 
 .CodeMirror div.CodeMirror-cursor {
