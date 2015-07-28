@@ -1,7 +1,7 @@
 var $ = require("jquery");
 
 var CodeMirror = require('codemirror');
-require("./lib/simplescrollbars.js"); // for codemirror scrollbars
+require("./lib/simplescrollbars.js"); // codemirror scrollbar plugin
 require('./mode-lauren');
 
 var createEditor = module.exports = function() {
