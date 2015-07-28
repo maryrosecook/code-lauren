@@ -12,34 +12,35 @@ a { color: black; }
 a:hover { text-decoration: none; }
 
 .CodeMirror {
+  margin-top: 32px;
   font-family: "courier";
   font-size: 14pt;
   width: calc(100% - 450px);
-  height: 100vh;
+  height: calc(100vh - 32px);
   z-index: 1;
   background-color: rgba(255, 255, 255, 0);
 }
 
 #screen {
   position: absolute;
-  left: 0;
-  top: 0;
+  top: 32px;
   z-index: -1;
   opacity: 1;
 }
 
-#program-player {
+.program-player {
   position: absolute;
   top: 0;
-  right: 448px;
-  padding: 2px 2px 0 0;
+  left: 110px;
+  padding: 4px 0 1px 0;
   z-index: 2;
+  background-color: black;
 }
 
 #sidebar {
   font-size: 17px;
   position: absolute;
-  top: 0;
+  top: 32px;
   right: 0;
   width: 450px;
   height: 100%;
@@ -47,15 +48,31 @@ a:hover { text-decoration: none; }
   overflow: hidden;
 }
 
+.topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 26px;
+  padding: 3px 0 3px 3px;
+  border-bottom: 1px black solid;
+  z-index: 2;
+  background-color: white;
+}
+
 .sidebar {
-  padding: 8px 0 0 8px; /* put padding on this so don't throw off 70/30 split w line messages */
-  margin: 0 8px 0 0;
+  padding: 3px 0 0 8px; /* put padding on this so don't throw off 70/30 split w line messages */
+  margin: 3px 8px 0 0;
   height: 100%;
 }
 
-#sidebar h1 {
+h1 {
   font-size: 22px;
-  margin-bottom: 0.5em;
+  margin: -4px 0 0 -3px;
+  padding: 3px 0 5px 4px;
+  color: white;
+  background-color: black;
+  width: 110px;
 }
 
 #sidebar h2 {
@@ -78,27 +95,35 @@ a:hover { text-decoration: none; }
   border: 0;
   width: 30px;
   height: 30px;
-  margin: 10px;
+  margin: 3px 10px 0 10px;
 }
 
 .play-button {
   background: url(/resources/images/play.png);
-  background-size: 30px 30px;
+  background-size: 20px 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .pause-button {
   background: url(/resources/images/pause.png);
-  background-size: 30px 30px;
+  background-size: 20px 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .step-forwards-button {
   background: url(/resources/images/step-forwards.png);
-  background-size: 30px 30px;
+  background-size: 20px 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .step-backwards-button {
   background: url(/resources/images/step-backwards.png);
-  background-size: 30px 30px;
+  background-size: 20px 20px;
+  width: 20px;
+  height: 20px;
 }
 
 button:focus {
@@ -116,7 +141,7 @@ button:focus {
   font-family: "courier";
   font-size: 14pt;
   position: absolute;
-  top: 4px;
+  top: 33px;
   left: 0;
   width: calc(100% - 450px);
   height: 100vh;
@@ -126,7 +151,7 @@ button:focus {
 .line-message {
   text-align: right;
   margin-right: 0;
-  padding-right: 10px; /* matches 8px padding on sidebar */
+
 }
 
 .line-message span {

@@ -1,6 +1,12 @@
+var $ = require('jquery');
 var React = require('react');
 var compiler = require("./lang/compiler");
 var vm = require("./lang/vm");
+var setupPlayer = require("./program-player");
+var env = require("./env");
+var vm = require("./lang/vm");
+var parser = require("./lang/parser");
+var compile = require("./lang/compiler");
 
 function annotateCurrentInstruction(ps, annotator) {
   annotator.clear();
@@ -32,12 +38,63 @@ function onClickOrHoldDown(onClick) {
   };
 };
 
+function initProgramState(code, annotator, canvasLib) {
+  canvasLib.programFns.reset();
+  var ast = parse(code, annotator);
+  if (ast !== undefined) {
+    var programEnv = env.createEnv(env.mergeLibraries(require("./lang/standard-library")(),
+                                                      canvasLib.userFns));
+    var ps = vm.initProgramState(code, compile(ast), programEnv);
+    ps.canvasLib = canvasLib.programFns;
+    return ps;
+  }
+};
+
+function parse(code, annotator) {
+  annotator.clear();
+
+  try {
+    parser.balanceParentheses(code);
+    return parser.parse(code);
+  } catch(e) {
+    if (e instanceof parser.ParseError) {
+      annotator.codeHighlight(code, e.s, e.e, "error");
+      annotator.lineMessage(code, e.s, "error", e.message);
+    } else if (e instanceof parser.ParenthesisError) {
+      annotator.codeHighlight(code, e.s, e.e, "error");
+      displayRainbowParentheses(code, annotator);
+
+      annotator.lineMessage(code, e.s, "error", e.message);
+    }
+  }
+};
+
+function displayRainbowParentheses(code, annotator) {
+  parser.rainbowParentheses(code)
+    .forEach(function(p, i) {
+      p.map(function(offset) {
+        annotator.codeHighlight(code, offset, offset + 1, "rainbow-" + i % 4);  });
+    });
+};
+
 var ProgramPlayer = React.createClass({
   getInitialState: function() {
     this.stepBackwardsClickHandler = onClickOrHoldDown(this.stepBackwards);
     this.stepForwardsClickHandler = onClickOrHoldDown(this.stepForwards);
 
-    return { player: this.props.player };
+    var player = setupPlayer(this.props.annotator);
+    var canvasLib = env.setupCanvasLib($("#screen")[0].getContext("2d"));
+
+    var self = this;
+    this.props.editor.on("change", function() {
+      player.setProgramState(initProgramState(self.props.editor.getValue(),
+                                              self.props.annotator,
+                                              canvasLib));
+
+      self.setState(self.state);
+    });
+
+    return { player: player };
   },
 
   onPlayPauseClick: function() {
@@ -49,11 +106,6 @@ var ProgramPlayer = React.createClass({
       this.props.annotator.clear();
     }
 
-    this.setState(this.state);
-  },
-
-  setProgramState: function(ps) {
-    this.state.player.setProgramState(ps);
     this.setState(this.state);
   },
 
