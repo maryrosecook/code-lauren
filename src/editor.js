@@ -22,6 +22,12 @@ var createEditor = module.exports = function() {
     if (e.ctrlKey === false && e.metaKey === false) {
       editor.focus();
     }
+
+    // recalc place to put top of scrollbar on keypress - bug in cm
+    // simplescrollbars and leaves bar way too far down on content
+    // size change
+    editor.display.scrollbars.horiz.moveTo(editor.display.scrollbars.horiz);
+    editor.display.scrollbars.vert.moveTo(editor.display.scrollbars.vert.pos);
   });
 
   return editor;
