@@ -48,6 +48,12 @@ a:hover { text-decoration: none; }
   overflow: hidden;
 }
 
+.sidebar {
+  padding: 3px 0 0 8px; /* put padding on this so don't throw off 70/30 split w line messages */
+  margin: 3px 8px 0 0;
+  height: 100%;
+}
+
 .topbar {
   position: absolute;
   top: 0;
@@ -58,12 +64,6 @@ a:hover { text-decoration: none; }
   border-bottom: 1px black solid;
   z-index: 2;
   background-color: white;
-}
-
-.sidebar {
-  padding: 3px 0 0 8px; /* put padding on this so don't throw off 70/30 split w line messages */
-  margin: 3px 8px 0 0;
-  height: 100%;
 }
 
 h1 {
