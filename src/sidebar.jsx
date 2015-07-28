@@ -27,6 +27,8 @@ var Sidebar = React.createClass({
       this.state.page = page;
       this.setState(this.state);
     }
+
+    this.scrollApi.reinitialise(); // calc scrollbars for height of new content
   },
 
   render: function() {

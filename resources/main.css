@@ -39,19 +39,16 @@ a:hover { text-decoration: none; }
 
 #sidebar {
   font-size: 17px;
-  position: absolute;
-  top: 32px;
+  position: fixed;
   right: 0;
   width: 450px;
-  height: 100%;
+  height: calc(100% - 31px);
   z-index: 2;
   overflow: hidden;
 }
 
 .sidebar {
-  padding: 3px 0 0 8px; /* put padding on this so don't throw off 70/30 split w line messages */
-  margin: 3px 8px 0 0;
-  height: 100%;
+  padding: 0 8px 0 8px; /* put padding on this so don't throw off 70/30 split w line messages */
 }
 
 .topbar {
@@ -62,7 +59,7 @@ a:hover { text-decoration: none; }
   height: 26px;
   padding: 3px 0 3px 3px;
   border-bottom: 1px black solid;
-  z-index: 2;
+  z-index: 3;
   background-color: white;
 }
 
@@ -77,7 +74,13 @@ h1 {
 
 #sidebar h2 {
   font-size: 22px;
-  margin-bottom: 0.6em;
+
+  /* to give nice space at top of content. When content loaded,
+     padding on .sidebar and margin on this h2 is auto-scrolled past for
+     some reason */
+  padding-top: 3px;
+
+  margin: 0 0 0.6em 0;
 }
 
 #sidebar h3 {
