@@ -33,6 +33,7 @@ window.addEventListener("load", function() {
   // export globally
   top.pub.sidebar = React.render(React.createElement(Sidebar), $("#sidebar")[0]);
   top.pub.editor = editor;
+  top.pub.codeToFailedParseStack = require("./lang/parser-state-error").codeToFailedParseStack;
 
   editor.on("change", function() {
     source.save();
