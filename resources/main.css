@@ -37,7 +37,7 @@ h1 a {
   position: absolute;
   top: 0;
   left: 110px;
-  padding: 4px 0 1px 0;
+  padding: 4px 0 5px 0;
   z-index: 2;
   background-color: black;
 }
@@ -110,6 +110,7 @@ h1 {
   width: 30px;
   height: 30px;
   margin: 3px 10px 0 10px;
+  vertical-align: top;
 }
 
 .play-button {
