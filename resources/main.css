@@ -6,12 +6,13 @@
 body {
   font-family: "Gill Sans W01 Light";
   overflow: hidden;
-  font-weight: light;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern";
   -webkit-font-feature-settings: "kern";
   -moz-font-feature-settings: "kern";
   -moz-font-feature-settings: "kern=1";
+  font-kerning: normal;
+  font-weight: normal;
 }
 
 a { color: black; }
@@ -75,6 +76,7 @@ h1 a {
 }
 
 h1 {
+  font-family: "Gill Sans W01 Book";
   font-size: 22px;
   margin: -4px 0 0 -3px;
   padding: 4px 0 4px 4px;
@@ -85,6 +87,7 @@ h1 {
 }
 
 #sidebar h2 {
+  font-family: "Gill Sans W01 Book";
   font-size: 22px;
 
   /* to give nice space at top of content. When content loaded,
@@ -93,12 +96,15 @@ h1 {
   padding-top: 3px;
 
   margin: 0 0 0.6em 0;
+  font-weight: normal;
 }
 
 #sidebar h3 {
   font-size: 18px;
   margin-top: 0;
   margin-bottom: 0.8em;
+  font-weight: normal;
+  font-family: "Gill Sans W01 Book";
 }
 
 
