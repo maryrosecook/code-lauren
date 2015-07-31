@@ -151,6 +151,38 @@ h1 {
   height: 20px;
 }
 
+.example-play-button {
+  background: url(/resources/images/play-bow.png);
+  background-size: 11px 11px;
+  width: 11px;
+  height: 11px;
+  border: 0;
+}
+
+.example-pause-button {
+  background: url(/resources/images/pause-bow.png);
+  background-size: 11px 11px;
+  width: 11px;
+  height: 11px;
+  border: 0;
+}
+
+.example-step-forwards-button {
+  background: url(/resources/images/step-forwards-bow.png);
+  background-size: 11px 11px;
+  width: 11px;
+  height: 11px;
+  border: 0;
+}
+
+.example-step-backwards-button {
+  background: url(/resources/images/step-backwards-bow.png);
+  background-size: 11px 11px;
+  width: 11px;
+  height: 11px;
+  border: 0;
+}
+
 button:focus {
   outline: 0; /* removes blue outline that appears on button click */
 }
