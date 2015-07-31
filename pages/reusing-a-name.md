@@ -1,6 +1,6 @@
-## Reusing a name <div class="top-nav">[←](#naming-the-result-of-an-action) &nbsp; [→](#doing-an-action-a-lot-of-times)</div>
+## <div class="top-nav-backwards">[←](#naming-the-result-of-an-action)</div> Reusing a name <div class="top-nav-forwards">[→](#doing-an-action-a-lot-of-times)</div>
 
-### Doing repeated additions
+### Repeated additions
 
 Type in this code:
 
@@ -28,4 +28,4 @@ write(number 600 230 "black")
 
 Do you see how `number` was reused as the name of the result of adding `number` and `2`? Why is that useful? Let's find out...
 
-### ←[Previous](#naming-the-result-of-an-action) <div class="next">[Doing an action a lot of times](#doing-an-action-a-lot-of-times)→</div>
+### [← Previous](#naming-the-result-of-an-action) <div class="next">[Doing an action a lot of times →](#doing-an-action-a-lot-of-times)</div>

@@ -1,4 +1,5 @@
-## Naming things <div class="top-nav">[←](#rectangle) &nbsp; [→](#writing-text)</div>
+## <div class="top-nav-backwards">[←](#rectangle)</div> Naming things <div class="top-nav-forwards">[→](#writing-text)</div>
+
 
 Earlier, I suggested you make a line of ovals. You might have noticed that you were repeating numbers. For another example, type in this code:
 
@@ -49,4 +50,4 @@ Notice how easy it was to figure out which number to change. Names describe the 
 
 Add a name for the width and use it in your `draw-oval` descriptions.
 
-### ←[Previous](#rectangle) <div class="next">[Writing text](#writing-text)→</div>
+### [← Previous](#rectangle) <div class="next">[Writing text →](#writing-text)</div>

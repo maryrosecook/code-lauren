@@ -1,4 +1,4 @@
-## Adding numbers <div class="top-nav">[←](#writing-text) &nbsp; [→](#naming-the-result-of-an-action)</div>
+## <div class="top-nav-backwards">[←](#writing-text)</div> Adding numbers <div class="top-nav-forwards">[→](#naming-the-result-of-an-action)</div>
 
 As well as drawing shapes, actions can be used for many other things.  For example: adding numbers. Type in this code:
 
@@ -10,4 +10,4 @@ What happened?
 
 The `add` action was given `1` and `2` and it added them.  `add` gave back the answer, `3`, to the `write` action which wrote it on the screen.
 
-### ←[Previous](#writing-text) <div class="next">[Naming the result of an action](#naming-the-result-of-an-action)→</div>
+### [← Previous](#writing-text) <div class="next">[Naming the result of an action →](#naming-the-result-of-an-action)</div>

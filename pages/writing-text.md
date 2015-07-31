@@ -1,4 +1,5 @@
-## Writing text <div class="top-nav">[←](#naming-things) &nbsp; [→](#adding-numbers)</div>
+## <div class="top-nav-backwards">[←](#naming-things)</div> Writing text <div class="top-nav-forwards">[→](#adding-numbers)</div>
+
 
 You can write text on the screen with the `write` action.  Type in this code:
 
@@ -17,4 +18,4 @@ write(top-dist 200 200 "black")
 Why would you want to do this? You'll see!
 
 
-### ←[Previous](#naming-things) <div class="next">[Adding numbers](#adding-numbers)→</div>
+### [← Previous](#naming-things) <div class="next">[Adding numbers →](#adding-numbers)</div>

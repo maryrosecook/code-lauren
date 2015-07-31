@@ -1,4 +1,5 @@
-## Moving an oval <div class="top-nav">[←](#doing-an-action-a-lot-of-times) &nbsp; [→](#home)</div>
+## <div class="top-nav-backwards">[←](#doing-an-action-a-lot-of-times)</div> Moving an oval <div class="top-nav-forwards">[→](#home)</div>
+
 
 In the previous lesson, you did your first animation. But animating a shape is even more fun. Let's do that.  Type in this code:
 
@@ -21,4 +22,4 @@ Again, if you're not sure how this code works, use the play controls at the top 
 
 That's the end of this tutorial. You've covered a lot. I'll publish more tutorials very soon. Please send feedback on things that could be better about Code Lauren to [mary@maryrosecook.com](mailto:mary@maryrosecook.com)
 
-### ←[Previous](#doing-an-action-a-lot-of-times) <div class="next">[Home](#home)→</div>
+### [← Previous](#doing-an-action-a-lot-of-times) <div class="next">[Home →](#home)</div>

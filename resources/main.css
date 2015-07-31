@@ -60,15 +60,31 @@ h1 a {
   padding: 0 8px 0 8px; /* put padding on this so don't throw off 70/30 split w line messages */
 }
 
-.sidebar .next {
+#sidebar .next {
   float: right;
 }
 
-.sidebar .top-nav {
+#sidebar .next a {
+  text-decoration: underline;
+}
+
+#sidebar .next a:hover {
+  text-decoration: none;
+}
+
+#sidebar .top-nav-backwards {
+  float: left;
+}
+
+#sidebar .top-nav-forwards {
   float: right;
 }
 
-.sidebar .top-nav a {
+#sidebar .top-nav-backwards a {
+  text-decoration: none;
+}
+
+#sidebar .top-nav-forwards a {
   text-decoration: none;
 }
 
@@ -106,6 +122,7 @@ h1 {
 
   margin: 0 0 0.6em 0;
   font-weight: normal;
+  text-align: center;
 }
 
 #sidebar h3 {
@@ -115,7 +132,6 @@ h1 {
   font-weight: normal;
   font-family: "Gill Sans W01 Book";
 }
-
 
 #sidebar p {
   margin-bottom: 0.8em;

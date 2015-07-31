@@ -1,4 +1,5 @@
-## Naming the result of an action <div class="top-nav">[←](#adding-numbers) &nbsp; [→](#reusing-a-name)</div>
+## <div class="top-nav-backwards">[←](#adding-numbers)</div> Naming the result of an action <div class="top-nav-forwards">[→](#reusing-a-name)</div>
+
 
 Type in this code:
 
@@ -9,4 +10,4 @@ write(addition-answer 600 200 "black")
 
 This is interesting. You created a new number, `3`, by giving `1` and `2` to the `add` action.  You then named the new number `addition-answer`.
 
-### ←[Previous](#adding-numbers) <div class="next">[Reusing a name](#reusing-a-name)→</div>
+### [← Previous](#adding-numbers) <div class="next">[Reusing a name →](#reusing-a-name)</div>

@@ -1,4 +1,4 @@
-## Doing an action a lot of times <div class="top-nav">[←](#reusing-a-name) &nbsp; [→](#moving-an-oval)</div>
+## <div class="top-nav-backwards">[←](#reusing-a-name)</div> Doing an action a lot of times <div class="top-nav-forwards">[→](#moving-an-oval)</div>
 
 When you reused the `number` name, you could focus on the adding, rather than the naming.  This will come in useful now.  You are going to create your first animation.  Type in the code below:
 
@@ -29,4 +29,4 @@ The screen is cleared. So the old number that was written to the screen is clear
 
 This progression of events is quite complicated.  You can use the Code Lauren program play controls to see a clearer picture of how your code runs.  Click <button class="example-pause-button"></button> at the top of the page to make your program pause.  Now use <button class="example-step-backwards-button"></button> and <button class="example-step-forwards-button"></button> to see your code run step by step.
 
-### ←[Previous](#reusing-a-name) <div class="next">[Moving an oval](#moving-an-oval)→</div>
+### [← Previous](#reusing-a-name) <div class="next">[Moving an oval →](#moving-an-oval)</div>
