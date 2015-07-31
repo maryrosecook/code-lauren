@@ -49,4 +49,4 @@ Notice how easy it was to figure out which number to change. Names describe the 
 
 Add a name for the width and use it in your `draw-oval` descriptions.
 
-### Next: [Writing text](#writing-text)
+### [< Previous](#rectangle) <div class="next">[Writing text >](#writing-text)</div>

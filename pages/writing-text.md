@@ -16,4 +16,5 @@ write(top-dist 200 200 "black")
 
 Why would you want to do this? You'll see!
 
-### Next: [Adding numbers](#adding-numbers)
+
+### [< Previous](#naming-things) <div class="next">[Adding numbers >](#adding-numbers)</div>

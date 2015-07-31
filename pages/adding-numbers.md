@@ -10,4 +10,4 @@ What happened?
 
 The `add` action was given `1` and `2` and it added them.  `add` gave back the answer, `3`, to the `write` action which wrote it on the screen.
 
-### Next: [Naming the result of an action](#naming-the-result-of-an-action)
+### [< Previous](#writing-text) <div class="next">[Naming the result of an action >](#naming-the-result-of-an-action)</div>

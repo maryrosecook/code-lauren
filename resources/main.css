@@ -60,6 +60,10 @@ h1 a {
   padding: 0 8px 0 8px; /* put padding on this so don't throw off 70/30 split w line messages */
 }
 
+.sidebar .next {
+  float: right;
+}
+
 .topbar {
   position: fixed;
   top: 0;

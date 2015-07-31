@@ -11,4 +11,4 @@ draw-oval(100 400 30 40 "filled" "green")
 
 Try and make a line of ovals.
 
-### Next: [Draw a rectangle](#rectangle)
+### [< Previous](#oval) <div class="next">[Draw a rectangle >](#rectangle)</div>

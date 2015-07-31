@@ -27,4 +27,4 @@ Which one is which?
 
 Do the numbers that describe the position of the oval indicate its middle or top left?
 
-### Next: [Draw lots of ovals](#ovals)
+### [< Previous](#home) <div class="next">[Draw lots of ovals >](#ovals)</div>
