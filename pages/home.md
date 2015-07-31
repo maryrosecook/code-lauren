@@ -4,4 +4,4 @@ Try changing `"blue"` to `"red"` in the code on the left.
 
 Try some other colors.
 
-[Continue the tutorial](#oval).
+[Continue the tutorial](#oval)

@@ -1,6 +1,10 @@
 ## Draw a rectangle
 
-Type in the code below to draw a rectangle.  When I say "type in the code", I really mean it. There is the world of difference between copying and pasting the code, or just taking my word for what the code does.  Learning to program is about experimenting.  Type in the code.  Play around with it.  Try things I haven't suggested. Guess what some code will do, then type it in to see if you're right.
+Type in the code below to draw a rectangle.
+
+When I say "type in the code", I really mean it. There is a world of difference between typing in the code and either copying and pasting it or just taking my word for what the code does.  Learning to program is about experimenting.  Play around.  Try things I haven't suggested. Guess what some code will do, then see if you're right.
+
+Go ahead and type this in:
 
 ```
 draw-rectangle(100 200 50 150 "filled" "gray")

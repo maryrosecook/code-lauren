@@ -10,10 +10,6 @@ draw-oval(100 200 30 40 "filled" "blue")
 
 Do you see a blue oval?
 
-### Change the color
-
-Try changing the color to `"red"` or `"green"` or your favorite color.
-
 ### Make the oval an outline
 
 Try changing `"filled"` to `"unfilled"`.
