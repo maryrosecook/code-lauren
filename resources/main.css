@@ -6,11 +6,6 @@
 body {
   font-family: "Gill Sans W01 Light";
   overflow: hidden;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "kern";
-  -webkit-font-feature-settings: "kern";
-  -moz-font-feature-settings: "kern";
-  -moz-font-feature-settings: "kern=1";
   font-kerning: normal;
   font-weight: normal;
 }
