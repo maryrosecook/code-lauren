@@ -67,7 +67,7 @@ var userFns = {
     programFns.flush();
   },
 
-  "write-text": function(str, x, y, color) {
+  "write": function(str, x, y, color) {
     function op() {
       screen.font = "20px Georgia";
       screen.fillStyle = color;
