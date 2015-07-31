@@ -64,6 +64,14 @@ h1 a {
   float: right;
 }
 
+.sidebar .top-nav {
+  float: right;
+}
+
+.sidebar .top-nav a {
+  text-decoration: none;
+}
+
 .topbar {
   position: fixed;
   top: 0;
