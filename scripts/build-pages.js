@@ -48,7 +48,7 @@ function maybeMarkdownLinkToOnClick(link) {
     return ['<a href="#', pageName, '"',
             'onclick="return top.pub.sidebar.load(',
             "'", pageName, "'",
-            '); return false;"',
+            ', event); return false;"',
             '>',
             text,
             "</a>"].join("");

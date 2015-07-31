@@ -21,16 +21,19 @@ var Sidebar = React.createClass({
     return { page: page };
   },
 
-  load: function(page) {
-    page = route(page);
-    if (page !== this.state.page) {
-      this.state.page = page;
-      this.setState(this.state);
+  load: function(page, ev) {
+    if (!(ev instanceof MouseEvent) ||
+        (ev.metaKey !== true && ev.altKey !== true)) {
+      page = route(page);
+      if (page !== this.state.page) {
+        this.state.page = page;
+        this.setState(this.state);
+      }
+
+      localStorage["page"] = page;
+
+      this.scrollApi.reinitialise(); // calc scrollbars for height of new content
     }
-
-    localStorage["page"] = page;
-
-    this.scrollApi.reinitialise(); // calc scrollbars for height of new content
   },
 
   render: function() {
