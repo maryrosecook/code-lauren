@@ -19,7 +19,7 @@ var createEditor = module.exports = function() {
 
   // restore focus to editor if user ever starts typing
   $(window).keydown(function(e) {
-    if (e.ctrlKey === false && e.metaKey === false) {
+    if (e.ctrlKey === false && e.metaKey === false && $("#searchbox").is(":focus") === false) {
       editor.focus();
     }
 
