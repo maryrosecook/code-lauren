@@ -22,8 +22,7 @@ var Sidebar = React.createClass({
   },
 
   load: function(page, ev) {
-    if (!(ev instanceof MouseEvent) ||
-        (ev.metaKey !== true && ev.altKey !== true)) {
+    if (!tryingToOpenPageInNewTab(ev)) {
       page = route(page);
       if (page !== this.state.page) {
         this.state.page = page;
@@ -48,6 +47,11 @@ var Sidebar = React.createClass({
     this.scrollApi = $('#sidebar').jScrollPane().data('jsp');
   }
 });
+
+function tryingToOpenPageInNewTab(ev) {
+  return (ev instanceof MouseEvent) &&
+    (ev.metaKey === true || ev.altKey === true);
+};
 
 function urlToPage(url) {
   var urlPageMatch = url.match(/#(.+)/);
