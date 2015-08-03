@@ -281,3 +281,14 @@ code {
 .CodeMirror div.CodeMirror-cursor {
   border-left: 2px solid black;
 }
+
+table, th, td {
+  border: 1px solid #ddd;
+  padding: 4px;
+  vertical-align: top;
+}
+
+table {
+  border-collapse: collapse;
+  margin-bottom: 0.6em;
+}
