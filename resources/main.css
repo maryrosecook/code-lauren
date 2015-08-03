@@ -275,6 +275,7 @@ code {
   font-family: "courier";
   font-size: 14px;
   color: #333;
+  padding: 0 3px;
 }
 
 .CodeMirror div.CodeMirror-cursor {
