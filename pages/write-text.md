@@ -1,5 +1,4 @@
-## Writing text
-
+## Write text
 
 You can write text on the screen with the `write` action.  Type in this code:
 
