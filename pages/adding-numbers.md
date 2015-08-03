@@ -1,4 +1,4 @@
-## <div class="top-nav-backwards">[←](#writing-text)</div> Adding numbers <div class="top-nav-forwards">[→](#naming-the-result-of-an-action)</div>
+## Adding numbers
 
 As well as drawing shapes, actions can be used for many other things.  For example: adding numbers. Type in this code:
 

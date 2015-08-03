@@ -1,4 +1,4 @@
-## <div class="top-nav-backwards">[←](#reusing-a-name)</div> Doing an action a lot of times <div class="top-nav-forwards">[→](#moving-an-oval)</div>
+## Doing an action a lot of times
 
 When you reused the `number` name, you could focus on the adding, rather than the naming.  This will come in useful now.  You are going to create your first animation.  Type in the code below:
 

@@ -1,4 +1,4 @@
-## <div class="top-nav-backwards">[←](#home)</div> Draw an oval <div class="top-nav-forwards">[→](#ovals)</div>
+## Draw an oval
 
 Let's write your first program.
 

@@ -1,4 +1,4 @@
-## <div class="top-nav-backwards">[←](#oval)</div> Draw lots of ovals <div class="top-nav-forwards">[→](#rectangle)</div>
+## Draw lots of ovals
 
 Draw some more ovals. You can do this by adding more lines of code to your program. For example:
 

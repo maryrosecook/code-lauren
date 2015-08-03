@@ -1,4 +1,4 @@
-## <div class="top-nav-backwards">[←](#naming-the-result-of-an-action)</div> Reusing a name <div class="top-nav-forwards">[→](#doing-an-action-a-lot-of-times)</div>
+## Reusing a name
 
 ### Repeated additions
 

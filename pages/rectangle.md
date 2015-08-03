@@ -1,4 +1,4 @@
-## <div class="top-nav-backwards">[←](#ovals)</div> Draw a rectangle <div class="top-nav-forwards">[→](#naming-things)</div>
+## Draw a rectangle
 
 Type in the code below to draw a rectangle.
 

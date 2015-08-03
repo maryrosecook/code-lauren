@@ -1,5 +1,4 @@
-## <div class="top-nav-backwards">[←](#doing-an-action-a-lot-of-times)</div> Moving an oval
-
+## Moving an oval
 
 In the previous lesson, you did your first animation. But animating a shape is even more fun. Let's do that.  Type in this code:
 

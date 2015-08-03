@@ -1,4 +1,4 @@
-## <div class="top-nav-backwards">[←](#naming-things)</div> Writing text <div class="top-nav-forwards">[→](#adding-numbers)</div>
+## Writing text
 
 
 You can write text on the screen with the `write` action.  Type in this code:

@@ -1,4 +1,4 @@
-## <div class="top-nav-backwards">[←](#rectangle)</div> Naming things <div class="top-nav-forwards">[→](#writing-text)</div>
+## Naming things
 
 
 Earlier, I suggested you make a line of ovals. You might have noticed that you were repeating numbers. For another example, type in this code:

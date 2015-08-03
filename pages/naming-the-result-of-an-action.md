@@ -1,4 +1,4 @@
-## <div class="top-nav-backwards">[←](#adding-numbers)</div> Naming the result of an action <div class="top-nav-forwards">[→](#reusing-a-name)</div>
+## Naming the result of an action
 
 
 Type in this code:
