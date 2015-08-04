@@ -8,31 +8,32 @@ require("./lib/jquery.mousewheel.js"); // enable sidebar mousewheel scrolling
 
 var Sidebar = React.createClass({
   getInitialState: function() {
-    var self = this;
-    $(window).on('hashchange', function(e) {
-      self.load(urlToPage(e.originalEvent.newURL));
-    });
-
-    var self = this;
-    $(window).resize(function() { self.scrollApi.reinitialise(); });
-
     var page = route(urlToPage(window.location.href));
-    history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), "/#" + page);
-    return { page: page };
+    history.replaceState({ page: page, scroll: 0 },
+                         page[0].toUpperCase() + page.slice(1),
+                         "/#" + page);
+    return {
+      page: page,
+      scrollPositions: {}, // records last scroll pos for each page
+      pageJustClicked: undefined // records fact that page link
+                                  // clicked. Used to decide whether to restore scroll position
+    };
   },
 
-  load: function(page, ev) {
-    if (!tryingToOpenPageInNewTab(ev)) {
-      page = route(page);
-      if (page !== this.state.page) {
-        this.state.page = page;
-        this.setState(this.state);
-      }
+  load: function(page) {
+    page = route(page);
+    if (page !== this.state.page) {
+      this.state.scrollPositions[this.state.page] = this.scrollApi.getContentPositionY();
 
-      localStorage["page"] = page;
-
-      this.scrollApi.reinitialise(); // calc scrollbars for height of new content
+      this.state.page = page;
+      this.setState(this.state);
     }
+
+    localStorage["page"] = page;
+  },
+
+  linkClick: function(page) {
+    this.state.pageJustClicked = page;
   },
 
   render: function() {
@@ -43,15 +44,27 @@ var Sidebar = React.createClass({
     );
   },
 
+  componentDidUpdate: function() {
+    this.scrollApi.reinitialise(); // calc scrollbars for height of new content
+
+    if (this.state.pageJustClicked !== this.state.page) { // back/forw button press just happened
+      this.scrollApi.scrollToY(this.state.scrollPositions[this.state.page]);
+    } else {
+      this.scrollApi.scrollToY(0);
+    }
+  },
+
   componentDidMount: function() {
     this.scrollApi = $('#sidebar').jScrollPane().data('jsp');
+
+    var self = this;
+    $(window).on('hashchange', function(e) {
+      self.load(urlToPage(e.originalEvent.newURL));
+    });
+
+    $(window).resize(() => self.scrollApi.reinitialise());
   }
 });
-
-function tryingToOpenPageInNewTab(ev) {
-  return (ev instanceof MouseEvent) &&
-    (ev.metaKey === true || ev.altKey === true);
-};
 
 function urlToPage(url) {
   var urlPageMatch = url.match(/#(.+)/);
