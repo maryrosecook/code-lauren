@@ -275,6 +275,9 @@ code {
   font-family: "courier";
   font-size: 14px;
   color: #333;
+}
+
+p code {
   padding: 0 3px;
 }
 
