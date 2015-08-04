@@ -46,9 +46,6 @@ function maybeMarkdownLinkToOnClick(link) {
     var pageName = pageMatch[1];
     var text = link.match(/^\[([^\]]+)\]/)[1];
     return ['<a href="#', pageName, '"',
-            'onclick="return top.pub.sidebar.linkClick(',
-            "'", pageName, "'",
-            '); return false;"',
             '>',
             text,
             "</a>"].join("");

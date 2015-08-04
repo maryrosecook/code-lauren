@@ -8,32 +8,22 @@ require("./lib/jquery.mousewheel.js"); // enable sidebar mousewheel scrolling
 
 var Sidebar = React.createClass({
   getInitialState: function() {
-    var page = route(urlToPage(window.location.href));
-    history.replaceState({ page: page, scroll: 0 },
-                         page[0].toUpperCase() + page.slice(1),
-                         "/#" + page);
-    return {
-      page: page,
-      scrollPositions: {}, // records last scroll pos for each page
-      pageJustClicked: undefined // records fact that page link
-                                  // clicked. Used to decide whether to restore scroll position
-    };
+    var page = urlToPage(window.location.href);
+    history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), "/#" + page);
+    return { page: page, wasBackOrForwards: false };
   },
 
   load: function(page) {
     page = route(page);
-    if (page !== this.state.page) {
-      this.state.scrollPositions[this.state.page] = this.scrollApi.getContentPositionY();
-
-      this.state.page = page;
-      this.setState(this.state);
+    this.state.wasBackOrForwards = history.state !== null;
+    if (!this.state.wasBackOrForwards) {
+      history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), "/#" + page);
     }
 
-    localStorage["page"] = page;
-  },
+    this.state.page = page;
+    this.setState(this.state);
 
-  linkClick: function(page) {
-    this.state.pageJustClicked = page;
+    localStorage["page"] = page;
   },
 
   render: function() {
@@ -45,13 +35,9 @@ var Sidebar = React.createClass({
   },
 
   componentDidUpdate: function() {
+    var scrollY = this.state.wasBackOrForwards === true ? history.state.scroll : 0;
     this.scrollApi.reinitialise(); // calc scrollbars for height of new content
-
-    if (this.state.pageJustClicked !== this.state.page) { // back/forw button press just happened
-      this.scrollApi.scrollToY(this.state.scrollPositions[this.state.page]);
-    } else {
-      this.scrollApi.scrollToY(0);
-    }
+    this.scrollApi.scrollToY(scrollY);
   },
 
   componentDidMount: function() {
@@ -60,6 +46,15 @@ var Sidebar = React.createClass({
     var self = this;
     $(window).on('hashchange', function(e) {
       self.load(urlToPage(e.originalEvent.newURL));
+    });
+
+    $("#sidebar").scroll(function() {
+      if (history.state !== null) {
+        var page = history.state.page;
+        history.replaceState({ page: page, scroll: self.scrollApi.getContentPositionY() },
+                             page[0].toUpperCase() + page.slice(1),
+                             "/#" + page);
+      }
     });
 
     $(window).resize(() => self.scrollApi.reinitialise());
