@@ -27,10 +27,13 @@ var Sidebar = React.createClass({
   },
 
   render: function() {
+    var html = pageContent[this.state.page] !== undefined ?
+        pageContent[this.state.page].html :
+        pageContent["404"].html;
+
     return (
       <div className="sidebar"
-        dangerouslySetInnerHTML={{ __html: pageContent[this.state.page].html ||
-                                   pageContent["404"].html }}>
+        dangerouslySetInnerHTML={{ __html: html }}>
       </div>
     );
   },
