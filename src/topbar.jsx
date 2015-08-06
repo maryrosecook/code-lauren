@@ -6,7 +6,7 @@ var Topbar = React.createClass({
   render: function() {
     return (
       <div className="topbar">
-        <h1><a href="/#home">code lauren</a></h1>
+        <h1><a href="/">code lauren</a></h1>
         <ProgramPlayer editor={this.props.editor} annotator={this.props.annotator} />
         <Search />
       </div>
