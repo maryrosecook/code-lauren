@@ -46,6 +46,78 @@ h1 a {
   background-color: black;
 }
 
+.search {
+  position: absolute;
+  top: 0;
+  left: calc(100% - 444px);
+  z-index: 2;
+  width: 400px;
+  padding-top: 4px;
+}
+
+.search code {
+  background-color: white;
+}
+
+.search .result.selected code {
+  background-color: inherit;
+}
+
+.search li {
+  margin-left: 0;
+  list-style: none;
+}
+
+.search .title {
+  font-family: "Gill Sans W01 Book";
+}
+
+.search input {
+  height: 22px;
+  border: 1px solid black;
+  font-family: "Gill Sans W01 Light";
+  font-size: 17px;
+  padding-left: 5px;
+  vertical-align: top;
+}
+
+.search input.default {
+  color: #999;
+}
+
+.search input.not-default {
+  color: #000;
+}
+
+.search .results {
+  border: 1px solid black;
+  z-index: 3;
+  background-color: white;
+}
+
+.search .resultsHolder {
+  position: absolute;
+  top: 27px;
+  left: 0;
+  width: 420px;
+  padding-bottom: 10px;
+  background-color: white;
+}
+
+.search .result {
+  cursor: pointer;
+  padding: 3px 5px;
+}
+
+.search .result.selected {
+  background-color: #e7e7e7;
+}
+
+.search .result .excerpt {
+  max-height: 38px;
+  overflow: hidden;
+}
+
 #sidebar {
   font-size: 17px;
   position: fixed;
@@ -142,7 +214,6 @@ h1 {
 
 .player-button {
   cursor: pointer;
-  cursor: hand;
   border: 0;
   width: 30px;
   height: 30px;

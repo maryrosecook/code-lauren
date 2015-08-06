@@ -12,11 +12,12 @@ function buildPages() {
         .map(function(n) { return path.join(PAGES_PATH, n); })
         .map(function(filePath) {
           return {
-            name: filePath.match(/^.+\/([A-Za-z0-9-]+)\.md$/)[1],
-            string: marked(makeLinksOnClick(fs.readFileSync(filePath, "utf8")))
+            slug: filePath.match(/^.+\/([A-Za-z0-9-]+)\.md$/)[1],
+            html: marked(makeLinksOnClick(fs.readFileSync(filePath, "utf8"))),
+            string: fs.readFileSync(filePath, "utf8")
           };
         }).reduce(function(a, o) {
-          a[o.name] = o.string;
+          a[o.slug] = { string: o.string, html: o.html, slug: o.slug };
           return a
         }, {});
 
