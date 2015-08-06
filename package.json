@@ -22,6 +22,8 @@
     "marked": "^0.3.3",
     "pegjs": "pegjs/pegjs#da57118a43a904f753d44d407994cf0b36358adc",
     "react": "^0.13.3",
+    "strip": "0.0.7",
+    "summarize-markdown": "^0.3.0",
     "transform-loader": "^0.2.1",
     "underscore": "^1.8.2"
   },
