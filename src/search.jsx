@@ -1,6 +1,7 @@
 var React = require('react');
 var summarizeMarkdown = require("summarize-markdown");
 var stripHtml = require("strip");
+var util = require("./util");
 var pageContent = cleanData(require("../pages/all-pages"));
 
 var DEFAULT_SEARCH_TEXT = "How do I...?";
@@ -30,6 +31,10 @@ var Search = React.createClass({
       this.state.results =
         find(this.state.searchText)
         .map(rawPageToResult.bind(this, this.state.searchText));
+
+      if (this.state.results.length > 0) {
+        this.state.results[0].selected = true;
+      }
     } else {
       this.state.results = [];
     }
@@ -37,9 +42,29 @@ var Search = React.createClass({
     this.setState(this.state);
   },
 
-  blurOnEscape: function(e) {
+  onKeyDown: function(e) {
     if (e.keyCode === 27) { // escape
       top.pub.editor.focus();
+      this.state.results = [];
+      this.setState(this.state);
+    } else if (e.keyCode === 13) { // return
+      var selectedResult = this.state.results.filter(r => r.selected === true)[0];
+      if (selectedResult !== undefined) {
+        this.resultPicked(selectedResult.slug);
+      } else {
+        this.state.results = [];
+        this.setState(this.state);
+      }
+    } else if (e.keyCode === 38) { // up arrow
+      var index = util.findIndex(this.state.results, r => r.selected === true);
+      if (index !== undefined && index > 0) {
+        this.resultSelected(this.state.results[index - 1].slug, true);
+      }
+    } else if (e.keyCode === 40) { // down arrow
+      var index = util.findIndex(this.state.results, r => r.selected === true);
+      if (index !== undefined && index < this.state.results.length - 1) {
+        this.resultSelected(this.state.results[index + 1].slug, true);
+      }
     }
   },
 
@@ -50,6 +75,8 @@ var Search = React.createClass({
   },
 
   resultSelected: function(slug, isSelected) {
+    this.state.results.filter(r => r.selected === true).forEach(r => r.selected = false);
+
     var selectedResult = this.state.results.filter(function(r) { return r.slug === slug; })[0];
     if (selectedResult !== undefined) {
       selectedResult.selected = isSelected;
@@ -92,7 +119,7 @@ var Search = React.createClass({
         <input id="searchbox" type="text" value={this.state.searchText}
                onFocus={this.clearDefaultSearchPrompt} onBlur={this.restoreDefaultTextIfEmpty}
                onChange={this.onChange}
-               onKeyDown={this.blurOnEscape}
+               onKeyDown={this.onKeyDown}
                className={textIsDefaultClass} />
 
         {this.buildResults()}
@@ -193,7 +220,8 @@ function rawPageToResult(searchString, rawPage) {
   return {
     slug: rawPage.slug,
     title: getPageTitleBody(rawPage.string).title,
-    excerpt: highlightSearch(getWords(getExcerpt(rawPage.string, searchString), 20), searchString)
+    excerpt: highlightSearch(getWords(getExcerpt(rawPage.string, searchString), 20), searchString),
+    selected: false
   };
 };
 
