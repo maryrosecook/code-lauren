@@ -66,5 +66,13 @@ var util = module.exports = {
     return list.reduce(function (acc, x) {
       return acc.concat(fn(x));
     }, []);
+  },
+
+  findIndex: function(arr, predicate) {
+    for (var i = 0; i < arr.length; i++) {
+      if (predicate(arr[i])) {
+        return i;
+      }
+    }
   }
 };
