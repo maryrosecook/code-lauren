@@ -101,7 +101,7 @@ var Search = React.createClass({
 });
 
 function getSearchRegex(str) {
-  return new RegExp(str.trim(), "i");
+  return new RegExp(str.trim(), "gi");
 };
 
 var EXCLUDED_PAGES = ["404", "home"];
@@ -144,22 +144,56 @@ function includeSentenceStart(string, i) {
 
 function getExcerpt(pageString, searchString) {
   var pageTitleBody = getPageTitleBody(pageString);
+  var matches = gatherAllMatches(pageString, getSearchRegex(searchString));
 
-  if (pageTitleBody.title.length >
-      pageString.match(getSearchRegex(searchString)).index) { // match in title
+  if (pageTitleBody.title.length > matches[0].index) { // match in title
     return pageTitleBody.body; // return main content start
   } else {
-    var matchStart = pageTitleBody.body.match(getSearchRegex(searchString)).index;
+    var matchStart = matches[0].index;
     return includeSentenceStart(pageTitleBody.body, matchStart);
   }
 };
 
-function rawPageToResult(str, rawPage) {
+function gatherAllMatches(str, regex) {
+  var match;
+  var matches = [];
+  while ((match = regex.exec(str)) !== null) {
+    matches.push(match);
+  }
 
+  return matches;
+};
+
+function chunk(str, indices, searchString) {
+  if (indices.length === 0) {
+    return [str];
+  } else {
+    var chunks = [];
+    var start = 0;
+    indices.forEach(function(index) {
+      chunks.push(str.slice(start, index));
+      chunks.push(str.slice(index, index + searchString.length));
+      start = index + searchString.length;
+    })
+
+    chunks.push(str.slice(start));
+    return chunks;
+  }
+};
+
+function highlightSearch(str, searchString) {
+  var matches = gatherAllMatches(str, getSearchRegex(searchString));
+  var chunks = chunk(str, matches.map(m => m.index), searchString);
+  return chunks.map(function(chunk, i) {
+    return i % 2 === 1 ? '<span class="match">' + chunk + "</span>" : chunk;
+  }).join("");
+};
+
+function rawPageToResult(searchString, rawPage) {
   return {
     slug: rawPage.slug,
     title: getPageTitleBody(rawPage.string).title,
-    excerpt: getWords(getExcerpt(rawPage.string, str), 20)
+    excerpt: highlightSearch(getWords(getExcerpt(rawPage.string, searchString), 20), searchString)
   };
 };
 
