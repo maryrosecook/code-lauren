@@ -8,7 +8,7 @@ require("./lib/jquery.mousewheel.js"); // enable sidebar mousewheel scrolling
 
 var Sidebar = React.createClass({
   getInitialState: function() {
-    var page = urlToPage(window.location.href);
+    var page = route(urlToPage(window.location.href));
     history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), "/#" + page);
     return { page: page, wasBackOrForwards: false };
   },
