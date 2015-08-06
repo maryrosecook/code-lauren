@@ -105,7 +105,7 @@ function setupPlayer(annotator) {
           break;
         } else if (pses[i].currentInstruction !== undefined &&
                    pses[i].currentInstruction.annotate === compiler.ANNOTATE) {
-          for (var j = i; j < pses.length; j++) {
+          for (var j = pses.length - 1; j >= i; j--) {
             ps = pses.pop();
             ps.canvasLib.stepBackwards();
           }
