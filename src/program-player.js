@@ -36,11 +36,18 @@ function setupPlayer(annotator) {
     },
 
     togglePause: function() {
-      paused = !paused;
+      if (paused === true) {
+        player.unpause();
+      } else if (paused === false) {
+        player.pause();
+      } else {
+        throw new Error("Tried to toggle player pause but it's neither paused nor unpaused");
+      }
     },
 
     pause: function() {
       paused = true;
+      ps.canvasLib.pause();
     },
 
     unpause: function() {

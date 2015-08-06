@@ -5,8 +5,14 @@ var step = 0;
 var allDrawOperations = [];
 var cachedDrawOperations = [];
 
-function addOperationToHistory(fn) {
-  allDrawOperations.push({ fn: fn, step: step });
+function addOperationToHistory(fn, name, isClearScreen) {
+  allDrawOperations.push({
+    fn: fn,
+    step: step,
+    name: name,
+    isClearScreen: isClearScreen === true ? true : false
+  });
+
   if (allDrawOperations.length > 5000) {
     allDrawOperations.shift();
   }
@@ -27,17 +33,22 @@ var programFns = {
     programFns.redraw();
   },
 
+  pause: function() {
+    programFns.redraw();
+  },
+
   redraw: function() {
     var ops = [];
     for (var i = allDrawOperations.length - 1; i >= 0; i--) {
-      if (allDrawOperations[i].step < step) {
+      if (allDrawOperations[i].step < step && allDrawOperations[i].isClearScreen === true) {
+        ops.push(allDrawOperations[i]);
         break;
+      } else if (allDrawOperations[i].step < step) {
+        ops.push(allDrawOperations[i]);
       }
-
-      ops.push(allDrawOperations[i]);
     }
 
-    ops.forEach(function(o) { o.fn(); });
+    ops.reverse().forEach(function(o) { o.fn(); });
   },
 
   deleteOld: function(STEP_TO_SAVE) {
@@ -62,7 +73,7 @@ var userFns = {
     };
 
     op();
-    addOperationToHistory(op);
+    addOperationToHistory(op, "clear-screen", true);
 
     programFns.flush();
   },
@@ -75,7 +86,7 @@ var userFns = {
       screen.fillStyle = "black";
     };
 
-    addOperationToHistory(op);
+    addOperationToHistory(op, "write");
     cachedDrawOperations.push(op);
   },
 
@@ -107,7 +118,7 @@ var userFns = {
       }
     };
 
-    addOperationToHistory(op);
+    addOperationToHistory(op, "draw-oval");
     cachedDrawOperations.push(op);
   },
 
@@ -124,7 +135,7 @@ var userFns = {
       }
     };
 
-    addOperationToHistory(op);
+    addOperationToHistory(op, "draw-rectangle");
     cachedDrawOperations.push(op);
   }
 };
