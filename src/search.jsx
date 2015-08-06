@@ -150,7 +150,6 @@ function getExcerpt(pageString, searchString) {
     return pageTitleBody.body; // return main content start
   } else {
     var matchStart = pageTitleBody.body.match(getSearchRegex(searchString)).index;
-    console.log(matchStart);
     return includeSentenceStart(pageTitleBody.body, matchStart);
   }
 };
