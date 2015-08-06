@@ -34,5 +34,3 @@ draw-oval(100 200 30 40 "filled" "green")
     <td>Color of the oval</td>
   </tr>
 </table>
-
-### [← Previous](#draw-an-oval) <div class="next">[Draw a rectangle →](#draw-a-rectangle)</div>
