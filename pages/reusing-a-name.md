@@ -12,7 +12,7 @@ second-number: add(first-number 2)
 write(second-number 600 230 "black")
 ```
 
-You created `second-number` by giving `first-number` and `2` to the `add` action.  That is, you gave a new name to a number you created using an old name.
+You created `second-number` by giving `first-number` and `2` to the `add` action.  That is, you created a number from an existing name and gave that number a new name.
 
 ### Reusing a name
 
