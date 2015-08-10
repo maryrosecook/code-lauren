@@ -83,18 +83,25 @@ var ProgramPlayer = React.createClass({
     this.stepForwardsClickHandler = onClickOrHoldDown(this.stepForwards);
 
     var player = setupPlayer(this.props.annotator);
-    var canvasLib = env.setupCanvasLib($("#screen")[0].getContext("2d"));
 
     var self = this;
     this.props.editor.on("change", function() {
       player.setProgramState(initProgramState(self.props.editor.getValue(),
                                               self.props.annotator,
-                                              canvasLib));
+                                              self.props.canvasLib));
 
       self.setState(self.state);
     });
 
     return { player: player };
+  },
+
+  onRewindClick: function() {
+    this.state.player.setProgramState(initProgramState(this.props.editor.getValue(),
+                                                       this.props.annotator,
+                                                       this.props.canvasLib));
+    this.state.player.pause();
+    this.stepForwards();
   },
 
   onPlayPauseClick: function() {
@@ -130,17 +137,20 @@ var ProgramPlayer = React.createClass({
         (this.state.player.isPaused() ? "play-button" : "pause-button");
 
     return (
-      <div className="program-player">
-        <button onMouseDown={this.stepBackwardsClickHandler}
-                onMouseUp={this.stepBackwardsClickHandler}
-                className="player-button step-backwards-button" />
+        <div className="program-player">
+          <button onClick={this.onRewindClick}
+                  className="player-button rewind-button" />
 
-        <button onClick={this.onPlayPauseClick} className={playPauseClassName} />
+          <button onMouseDown={this.stepBackwardsClickHandler}
+                  onMouseUp={this.stepBackwardsClickHandler}
+                  className="player-button step-backwards-button" />
 
-        <button onMouseDown={this.stepForwardsClickHandler}
-                onMouseUp={this.stepForwardsClickHandler}
-                className="player-button step-forwards-button" />
-      </div>
+          <button onClick={this.onPlayPauseClick} className={playPauseClassName} />
+
+          <button onMouseDown={this.stepForwardsClickHandler}
+                  onMouseUp={this.stepForwardsClickHandler}
+                  className="player-button step-forwards-button" />
+        </div>
     );
   }
 });
