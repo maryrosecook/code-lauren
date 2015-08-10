@@ -75,7 +75,7 @@ var createStandardLibrary = module.exports = function () {
       return dict[key];
     },
 
-    print: function(printable) {
+    print: function() {
       var output = _.map(arguments, function(x) { return x.toString(); }).join(" ");
       console.log(output);
       return output + "\n";
