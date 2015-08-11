@@ -9,7 +9,7 @@ require("./lib/jquery.mousewheel.js"); // enable sidebar mousewheel scrolling
 var Sidebar = React.createClass({
   getInitialState: function() {
     var page = route(urlToPage(window.location.href));
-    history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), "/#" + page);
+    history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), pageToUrl(page));
     return { page: page, wasBackOrForwards: false };
   },
 
@@ -17,7 +17,7 @@ var Sidebar = React.createClass({
     page = route(page);
     this.state.wasBackOrForwards = history.state !== null;
     if (!this.state.wasBackOrForwards) {
-      history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), "/#" + page);
+      history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), pageToUrl(page));
     }
 
     this.state.page = page;
@@ -57,7 +57,7 @@ var Sidebar = React.createClass({
         var page = history.state.page;
         history.replaceState({ page: page, scroll: self.scrollApi.getContentPositionY() },
                              page[0].toUpperCase() + page.slice(1),
-                             "/#" + page);
+                             pageToUrl(page));
       }
     });
 
@@ -69,6 +69,14 @@ function urlToPage(url) {
   var urlPageMatch = url.match(/#(.+)/);
   if (urlPageMatch) {
     return urlPageMatch[1];
+  }
+};
+
+function pageToUrl(page) {
+  if (page === "home") {
+    return "/";
+  } else {
+    return "/#" + page;
   }
 };
 
