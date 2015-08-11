@@ -23,7 +23,7 @@ h1 a {
 .CodeMirror {
   margin-top: 32px;
   font-family: "courier";
-  font-size: 14pt;
+  font-size: 12pt;
   width: calc(100% - 450px);
   height: calc(100vh - 32px);
   z-index: 1;
@@ -307,7 +307,7 @@ button:focus {
 
 #line-messages {
   font-family: "courier";
-  font-size: 14pt;
+  font-size: 12pt;
   position: absolute;
   top: 33px;
   left: 0;
