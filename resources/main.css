@@ -238,6 +238,7 @@ h1 {
   background: url(/resources/images/play.png);
   background-size: 16.5px 33px;
   width: 16.5px;
+  margin: 0 7px 0 9px; /* push play right and pull stepforward left to make play look correct */
   height: 33px;
 }
 
