@@ -8,25 +8,25 @@ var DEFAULT_SEARCH_TEXT = "How do I...?";
 
 var Search = React.createClass({
   getInitialState: function() {
-    return { searchText: DEFAULT_SEARCH_TEXT, results: [] };
+    return { searchText: DEFAULT_SEARCH_TEXT, results: [], showResults: false };
   },
 
-  restoreDefaultTextIfEmpty: function() {
-    if (this.state.searchText === "") {
-      this.state.searchText = DEFAULT_SEARCH_TEXT;
-      this.setState(this.state);
-    }
+  onInputFocus: function() {
+    this.state.showResults = true;
+    this.setState(this.state);
   },
 
-  clearDefaultSearchPrompt: function() {
-    if (this.state.searchText === DEFAULT_SEARCH_TEXT) {
-      this.state.searchText = "";
-      this.setState(this.state);
-    }
+  onInputBlur: function() {
+    this.state.showResults = false;
+    this.setState(this.state);
   },
 
   onChange: function(event) {
     this.state.searchText = event.target.value;
+    this.setResults();
+  },
+
+  setResults: function() {
     if (this.state.searchText.length > 1) {
       this.state.results =
         find(this.state.searchText)
@@ -45,14 +45,14 @@ var Search = React.createClass({
   onKeyDown: function(e) {
     if (e.keyCode === 27) { // escape
       top.pub.editor.focus();
-      this.state.results = [];
+      this.state.showResults = false;
       this.setState(this.state);
     } else if (e.keyCode === 13) { // return
       var selectedResult = this.state.results.filter(r => r.selected === true)[0];
       if (selectedResult !== undefined) {
         this.resultPicked(selectedResult.slug);
       } else {
-        this.state.results = [];
+        this.state.showResults = false;
         this.setState(this.state);
       }
     } else if (e.keyCode === 38) { // up arrow
@@ -69,7 +69,7 @@ var Search = React.createClass({
   },
 
   resultPicked: function(slug) {
-    this.state.results = [];
+    this.state.showResults = false;
     this.setState(this.state);
     window.location.href = "/#" + slug;
   },
@@ -87,7 +87,7 @@ var Search = React.createClass({
 
   buildResults: function() {
     var self = this;
-    if (this.state.results.length > 0) {
+    if (this.state.results.length > 0 && this.state.showResults) {
       return <div className="resultsHolder">
         <div className="results">
           {
@@ -97,7 +97,7 @@ var Search = React.createClass({
               var resultSelected = self.resultSelected.bind(self, data.slug, true);
               var resultDeselected = self.resultSelected.bind(self, data.slug, false);
 
-              return <li className={className} key={data.slug} onClick={resultPicked}
+              return <li className={className} key={data.slug} onMouseDown={resultPicked}
                          onMouseOver={resultSelected} onMouseOut={resultDeselected}>
                   <div className="title">{data.title}</div>
                   <div className="excerpt"
@@ -110,14 +110,24 @@ var Search = React.createClass({
     }
   },
 
+  getQuery: function() {
+    if (!this.state.showResults && this.state.searchText === "") {
+      return DEFAULT_SEARCH_TEXT;
+    } else if (this.state.showResults && this.state.searchText === DEFAULT_SEARCH_TEXT) {
+      return "";
+    } else {
+      return this.state.searchText;
+    }
+  },
+
   render: function() {
     var textIsDefaultClass = this.state.searchText === DEFAULT_SEARCH_TEXT ?
         "default" : "not-default";
 
     return (
       <div className="search">
-        <input id="searchbox" type="text" value={this.state.searchText}
-               onFocus={this.clearDefaultSearchPrompt} onBlur={this.restoreDefaultTextIfEmpty}
+        <input id="searchbox" type="text" value={this.getQuery()}
+               onFocus={this.onInputFocus} onBlur={this.onInputBlur}
                onChange={this.onChange}
                onKeyDown={this.onKeyDown}
                className={textIsDefaultClass} />
