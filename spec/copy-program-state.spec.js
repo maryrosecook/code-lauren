@@ -36,7 +36,7 @@ describe("copy-state", function() {
     });
 
     it("should be able to copy env at every step of lambda creation", function() {
-      var code = "{}";
+      var code = "{}()"; // invoke to stop compiler complaining about uninvoked lambda
 
       var ps = v.initProgramState(code, c(p(code)));
       expect(ps).toEqual(copyProgramState(ps));

@@ -7,7 +7,7 @@ var createScope = require("../src/lang/scope");
 
 var util = require("../src/util");
 
-describe("bytecode interpreter", function() {
+describe("vm", function() {
   describe("top level", function() {
     it("should return undefined from an empty program", function() {
       var code = "";
@@ -44,32 +44,31 @@ describe("bytecode interpreter", function() {
       expect(v(code, c(p(code))).stack.pop().v).toEqual(1);
     });
 
-    it("should be able to invoke an invocation with many applications", function() {
-      var code = "{ { { 1 } } }()()()";
-      expect(v(code, c(p(code))).stack.pop().v).toEqual(1);
-    });
-
     it("should use new value for closed over var that changes after closure creation", function() {
       var code = "a: 1 \n b:{ a } \n a: 2 \n b()";
       expect(v(code, c(p(code))).stack.pop().v).toEqual(2);
     });
   });
 
-  describe("invocation of result of conditional", function() {
-    it("should return ret val of invoked lambda returned by conditional", function() {
-      var code = "if true { { 1 } }()";
-      expect(v(code, c(p(code))).stack.pop().v).toEqual(1);
+  describe("uninvoked functions in a do", function() {
+    it("should complain about returned uninvoked lambda/builtin", function() {
+      var code = "a: {}\n a";
+      expect(function() { v(code, c(p(code))); })
+        .toThrow("This is an action. Type a() to run it.");
 
-      var code = "if false {  } else { { 1 } }()";
-      expect(v(code, c(p(code))).stack.pop().v).toEqual(1);
-
-      var code = "if false {  } elseif true { { 1 } }()";
-      expect(v(code, c(p(code))).stack.pop().v).toEqual(1);
+      var code = "print";
+      expect(function() { v(code, c(p(code))); })
+        .toThrow("This is an action. Type print() to run it.");
     });
 
-    it("should blow up if try to invoke the undefined returned by conditional", function() {
-      var code = "if true { }()";
-      expect(function() { v(code, c(p(code))) }).toThrow("This is not an action");
+    it("should complain about uninvoked lambda/builtin part way through do", function() {
+      var code = "a: {}\n a \n 1";
+      expect(function() { v(code, c(p(code))); })
+        .toThrow("This is an action. Type a() to run it.");
+
+      var code = "print \n 1";
+      expect(function() { v(code, c(p(code))); })
+        .toThrow("This is an action. Type print() to run it.");
     });
   });
 
@@ -126,12 +125,15 @@ describe("bytecode interpreter", function() {
     });
 
     it("should assign lambda to env at top level", function() {
-      var code = "a: { 1 } \n a";
-      var fn = v(code, c(p(code))).stack.pop().v;
-      util.stripBc(fn.bc);
-      expect(fn.bc).toEqual([["push", 1],
-                             ["return"]]);
-      expect(fn.parameters).toBeDefined();
+      var code = "a: { 1 }";
+      var ps = v.initProgramState(code, c(p(code)));
+      v.step(ps);
+      v.step(ps);
+
+      var binding = ps.callStack[0].env.bindings.a;
+      expect(util.stripBc(binding.bc)).toEqual([["push", 1],
+                                                ["return"]]);
+      expect(binding.parameters).toBeDefined();
     });
   });
 

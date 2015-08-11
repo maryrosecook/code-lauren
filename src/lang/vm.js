@@ -4,6 +4,7 @@ var util = require("../util");
 var standardLibrary = require("./standard-library");
 var envModule = require("../env");
 var scope = require("./scope");
+var langUtil = require("./lang-util");
 
 var copyProgramState;
 function stepPush(ins, p) {
@@ -20,11 +21,13 @@ function stepPushLambda(ins, p) {
 };
 
 function stepPop(ins, p) {
+  throwIfUninvokedStackFunctions(p);
   p.stack.pop();
   return p;
 };
 
 function stepReturn(ins, p) {
+  throwIfUninvokedStackFunctions(p);
   p.callStack.pop();
   return p;
 };
@@ -33,7 +36,7 @@ function stepGetEnv(ins, p) {
   var value = currentCallFrame(p).env.getScopedBinding(ins[1]);
   if (value === undefined) {
     p.crashed = true;
-    throw new RuntimeError("Never heard of " + ins[1], ins.ast);
+    throw new langUtil.RuntimeError("Never heard of " + ins[1], ins.ast);
   } else {
     p.stack.push({ v: value, ast: ins.ast });
     return p;
@@ -53,7 +56,7 @@ function stepInvoke(ins, p) {
   // TODO: raise errors for arity problems
   var args = _.range(arity).map(function() { return p.stack.pop().v; }).reverse();
 
-  if (fn !== undefined && fn.bc !== undefined) { // a lambda
+  if (langUtil.isLambda(fn)) {
     var lambdaEnv = scope(_.object(fn.parameters, args), fn.closureEnv);
 
     var tailIndex = tailCallIndex(p.callStack, fn);
@@ -66,12 +69,12 @@ function stepInvoke(ins, p) {
     }
 
     return p;
-  } else if (fn instanceof Function) { // is a JS function object
+  } else if (langUtil.isJsFn(fn)) {
     p.stack.push({ v: fn.apply(null, args), ast: ins.ast });
     return p;
   } else {
     p.crashed = true;
-    throw new RuntimeError("This is not an action", stackValue.ast);
+    throw new langUtil.RuntimeError("This is not an action", stackValue.ast);
   }
 };
 
@@ -136,7 +139,7 @@ function step(p) {
       return stepReturn(ins, p);
     } else {
       p.crashed = true;
-      throw new RuntimeError("I don't know how to run this instruction: " + ins, ins.ast);
+      throw new langUtil.RuntimeError("I don't know how to run this instruction: " + ins, ins.ast);
     }
   }
 };
@@ -181,12 +184,16 @@ function initProgramStateAndComplete(bc, env, stack) {
   return complete(initProgramState(bc, env, stack));
 };
 
-function RuntimeError(message, ast) {
-  this.message = message;
-  this.s = ast.s;
-  this.e = ast.e;
+function throwIfUninvokedStackFunctions(p) {
+  var unrunFn = _.chain(p.stack).find(o => langUtil.isFunction(o.v)).value();
+  if (unrunFn !== undefined) {
+    p.crashed = true;
+    throw new langUtil.RuntimeError("This is an action. Type " +
+                                    p.code.slice(unrunFn.ast.s, unrunFn.ast.e) +
+                                    "() to run it.",
+                                    unrunFn.ast);
+  }
 };
-RuntimeError.prototype = Object.create(Error.prototype);
 
 initProgramStateAndComplete.initProgramStateAndComplete = initProgramStateAndComplete;
 initProgramStateAndComplete.initProgramState = initProgramState;
@@ -195,6 +202,5 @@ initProgramStateAndComplete.complete = complete;
 initProgramStateAndComplete.isComplete = isComplete;
 initProgramStateAndComplete.isCrashed = isCrashed;
 initProgramStateAndComplete.createCallFrame = createCallFrame;
-initProgramStateAndComplete.RuntimeError = RuntimeError;
 
 module.exports = initProgramStateAndComplete;

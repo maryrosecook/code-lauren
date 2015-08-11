@@ -1,5 +1,6 @@
 var _ = require("underscore");
 var vm = require("../src/lang/vm");
+var langUtil = require("../src/lang/lang-util");
 var copyProgramState = require("../src/copy-program-state");
 var compiler = require("./lang/compiler");
 
@@ -68,7 +69,7 @@ function setupPlayer(annotator) {
           newPses.push(copyProgramState(ps));
           vm.step(ps);
         } catch (e) {
-          if (e instanceof vm.RuntimeError) {
+          if (e instanceof langUtil.RuntimeError) {
             annotator.codeHighlight(ps.code, e.s, e.e, "error");
             annotator.lineMessage(ps.code, e.s, "error", e.message);
           }
