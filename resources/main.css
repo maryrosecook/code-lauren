@@ -289,16 +289,16 @@ h1 {
 
 .example-play-button {
   background: url(/resources/images/play-bow.png);
-  background-size: 11px 11px;
-  width: 11px;
+  background-size: 9px 11px;
+  width: 9px;
   height: 11px;
   border: 0;
 }
 
 .example-pause-button {
   background: url(/resources/images/pause-bow.png);
-  background-size: 11px 11px;
-  width: 11px;
+  background-size: 8px 11px;
+  width: 8px;
   height: 11px;
   border: 0;
 }
@@ -318,6 +318,15 @@ h1 {
   height: 11px;
   border: 0;
 }
+
+.example-rewind-button {
+  background: url(/resources/images/rewind-bow.png);
+  background-size: 21px 11px;
+  width: 21px;
+  height: 11px;
+  border: 0;
+}
+
 
 button:focus {
   outline: 0; /* removes blue outline that appears on button click */
