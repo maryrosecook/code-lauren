@@ -1,7 +1,6 @@
 ## Naming the result of an action
 
-
-Type in this code:
+Delete the code on the left. Type in this code:
 
 ```
 addition-answer: add(1 2)

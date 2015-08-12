@@ -1,6 +1,6 @@
 ## Moving an oval
 
-In the previous lesson, you did your first animation. But animating a shape is even more fun. Let's do that!  Type in this code:
+In the previous lesson, you did your first animation. But animating a shape is even more fun. Let's do that! Delete the code on the left. Type in this code:
 
 ```
 left-dist: 1

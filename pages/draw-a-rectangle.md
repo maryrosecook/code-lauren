@@ -1,6 +1,6 @@
 ## Draw a rectangle
 
-Type in the code below to draw a rectangle.
+Delete all the code on the left.  Then type in the code below to draw a rectangle.
 
 When I say "type in the code", I really mean it. There is a world of difference between typing in the code and either copying and pasting it or just taking my word for what the code does.  Learning to program is about experimenting.  Play around.  Try things I haven't suggested. Guess what some code will do, then see if you're right.
 

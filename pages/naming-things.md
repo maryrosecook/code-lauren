@@ -1,24 +1,28 @@
 ## Naming things
 
 
-Earlier, I suggested you make a line of ovals. You might have noticed that you were repeating numbers. For another example, type in this code:
+Earlier, I suggested you make a line of ovals. You might have noticed that you were repeating numbers.
+
+Delete all the code on the left. Type in this code:
 
 ```
 draw-oval(200 200 30 40 "filled" "blue")
 draw-oval(250 200 30 40 "filled" "red")
 ```
 
-`200`, the description of how far down to draw an oval, appears twice.  `30`, the width of the ovals, appears twice. The height appears twice, too.
+Notice how `200`, the description of how far down to draw an oval, appears twice.  `30`, the width of the ovals, appears twice. The height appears twice, too.
 
 ### Name the distance from the top
 
-You can name the distance of the ovals from the top like this:
+You could name the distance of the ovals from the top like this:
 
 ```
 top-dist: 200
 ```
 
-You can then use the name in place of the distance.  Notice how the code below sets `top-dist` to `200` and replaces the `200`s with `top-dist` in the `draw-oval` actions.
+Then you could use the name in place of the distance.
+
+Let's do that. Delete all the code on the left. Type in this code:
 
 ```
 top-dist: 200
@@ -26,6 +30,8 @@ top-dist: 200
 draw-oval(200 top-dist 30 40 "filled" "blue")
 draw-oval(250 top-dist 30 40 "filled" "red")
 ```
+
+Notice how the code sets `top-dist` to `200` and replaces the `200`s with `top-dist` in the `draw-oval` actions.
 
 ### Change the distance from the top
 

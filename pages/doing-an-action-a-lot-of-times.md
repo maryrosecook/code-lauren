@@ -1,6 +1,6 @@
 ## Doing an action a lot of times
 
-When you reused the `number` name, you could focus on the adding, rather than the naming.  This will come in useful now.  You are going to create your first animation.  Type in the code below:
+When you reused the `number` name, you could focus on the adding, rather than the naming.  This will come in useful now.  You are going to create your first animation. Delete the code on the left. Type in the code below:
 
 ```
 number: 1

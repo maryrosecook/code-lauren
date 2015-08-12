@@ -1,6 +1,6 @@
 ## Adding numbers
 
-As well as drawing shapes, actions can be used for many other things.  For example: adding numbers. Type in this code:
+As well as drawing shapes, actions can be used for many other things.  For example: adding numbers. Delete all the code on the left. Type in this code:
 
 ```
 write(add(1 2) 200 200 "black")

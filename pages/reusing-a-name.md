@@ -2,7 +2,7 @@
 
 ### Repeated additions
 
-Type in this code:
+Delete the code on the left. Type in this code:
 
 ```
 first-number: 1
@@ -16,7 +16,7 @@ You created `second-number` by giving `first-number` and `2` to the `add` action
 
 ### Reusing a name
 
-But why bother making a new name? Why not just reuse the old one? Type in this code:
+But why bother making a new name? Why not just reuse the old one? Change the code on the left to this:
 
 ```
 number: 1
