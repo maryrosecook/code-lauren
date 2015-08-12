@@ -234,6 +234,14 @@ h1 {
   height: 33px;
 }
 
+.rewind-button.disabled {
+  background: url(/resources/images/rewind-disabled.png);
+  background-size: 35.5px 33px;
+  width: 35.5px;
+  height: 33px;
+  cursor: default;
+}
+
 .play-button {
   background: url(/resources/images/play.png);
   background-size: 16.5px 33px;
@@ -256,11 +264,27 @@ h1 {
   height: 33px;
 }
 
+.step-forwards-button.disabled {
+  background: url(/resources/images/step-forwards-disabled.png);
+  background-size: 20px 33px;
+  width: 20px;
+  height: 33px;
+  cursor: default;
+}
+
 .step-backwards-button {
   background: url(/resources/images/step-backwards.png);
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
+}
+
+.step-backwards-button.disabled {
+  background: url(/resources/images/step-backwards-disabled.png);
+  background-size: 20px 33px;
+  width: 20px;
+  height: 33px;
+  cursor: default;
 }
 
 .example-play-button {
