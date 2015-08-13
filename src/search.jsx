@@ -186,8 +186,8 @@ function getExcerpt(pageString, searchString) {
   if (pageTitleBody.title.length > matches[0].index) { // match in title
     return pageTitleBody.body; // return main content start
   } else {
-    var matchStart = matches[0].index;
-    return includeSentenceStart(pageTitleBody.body, matchStart);
+    var matches = gatherAllMatches(pageTitleBody.body, getSearchRegex(searchString));
+    return includeSentenceStart(pageTitleBody.body, matches[0].index);
   }
 };
 
