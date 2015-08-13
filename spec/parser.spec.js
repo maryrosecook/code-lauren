@@ -454,6 +454,10 @@ describe("parser", function() {
       expect(function() {
         parse("a bb");
       }).toThrow('Expected this to be on a new line');
+
+      expect(function() {
+        parse("{ { a b } }");
+      }).toThrow('Expected this to be on a new line');
     });
 
     it("should report that can't invoke literals", function() {
@@ -468,21 +472,21 @@ describe("parser", function() {
       }).toThrow('Should be no spaces between\nthe name of the action and the ()');
     });
 
-    it("should expect expression on same line nested in lambda to be preceded by nl", function() {
-      expect(function() {
-        parse("{ { a b } }");
-      }).toThrow('Expected this to be on a new line');
-    });
-
-    it("should report missing value in assignment at end of input", function() {
+    it("should report missing value in assignment", function() {
       expect(function() {
         parse("a: ");
       }).toThrow("Name needs a value");
-    });
 
-    it("should report missing value in assignment followed by newline", function() {
       expect(function() {
         parse("a: \n");
+      }).toThrow("Name needs a value");
+
+      expect(function() {
+        parse("a:");
+      }).toThrow("Name needs a value");
+
+      expect(function() {
+        parse("a: \n1");
       }).toThrow("Name needs a value");
     });
 
@@ -490,9 +494,7 @@ describe("parser", function() {
       expect(function() {
         parse(": 1");
       }).toThrow("Needs a name on the left and a value on the right");
-    });
 
-    it("should report missing label in assignment after parsed expr", function() {
       // regression test
       expect(function() {
         parse("a: 1\n: 1");

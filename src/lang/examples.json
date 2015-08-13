@@ -1,13 +1,6 @@
 {
   "examples": [
     {
-      "code":      "a b",
-      "stack":     ["_"],
-      "nextInput": "[a-zA-Z0-9_\\-]+",
-      "message":   "Expected this to be on a new line"
-    },
-
-    {
       "code":      "1a",
       "stack":     ["number"],
       "nextInput": "[a-zA-Z0-9_\\-]+",
@@ -54,6 +47,20 @@
       "stack":     ["nl"],
       "nextInput": ":",
       "message":   "Needs a name on the left and a value on the right"
+    },
+
+    {
+      "code":      "a: 1\n: 1",
+      "stack":     ["nl"],
+      "nextInput": ":",
+      "message":   "Needs a name on the left and a value on the right"
+    },
+
+    {
+      "code":      "a b",
+      "stack":     ["_"],
+      "nextInput": "[a-zA-Z0-9_\\-]+",
+      "message":   "Expected this to be on a new line"
     }
   ]
 }
