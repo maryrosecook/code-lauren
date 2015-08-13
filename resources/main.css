@@ -114,7 +114,7 @@ h1 a {
 }
 
 .search .result .excerpt {
-  max-height: 38px;
+  height: 38px;
   overflow: hidden;
 }
 
