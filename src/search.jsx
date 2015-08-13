@@ -95,10 +95,9 @@ var Search = React.createClass({
               var className = "result " + (data.selected === true ? "selected" : "");
               var resultPicked = self.resultPicked.bind(self, data.slug);
               var resultSelected = self.resultSelected.bind(self, data.slug, true);
-              var resultDeselected = self.resultSelected.bind(self, data.slug, false);
 
               return <li className={className} key={data.slug} onMouseDown={resultPicked}
-                         onMouseOver={resultSelected} onMouseOut={resultDeselected}>
+                         onMouseOver={resultSelected}>
                   <div className="title">{data.title}</div>
                   <div className="excerpt"
                        dangerouslySetInnerHTML={{ __html: data.excerpt }}></div>
