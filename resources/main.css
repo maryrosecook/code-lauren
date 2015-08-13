@@ -107,6 +107,11 @@ h1 a {
 .search .result {
   cursor: pointer;
   padding: 3px 5px;
+  border-bottom: 1px solid #000;
+}
+
+.search .results:last-child {
+  border-bottom: none;
 }
 
 .search .result.selected {
