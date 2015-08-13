@@ -60,7 +60,7 @@ function stepInvoke(ins, p) {
     var lambdaEnv = scope(_.object(fn.parameters, args), fn.closureEnv);
 
     var tailIndex = tailCallIndex(p.callStack, fn);
-    if (tailIndex !== undefined) { // if tails calls all the way to recursive call, then tco
+    if (tailIndex !== undefined) { // if tail position exprs all the way to recursive call then tco
       p.callStack = p.callStack.slice(0, tailIndex + 1);
       currentCallFrame(p).env = lambdaEnv;
       currentCallFrame(p).bcPointer = 0;
