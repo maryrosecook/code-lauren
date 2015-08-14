@@ -179,13 +179,13 @@ var ProgramPlayer = React.createClass({
         }
       }
 
-      if (vm.isComplete(this.state.ps)) {
+      if (vm.isCrashed(this.state.ps) ||
+          (this.state.ps.currentInstruction !== undefined &&
+           this.state.ps.currentInstruction.annotate === compile.ANNOTATE)) {
+        break;
+      } else if (vm.isComplete(this.state.ps)) {
         newPses = [];
         this.state.ps = originalPs;
-        break;
-      } else if (vm.isCrashed(this.state.ps) ||
-                 (this.state.ps.currentInstruction !== undefined &&
-                  this.state.ps.currentInstruction.annotate === compile.ANNOTATE)) {
         break;
       }
     }
