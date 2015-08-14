@@ -2,7 +2,6 @@ var $ = require('jquery');
 var React = require('react');
 var _ = require("underscore");
 
-var vm = require("./lang/vm");
 var env = require("./env");
 var vm = require("./lang/vm");
 var parser = require("./lang/parser");
