@@ -5,23 +5,33 @@ var screen;
 var step = 0;
 var allDrawOperations = [];
 var cachedDrawOperations = [];
+var flushIntervalId;
 
-function addOperationToHistory(fn, name, isClearScreen) {
-  allDrawOperations.push({
+function addOperation(fn, name, isClearScreen) {
+  var op = {
     fn: fn,
     step: step,
     name: name,
     isClearScreen: isClearScreen === true ? true : false
-  });
+  };
+
+  allDrawOperations.push(op);
+  cachedDrawOperations.push(op);
 
   if (allDrawOperations.length > 5000) {
     allDrawOperations.shift();
+  }
+
+  if (cachedDrawOperations.length > 5000) {
+    throw new Error("Cached draw ops exceeded save state limit.");
   }
 };
 
 var programFns = {
   flush: function() {
-    cachedDrawOperations.forEach(function(o) { o() })
+    cachedDrawOperations
+      .filter(function(o) { return o.isClearScreen === false;  })
+      .forEach(function(o) { o.fn(); });
     cachedDrawOperations = [];
   },
 
@@ -36,6 +46,15 @@ var programFns = {
 
   pause: function() {
     programFns.redraw();
+  },
+
+  hitClearScreen: function() {
+    return _.find(cachedDrawOperations,
+                  function(o) { return o.isClearScreen === true; }) !== undefined;
+  },
+
+  clearScreen: function() {
+    screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
   },
 
   redraw: function() {
@@ -68,31 +87,23 @@ var programFns = {
 };
 
 var userFns = {
-  "clear-screen": function() {
-    function op() {
-      screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
-    };
+  "clear-screen": langUtil.hasSideEffects(function() {
+    addOperation(function () {
+      programFns.clearScreen();
+    }, "clear-screen", true);
+  }),
 
-    op();
-    addOperationToHistory(op, "clear-screen", true);
-
-    programFns.flush();
-  },
-
-  "write": function(str, x, y, color) {
-    function op() {
+  write: langUtil.hasSideEffects(function(str, x, y, color) {
+    addOperation(function () {
       screen.font = "20px Georgia";
       screen.fillStyle = color;
       screen.fillText(str, x, y);
       screen.fillStyle = "black";
-    };
+    }, "write");
+  }),
 
-    addOperationToHistory(op, "write");
-    cachedDrawOperations.push(op);
-  },
-
-    function op() {
   "draw-oval": langUtil.hasSideEffects(function(x, y, w, h, filledStr, color) {
+    addOperation(function () {
       var kappa = 0.5522848;
       var ox = (w / 2) * kappa; // control point offset horizontal
       var oy = (h / 2) * kappa; // control point offset vertical
@@ -117,14 +128,11 @@ var userFns = {
         screen.fill();
         screen.fillStyle = "black";
       }
-    };
-
-    addOperationToHistory(op, "draw-oval");
-    cachedDrawOperations.push(op);
+    }, "draw-oval");
   }),
 
-    function op() {
   "draw-rectangle": langUtil.hasSideEffects(function(x, y, width, height, filledStr, color) {
+    addOperation(function () {
       if (filledStr === "unfilled") {
         screen.strokeStyle = color;
         screen.strokeRect(x, y, width, height);
@@ -134,10 +142,7 @@ var userFns = {
         screen.fillRect(x, y, width, height);
         screen.fillStyle = "black";
       }
-    };
-
-    addOperationToHistory(op, "draw-rectangle");
-    cachedDrawOperations.push(op);
+    }, "draw-rectangle");
   })
 };
 

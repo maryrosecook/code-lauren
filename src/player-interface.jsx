@@ -89,19 +89,29 @@ function displayRainbowParentheses(code, annotator) {
 var ProgramPlayer = React.createClass({
   getInitialState: function() {
     var self = this;
+    var hitClearScreen = false;
 
     (function tick(lastEventLoopYield) {
       while(true) {
+        if (hitClearScreen) {
+          self.state.ps.canvasLib.clearScreen();
+        }
+
         if (self.state !== null && self.state.ps !== undefined && !self.state.paused) {
           if (vm.isComplete(self.state.ps)) {
             self.state.ps.canvasLib.flush();
           } else {
             self.stepForwards();
+
+            hitClearScreen = self.state.ps.canvasLib.hitClearScreen();
+            if (hitClearScreen === true) {
+              self.state.ps.canvasLib.flush();
+            }
           }
         }
 
-        if (isTimeToYieldToEventLoop(lastEventLoopYield)) {
-          requestAnimationFrame(() => tick(new Date().getTime()));
+        if (hitClearScreen || isTimeToYieldToEventLoop(lastEventLoopYield)) {
+          requestAnimationFrame(() => tick(new Date().getTime()))
           break;
         }
       }
@@ -143,8 +153,8 @@ var ProgramPlayer = React.createClass({
   pause: function() {
     this.state.paused = true;
     this.state.ps.canvasLib.pause();
-    annotateCurrentInstruction(this.state.ps, this.props.annotator);
     this.setState(this.state);
+    annotateCurrentInstruction(this.state.ps, this.props.annotator);
   },
 
   unpause: function() {
@@ -159,6 +169,10 @@ var ProgramPlayer = React.createClass({
   },
 
   stepForwards: function() {
+    // Assumes all side effecting (bascially drawing) functions are annotatable.
+    // Without this assumption, the case where we don't make it to an annotatable
+    // instruction would leave side effects done.
+
     if (vm.isCrashed(this.state.ps) || vm.isComplete(this.state.ps)) {
       this.setState(this.state); // update buttons
       return;
@@ -177,7 +191,7 @@ var ProgramPlayer = React.createClass({
         }
       }
 
-      if (vm.isCrashed(this.state.ps) ||
+      if (vm.isCrashed(this.state.ps) || // assume want to annotate crashed instruction
           (this.state.ps.currentInstruction !== undefined &&
            this.state.ps.currentInstruction.annotate === compile.ANNOTATE)) {
         break;
@@ -205,7 +219,6 @@ var ProgramPlayer = React.createClass({
     while (true) {
       if (i === -1) { // couldn't find annotatable previous ps - don't step back
         this.state.ps = originalPs;
-        this.setState(this.state); // update buttons
         break;
       } else if (this.state.pses[i].currentInstruction !== undefined &&
                  this.state.pses[i].currentInstruction.annotate === compile.ANNOTATE) {
@@ -222,8 +235,14 @@ var ProgramPlayer = React.createClass({
   },
 
   stepBackwardsByHand: function() {
-    this.stepBackwards();
-    this.pause();
+    if (this.state.paused === false) {
+      this.pause();
+    } else {
+      this.stepBackwards();
+    }
+
+    this.setState(this.state);
+    annotateCurrentInstruction(this.state.ps, this.props.annotator);
   },
 
   canStepForwards: function() {
