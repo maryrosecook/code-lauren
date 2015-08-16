@@ -1,4 +1,5 @@
 var _ = require("underscore");
+var langUtil = require("./lang-util");
 
 var screen;
 var step = 0;
@@ -90,8 +91,8 @@ var userFns = {
     cachedDrawOperations.push(op);
   },
 
-  "draw-oval": function(x, y, w, h, filledStr, color) {
     function op() {
+  "draw-oval": langUtil.hasSideEffects(function(x, y, w, h, filledStr, color) {
       var kappa = 0.5522848;
       var ox = (w / 2) * kappa; // control point offset horizontal
       var oy = (h / 2) * kappa; // control point offset vertical
@@ -120,10 +121,10 @@ var userFns = {
 
     addOperationToHistory(op, "draw-oval");
     cachedDrawOperations.push(op);
-  },
+  }),
 
-  "draw-rectangle": function(x, y, width, height, filledStr, color) {
     function op() {
+  "draw-rectangle": langUtil.hasSideEffects(function(x, y, width, height, filledStr, color) {
       if (filledStr === "unfilled") {
         screen.strokeStyle = color;
         screen.strokeRect(x, y, width, height);
@@ -137,7 +138,7 @@ var userFns = {
 
     addOperationToHistory(op, "draw-rectangle");
     cachedDrawOperations.push(op);
-  }
+  })
 };
 
 var api = {

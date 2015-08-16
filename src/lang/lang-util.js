@@ -20,5 +20,12 @@ var langUtil = module.exports = {
     return o instanceof Function;
   },
 
+  hasSideEffects: function(fn) {
+    fn.hasSideEffects = true;
+    return fn;
+  },
+
+  NO_SIDE_EFFECTS: "no_side_effects",
+
   RuntimeError: RuntimeError
 };

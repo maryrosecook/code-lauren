@@ -48,7 +48,7 @@ function stepSetEnv(ins, p) {
   return p;
 };
 
-function stepInvoke(ins, p) {
+function stepInvoke(ins, p, noSideEffects) {
   var stackValue = p.stack.pop();
   var fn = stackValue.v;
   var arity = ins[1];
@@ -70,7 +70,10 @@ function stepInvoke(ins, p) {
 
     return p;
   } else if (langUtil.isJsFn(fn)) {
-    p.stack.push({ v: fn.apply(null, args), ast: ins.ast });
+    if (noSideEffects !== langUtil.NO_SIDE_EFFECTS || fn.hasSideEffects !== true) {
+      p.stack.push({ v: fn.apply(null, args), ast: ins.ast });
+    }
+
     return p;
   } else {
     p.crashed = true;
@@ -109,7 +112,7 @@ function stepJump(ins, p) {
   return p;
 };
 
-function step(p) {
+function step(p, noSideEffects) {
   var callFrame = currentCallFrame(p);
   if (callFrame === undefined) {
     return p;
@@ -130,7 +133,7 @@ function step(p) {
     } else if (ins[0] === "set_env") {
       return stepSetEnv(ins, p);
     } else if (ins[0] === "invoke") {
-      return stepInvoke(ins, p);
+      return stepInvoke(ins, p, noSideEffects);
     } else if (ins[0] === "if_not_true_jump") {
       return stepIfNotTrueJump(ins, p);
     } else if (ins[0] === "jump") {

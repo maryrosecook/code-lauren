@@ -232,7 +232,7 @@ var ProgramPlayer = React.createClass({
     var testPs = copyProgramState(this.state.ps);
     while(true) {
       try {
-        vm.step(testPs);
+        vm.step(testPs, langUtil.NO_SIDE_EFFECTS);
       } catch(e) {} // swallow any errors - program will get marked as crashed
 
       if (testPs.currentInstruction !== undefined &&
