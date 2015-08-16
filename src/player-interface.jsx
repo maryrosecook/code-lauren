@@ -110,7 +110,6 @@ var ProgramPlayer = React.createClass({
     this.stepBackwardsClickHandler = onClickOrHoldDown(this.stepBackwardsByHand);
     this.stepForwardsClickHandler = onClickOrHoldDown(this.stepForwardsByHand);
 
-
     this.props.editor.on("change", function() {
       self.state.ps = initProgramState(self.props.editor.getValue(),
                                        self.props.annotator,
