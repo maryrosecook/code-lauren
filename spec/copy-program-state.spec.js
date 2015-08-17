@@ -67,7 +67,7 @@ describe("copy-state", function() {
     });
 
     it("should be able to copy env for recursive calls", function() {
-      var code = 'tozero: { ?x if equals(x 0) { "done" } else { tozero(subtract(x 1)) } } \n tozero(5)';
+      var code = 'tozero: { ?x if equal(x 0) { "done" } else { tozero(subtract(x 1)) } } \n tozero(5)';
 
       var ps = v.initProgramState(code, c(p(code)));
       expect(ps).toEqual(copyProgramState(ps));

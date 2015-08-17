@@ -87,25 +87,25 @@ describe("library", function() {
     });
   });
 
-  describe("equals", function() {
+  describe("equal", function() {
     it("should return false for no args", function() {
-      expect(standardLibrary()["equals"]()).toEqual(false);
+      expect(standardLibrary()["equal"]()).toEqual(false);
     });
 
     it("should return true for two identical args", function() {
-      expect(standardLibrary()["equals"](1, 1)).toEqual(true);
+      expect(standardLibrary()["equal"]({}, 1, 1)).toEqual(true);
     });
 
     it("should return true for four identical args", function() {
-      expect(standardLibrary()["equals"](1, 1, 1, 1)).toEqual(true);
+      expect(standardLibrary()["equal"]({}, 1, 1, 1, 1)).toEqual(true);
     });
 
     it("should return false for four args with one different at the beginning", function() {
-      expect(standardLibrary()["equals"](2, 1, 1, 1)).toEqual(false);
+      expect(standardLibrary()["equal"]({}, 2, 1, 1, 1)).toEqual(false);
     });
 
     it("should return false for four args with one different at the end", function() {
-      expect(standardLibrary()["equals"](1, 1, 1, 2)).toEqual(false);
+      expect(standardLibrary()["equal"]({}, 1, 1, 1, 2)).toEqual(false);
     });
   });
 });

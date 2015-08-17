@@ -139,7 +139,7 @@ describe("vm", function() {
 
   describe("forever", function() {
     it("should run for a long time", function() {
-      var code = "n: 1 \n forever { n: add(n 1) \n if equals(n 100) { blowup() } }";
+      var code = "n: 1 \n forever { n: add(n 1) \n if equal(n 100) { blowup() } }";
       expect(function() {
         v(code, c(p(code)));
       }).toThrow("Never heard of blowup");
@@ -206,7 +206,7 @@ describe("vm", function() {
 
   describe("recursion", function() {
     it("should trampoline a program where there is an if in the tail position", function() {
-      var code = 'tozero: { ?x if equals(x 0) { "done" } else { tozero(subtract(x 1)) } } \n tozero(20000)';
+      var code = 'tozero: { ?x if equal(x 0) { "done" } else { tozero(subtract(x 1)) } } \n tozero(20000)';
       expect(v(code, c(p(code))).stack.pop().v).toEqual("done");
     });
   });
