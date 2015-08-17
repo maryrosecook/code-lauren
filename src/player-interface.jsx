@@ -93,11 +93,11 @@ var ProgramPlayer = React.createClass({
 
     (function tick(lastEventLoopYield) {
       while(true) {
-        if (hitClearScreen) {
-          self.state.ps.canvasLib.clearScreen();
-        }
-
         if (self.state !== null && self.state.ps !== undefined && !self.state.paused) {
+          if (hitClearScreen) {
+            self.state.ps.canvasLib.clearScreen();
+          }
+
           if (vm.isComplete(self.state.ps)) {
             self.state.ps.canvasLib.flush();
           } else {
