@@ -15,6 +15,10 @@ var Topbar = React.createClass({
                        annotator={this.props.annotator}
                        canvasLib={canvasLib} />
         <Search />
+
+        <div className="navigation">
+          <a href="/#suggestions">Suggestions?</a>
+        </div>
       </div>
     );
   }

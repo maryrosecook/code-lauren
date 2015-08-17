@@ -51,7 +51,7 @@ h1 a {
   top: 0;
   left: calc(100% - 445px);
   z-index: 2;
-  width: 400px;
+  width: 200px;
   padding-top: 4px;
 }
 
@@ -128,7 +128,6 @@ h1 a {
   font-weight: bold;
 }
 
-
 #sidebar {
   font-size: 17px;
   position: fixed;
@@ -181,6 +180,15 @@ h1 a {
   border-bottom: 1px black solid;
   z-index: 3;
   background-color: white;
+}
+
+.topbar .navigation {
+  position: absolute;
+  top: 0;
+  right: 9px;
+  padding-top: 6px;
+  font-family: "Gill Sans W01 Light";
+  font-size: 17px;
 }
 
 h1 {
