@@ -155,7 +155,7 @@ function stripNav(pageString) {
 };
 
 function getPageTitleBody(pageString) {
-  var pieces = pageString.match(/([^:]+): ((.|\n)+)/);
+  var pieces = pageString.match(/([^:]+):((.|\n)*)/);
 
   return { title: pieces[1], body: pieces[2] };
 };
