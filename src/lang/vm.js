@@ -71,7 +71,8 @@ function stepInvoke(ins, p, noSideEffects) {
     return p;
   } else if (langUtil.isJsFn(fn)) {
     if (noSideEffects !== langUtil.NO_SIDE_EFFECTS || fn.hasSideEffects !== true) {
-      p.stack.push({ v: fn.apply(null, args), ast: ins.ast });
+      var meta = { ast: ins.ast };
+      p.stack.push({ v: fn.apply(null, [meta].concat(args)), ast: ins.ast });
     }
 
     return p;

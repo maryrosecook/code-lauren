@@ -87,13 +87,13 @@ var programFns = {
 };
 
 var userFns = {
-  "clear-screen": langUtil.hasSideEffects(function() {
+  "clear-screen": langUtil.hasSideEffects(function(meta) {
     addOperation(function () {
       programFns.clearScreen();
     }, "clear-screen", true);
   }),
 
-  write: langUtil.hasSideEffects(function(str, x, y, color) {
+  write: langUtil.hasSideEffects(function(meta, str, x, y, color) {
     addOperation(function () {
       screen.font = "20px Georgia";
       screen.fillStyle = color;
@@ -102,7 +102,7 @@ var userFns = {
     }, "write");
   }),
 
-  "draw-oval": langUtil.hasSideEffects(function(x, y, w, h, filledStr, color) {
+  "draw-oval": langUtil.hasSideEffects(function(meta, x, y, w, h, filledStr, color) {
     addOperation(function () {
       var kappa = 0.5522848;
       var ox = (w / 2) * kappa; // control point offset horizontal
@@ -131,7 +131,7 @@ var userFns = {
     }, "draw-oval");
   }),
 
-  "draw-rectangle": langUtil.hasSideEffects(function(x, y, width, height, filledStr, color) {
+  "draw-rectangle": langUtil.hasSideEffects(function(meta, x, y, width, height, filledStr, color) {
     addOperation(function () {
       if (filledStr === "unfilled") {
         screen.strokeStyle = color;

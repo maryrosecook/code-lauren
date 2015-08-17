@@ -3,56 +3,57 @@ var langUtil = require("./lang-util");
 
 var createStandardLibrary = module.exports = function () {
   var lib = {
-    add: function() {
-      return _.reduce(arguments, function(a, n) { return a + n; });
+    add: function(meta) {
+      return _.reduce(_.rest(arguments), function(a, n) { return a + n; });
     },
 
-    subtract: function() {
-      return _.reduce(arguments, function(a, n) { return a - n; });
+    subtract: function(meta) {
+      return _.reduce(_.rest(arguments), function(a, n) { return a - n; });
     },
 
-    multiply: function() {
-      return _.reduce(arguments, function(a, n) { return a * n; });
+    multiply: function(meta) {
+      return _.reduce(_.rest(arguments), function(a, n) { return a * n; });
     },
 
-    divide: function(a, b) {
-      return _.reduce(arguments, function(a, n) { return a / n; });
+    divide: function(meta) {
+      return _.reduce(_.rest(arguments), function(a, n) { return a / n; });
     },
 
-    modulus: function(a, b) {
+    modulus: function(meta, a, b) {
       return a % b;
     },
 
-    sine: function(x) {
+    sine: function(meta, x) {
       return Math.sin(lib.radians(x));
     },
 
-    cosine: function(x) {
+    cosine: function(meta, x) {
       return Math.cos(lib.radians(x));
     },
 
-    tangent: function(x) {
+    tangent: function(meta, x) {
       return Math.tan(lib.radians(x));
     },
 
-    radians: function(x) {
+    radians: function(meta, x) {
       return 0.01745 * x;
     },
 
-    degrees: function(x) {
+    degrees: function(meta, x) {
       return x / 0.01745;
     },
 
-    "new-dictionary": function() {
-      return _.object(_.filter(arguments, function(_, i) { return i % 2 === 0; }),
-                      _.filter(arguments, function(_, i) { return i % 2 === 1; }));
+    "new-dictionary": function(meta) {
+      var args = _.rest(arguments);
+      return _.object(_.filter(args, function(_, i) { return i % 2 === 0; }),
+                      _.filter(args, function(_, i) { return i % 2 === 1; }));
     },
 
-    "less-than": function(a, b) {
+    "less-than": function(meta, a, b) {
       return a < b;
     },
 
-    "greater-than": function(a, b) {
+    "greater-than": function(meta, a, b) {
       return a > b;
     },
 
@@ -67,17 +68,17 @@ var createStandardLibrary = module.exports = function () {
       }
     },
 
-    set: function(dict, key, value) {
+    set: function(meta, dict, key, value) {
       dict[key] = value;
       return dict;
     },
 
-    get: function(dict, key) {
+    get: function(meta, dict, key) {
       return dict[key];
     },
 
-    print: langUtil.hasSideEffects(function() {
-      var output = _.map(arguments, function(x) { return x.toString(); }).join(" ");
+    print: langUtil.hasSideEffects(function(meta) {
+      var output = _.map(_.rest(arguments), function(x) { return x.toString(); }).join(" ");
       console.log(output);
       return output + "\n";
     })
