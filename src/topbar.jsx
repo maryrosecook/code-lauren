@@ -11,9 +11,11 @@ var Topbar = React.createClass({
     return (
       <div className="topbar">
         <h1><a href="/#home">code lauren</a></h1>
+
         <ProgramPlayer editor={this.props.editor}
                        annotator={this.props.annotator}
                        canvasLib={canvasLib} />
+
         <Search />
 
         <div className="navigation">
