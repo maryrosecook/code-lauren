@@ -1,6 +1,6 @@
 ## Flashing light
 
-This code makes a light flash from red to blue.
+Code that a light flash from red to blue:
 
 ```
 color: "red"
