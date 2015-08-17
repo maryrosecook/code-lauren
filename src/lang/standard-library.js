@@ -81,7 +81,24 @@ var createStandardLibrary = module.exports = function () {
       var output = _.map(_.rest(arguments), function(x) { return x.toString(); }).join(" ");
       console.log(output);
       return output + "\n";
-    })
+    }),
+
+    counters: [],
+    counted: function(meta, target) {
+      var counter = lib.counters[meta.ast.s];
+      if (counter === undefined) {
+        counter = lib.counters[meta.ast.s] = { count: 0, target: target };
+      }
+
+      counter.count++;
+
+      if (counter.count === counter.target) {
+        counter.count = 0;
+        return true;
+      } else {
+        return false;
+      }
+    }
   };
 
   return lib;
