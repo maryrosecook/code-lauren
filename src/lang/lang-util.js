@@ -7,6 +7,10 @@ function RuntimeError(message, ast) {
 };
 RuntimeError.prototype = Object.create(Error.prototype);
 
+function Meta(ast) {
+  this.ast = ast;
+};
+
 var langUtil = module.exports = {
   isFunction: function(o) {
     return langUtil.isLambda(o) || langUtil.isJsFn(o);
@@ -27,5 +31,6 @@ var langUtil = module.exports = {
 
   NO_SIDE_EFFECTS: "no_side_effects",
 
-  RuntimeError: RuntimeError
+  RuntimeError: RuntimeError,
+  Meta: Meta
 };
