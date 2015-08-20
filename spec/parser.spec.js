@@ -488,6 +488,10 @@ describe("parser", function() {
       expect(function() {
         parse("a: \n1");
       }).toThrow("Name needs a value");
+
+      expect(function() {
+        parse("a: \nd()");
+      }).toThrow("Name needs a value");
     });
 
     it("should report missing label in assignment", function() {

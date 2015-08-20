@@ -15,17 +15,17 @@
     },
 
     {
-      "code":      "a ()",
-      "stack":     ["_"],
-      "nextInput": "\\(\\)",
-      "message":   "Should be no spaces between\nthe name of the action and the ()"
-    },
-
-    {
       "code":      "a: ",
       "stack":     ["assignment", "_"],
       "nextInput": "\n*$",
       "message":   "Name needs a value"
+    },
+
+    {
+      "code":      "a ()",
+      "stack":     ["_"],
+      "nextInput": "\\(\\)",
+      "message":   "Should be no spaces between\nthe name of the action and the ()"
     },
 
     {
