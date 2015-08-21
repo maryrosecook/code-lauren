@@ -60,7 +60,7 @@
       "code":      "a b",
       "stack":     ["_"],
       "nextInput": "[a-zA-Z0-9_\\-]+",
-      "message":   "Expected this to be on a new line"
+      "message":   "Expected this to be on the next line"
     }
   ]
 }
