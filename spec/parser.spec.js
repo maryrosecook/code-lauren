@@ -453,11 +453,11 @@ describe("parser", function() {
     it("should expect expression on same line to be preceded by nl", function() {
       expect(function() {
         parse("a bb");
-      }).toThrow('Expected this to be on a new line');
+      }).toThrow('Expected this to be on the next line');
 
       expect(function() {
         parse("{ { a b } }");
-      }).toThrow('Expected this to be on a new line');
+      }).toThrow('Expected this to be on the next line');
     });
 
     it("should report that can't invoke literals", function() {
