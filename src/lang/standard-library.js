@@ -11,8 +11,8 @@ var createStandardLibrary = module.exports = function () {
       return a - b;
     },
 
-    multiply: function(meta) {
-      return _.reduce(_.rest(arguments), function(a, n) { return a * n; });
+    multiply: function(meta, a, b) {
+      return a * b;
     },
 
     divide: function(meta) {
