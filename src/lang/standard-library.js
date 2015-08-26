@@ -57,15 +57,8 @@ var createStandardLibrary = module.exports = function () {
       return a > b;
     },
 
-    equal: function(meta) {
-      var args = _.toArray(_.rest(arguments));
-      if (args.length < 2 || args[0] !== args[1]) {
-        return false;
-      } else if (args.length === 2) {
-        return true;
-      } else {
-        return lib.equal.apply(null, args.slice(1));
-      }
+    equal: function(meta, a, b) {
+      return a === b;
     },
 
     set: function(meta, dict, key, value) {
