@@ -1,5 +1,9 @@
 var standardLibrary = require("../src/lang/standard-library.js");
 
+var p = require("../src/lang/parser");
+var c = require("../src/lang/compiler");
+var v = require("../src/lang/vm");
+
 describe("library", function() {
   describe("new-dictionary", function() {
     it("should be able to make new empty dict", function() {
@@ -38,6 +42,9 @@ describe("library", function() {
       expect(standardLibrary().add({}, 1, 2)).toEqual(3);
     });
 
+    it("should throw if missing args", function() {
+      var code = "add()";
+      expect(function() { v(code, c(p(code))) }).toThrow("a number to add");
 
       var code = "add(1)";
       expect(function() { v(code, c(p(code))) }).toThrow("a number to add");

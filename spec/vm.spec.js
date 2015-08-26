@@ -204,6 +204,100 @@ describe("vm", function() {
     });
   });
 
+  describe("arity", function() {
+    describe("lambda", function() {
+      it("should not complain when right number of args passed", function() {
+        var code = 'none: { 1 } \n none()';
+        expect(v(code, c(p(code))).stack.pop().v).toEqual(1);
+
+        var code = 'one: { ?a a } \n one("a")';
+        expect(v(code, c(p(code))).stack.pop().v).toEqual("a");
+
+        var code = 'many: { ?a ?b ?c ?d ?e ?f ?g ?h h } \n many("a" "b" "c" "d" "e" "f" "g" "h")';
+        expect(v(code, c(p(code))).stack.pop().v).toEqual("h");
+      });
+
+      it("should complain if passed too few args", function() {
+        var code = 'one: { ?a } \n one()';
+        expect(function() { v(code, c(p(code))) }).toThrow('Missing a "a"');
+
+        var code = 'one: { ?a ?b ?c } \n one("a")';
+        expect(function() { v(code, c(p(code))) }).toThrow('Missing a "b"');
+      });
+
+      it("should mark end of arg list if passed too few args", function() {
+        var caught = false;
+        try {
+          var code = 'one: { ?a ?b ?c } \n one("a")';
+          v(code, c(p(code)))
+        } catch (e) {
+          caught = true;
+          expect(e.s).toEqual(27);
+          expect(e.e).toEqual(27);
+        }
+
+        expect(caught).toEqual(true);
+      });
+
+      it("should mark all extra args if passed too many args", function() {
+        var caught = false;
+        try {
+          var code = 'one: { ?a ?b } \n one("a" "b" "c" "d")';
+          v(code, c(p(code)))
+        } catch (e) {
+          caught = true;
+          expect(e.s).toEqual(29);
+          expect(e.e).toEqual(36);
+        }
+
+        expect(caught).toEqual(true);
+      });
+
+      it("should complain if fn passed too many args", function() {
+        var code = 'one: { } \n one(1)';
+        expect(function() { v(code, c(p(code))) }).toThrow('"one" does not need this');
+
+        var code = 'one: { ?a } \n one(1 2 3)';
+        expect(function() { v(code, c(p(code))) }).toThrow('"one" does not need these');
+      });
+    });
+
+    describe("builtin", function() {
+      it("should complain when too many args passed", function() {
+        var code = 'add(1 2 3 4)';
+        expect(function() { v(code, c(p(code))) }).toThrow('"add" does not need these');
+      });
+
+      it("should mark end of arg list when arg missing", function() {
+        var caught = false;
+        try {
+          var code = 'add()';
+          v(code, c(p(code)))
+        } catch (e) {
+          caught = true;
+          expect(e.s).toEqual(4);
+          expect(e.e).toEqual(4);
+        }
+
+        expect(caught).toEqual(true);
+      });
+
+      it("should mark all extra args when too many passed", function() {
+        var caught = false;
+        try {
+          var code = 'add(1 2 3 4)';
+          v(code, c(p(code)))
+        } catch (e) {
+          caught = true;
+          expect(e.s).toEqual(8);
+          expect(e.e).toEqual(11);
+        }
+
+        expect(caught).toEqual(true);
+      });
+    });
+  });
+
   describe("recursion", function() {
     it("should trampoline a program where there is an if in the tail position", function() {
       var code = 'tozero: { ?x if equal(x 0) { "done" } else { tozero(subtract(x 1)) } } \n tozero(20000)';

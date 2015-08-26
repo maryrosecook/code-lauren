@@ -5,6 +5,7 @@ var standardLibrary = require("./standard-library");
 var envModule = require("../env");
 var scope = require("./scope");
 var langUtil = require("./lang-util");
+var checkArgs = require("./check-args");
 
 var copyProgramState;
 function stepPush(ins, p) {
@@ -32,6 +33,12 @@ function stepReturn(ins, p) {
   return p;
 };
 
+var ARG_START = ["ARG_START"];
+function stepArgStart(ins, p) {
+  p.stack.push({ v: ARG_START });
+  return p;
+};
+
 function stepGetEnv(ins, p) {
   var value = currentCallFrame(p).env.getScopedBinding(ins[1]);
   if (value === undefined) {
@@ -49,36 +56,40 @@ function stepSetEnv(ins, p) {
 };
 
 function stepInvoke(ins, p, noSideEffects) {
-  var stackValue = p.stack.pop();
-  var fn = stackValue.v;
-  var arity = ins[1];
+  var fnStackItem = p.stack.pop();
+  var fn = fnStackItem.v;
 
-  // TODO: raise errors for arity problems
-  var args = _.range(arity).map(function() { return p.stack.pop().v; }).reverse();
+  if (langUtil.isFunction(fn)) {
+    var argContainers = getTopArgsOnStack(p.stack).reverse();
+    var argValues = _.pluck(argContainers, "v");
 
-  if (langUtil.isLambda(fn)) {
-    var lambdaEnv = scope(_.object(fn.parameters, args), fn.closureEnv);
+    if (langUtil.isLambda(fn)) {
+      checkArgs.checkLambdaArity(fnStackItem, argContainers, ins.ast);
 
-    var tailIndex = tailCallIndex(p.callStack, fn);
-    if (tailIndex !== undefined) { // if tail position exprs all the way to recursive call then tco
-      p.callStack = p.callStack.slice(0, tailIndex + 1);
-      currentCallFrame(p).env = lambdaEnv;
-      currentCallFrame(p).bcPointer = 0;
-    } else {
-      p.callStack.push(createCallFrame(fn.bc, 0, lambdaEnv, ins[2]));
+      var lambdaEnv = scope(_.object(fn.parameters, argValues), fn.closureEnv);
+      var tailIndex = tailCallIndex(p.callStack, fn);
+      if (tailIndex !== undefined) { // if tail position exprs all way to recursive call then tco
+        p.callStack = p.callStack.slice(0, tailIndex + 1);
+        currentCallFrame(p).env = lambdaEnv;
+        currentCallFrame(p).bcPointer = 0;
+      } else {
+        p.callStack.push(createCallFrame(fn.bc, 0, lambdaEnv, ins[2]));
+      }
+
+      return p;
+    } else if (langUtil.isJsFn(fn)) {
+      if (noSideEffects !== langUtil.NO_SIDE_EFFECTS || fn.hasSideEffects !== true) {
+        checkArgs.checkBuiltinNoExtraArgs(fnStackItem, argContainers, fn.length);
+
+        var meta = new langUtil.Meta(ins.ast);
+        p.stack.push({ v: fn.apply(null, [meta].concat(argValues)), ast: ins.ast });
+      }
+
+      return p;
     }
-
-    return p;
-  } else if (langUtil.isJsFn(fn)) {
-    if (noSideEffects !== langUtil.NO_SIDE_EFFECTS || fn.hasSideEffects !== true) {
-      var meta = { ast: ins.ast };
-      p.stack.push({ v: fn.apply(null, [meta].concat(args)), ast: ins.ast });
-    }
-
-    return p;
   } else {
     p.crashed = true;
-    throw new langUtil.RuntimeError("This is not an action", stackValue.ast);
+    throw new langUtil.RuntimeError("This is not an action", fnStackItem.ast);
   }
 };
 
@@ -141,6 +152,8 @@ function step(p, noSideEffects) {
       return stepJump(ins, p);
     } else if (ins[0] === "return") {
       return stepReturn(ins, p);
+    } else if (ins[0] === "arg_start") {
+      return stepArgStart(ins, p);
     } else {
       p.crashed = true;
       throw new langUtil.RuntimeError("I don't know how to run this instruction: " + ins, ins.ast);
@@ -197,6 +210,16 @@ function throwIfUninvokedStackFunctions(p) {
                                     "() to run it.",
                                     unrunFn.ast);
   }
+};
+
+function getTopArgsOnStack(stack) {
+  var args = [];
+  while (stack.length > 0 && _.last(stack).v !== ARG_START) {
+    args.push(stack.pop());
+  }
+
+  stack.pop(); // throw away arg_start instruction
+  return args;
 };
 
 initProgramStateAndComplete.initProgramStateAndComplete = initProgramStateAndComplete;

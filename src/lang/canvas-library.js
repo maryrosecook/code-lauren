@@ -1,5 +1,6 @@
 var _ = require("underscore");
 var langUtil = require("./lang-util");
+var chk = require("./check-args");
 
 var screen;
 var step = 0;
@@ -93,14 +94,21 @@ var userFns = {
     }, "clear-screen", true);
   }),
 
-  write: langUtil.hasSideEffects(function(meta, str, x, y, color) {
-    addOperation(function () {
-      screen.font = "20px Georgia";
-      screen.fillStyle = color;
-      screen.fillText(str, x, y);
-      screen.fillStyle = "black";
-    }, "write");
-  }),
+  write: langUtil.hasSideEffects(
+    function(meta, str, x, y, color) {
+      chk(arguments,
+          chk.any("Needs something to write to the screen"),
+          chk.num("Needs the distance from the left of the screen"),
+          chk.num("Needs the distance from the top of the screen"),
+          chk.color("Needs the color of the text"));
+
+      addOperation(function () {
+        screen.font = "20px Georgia";
+        screen.fillStyle = color;
+        screen.fillText(str, x, y);
+        screen.fillStyle = "black";
+      }, "write");
+    }),
 
   "draw-oval": langUtil.hasSideEffects(function(meta, x, y, w, h, filledStr, color) {
     addOperation(function () {

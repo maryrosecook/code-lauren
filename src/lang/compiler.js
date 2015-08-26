@@ -36,13 +36,13 @@ function compileDo(a) {
 function compileInvocation(a) {
   var aInvocation = util.getNodeAt(a, ["invocation"]);
   var aArgs = aInvocation.slice(1);
-  var compiledArgs = util.mapCat(aArgs, compile);
+  var compiledArgs = ins(["arg_start"]).concat(util.mapCat(aArgs, compile));
   var compiledFn = compile(aInvocation[0]);
-  var code = compiledArgs.concat(compiledFn, ins(["invoke",
-                                                  aArgs.length,
-                                                  a.tail === true ? true : false],
-                                                 a,
-                                                 ANNOTATE));
+  var tail = a.tail === true ? true : false;
+  var code = compiledArgs.concat(compiledFn,
+                                 ins(["invoke", aArgs.length, tail],
+                                     a,
+                                     ANNOTATE));
   return code;
 };
 
@@ -53,7 +53,7 @@ function compileConditional(a) {
   for (var i = 0; i < parts.length; i += 2) {
     clauses.push(
       compile(parts[i]).concat( // put conditional value to evaluate on stack
-        ins(["if_not_true_jump", 3], parts[i]), // skip block if !condition
+        ins(["if_not_true_jump", 4], parts[i]), // skip block if !condition
         compile(parts[i + 1]) // push condition's lambda inv onto stack (skipped if !condition)
       )
     );

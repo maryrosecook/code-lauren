@@ -39,7 +39,8 @@ describe("bytecode compiler", function() {
     it("should compile an if", function() {
       expect(util.stripBc(c(p("if true { 1 }"))))
         .toEqual([["push", true],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
                   ["invoke", 0, true],
@@ -51,14 +52,16 @@ describe("bytecode compiler", function() {
     it("should compile an if/else", function() {
       expect(util.stripBc(c(p("if true { 1 } else { 2 }"))))
         .toEqual([["push", true],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 5],
+                  ["jump", 6],
 
                   ["push", true],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
                   ["invoke", 0, true],
@@ -70,21 +73,24 @@ describe("bytecode compiler", function() {
     it("should compile an if/elseif/else", function() {
       expect(util.stripBc(c(p("if true { 1 } elseif false { 2 } else { 3 }"))))
         .toEqual([["push", true],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 10],
+                  ["jump", 12],
 
                   ["push", false],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 5],
+                  ["jump", 6],
 
                   ["push", true],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 3],
                                          ["return"]] }],
                   ["invoke", 0, true],
@@ -96,28 +102,32 @@ describe("bytecode compiler", function() {
     it("should compile an if/elseif/elseif/else", function() {
       expect(util.stripBc(c(p("if true { 1 } elseif false { 2 } elseif true { 3 } else { 4 }"))))
         .toEqual([["push", true],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 15],
+                  ["jump", 18],
 
                   ["push", false],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 10],
+                  ["jump", 12],
 
                   ["push", true],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 3],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 5],
+                  ["jump", 6],
 
                   ["push", true],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 4],
                                          ["return"]] }],
                   ["invoke", 0, true],
@@ -129,13 +139,15 @@ describe("bytecode compiler", function() {
     it("should compile an if/elseif/elseif/else", function() {
       expect(util.stripBc(c(p("if true { 1 } elseif false { 2 }"))))
         .toEqual([["push", true],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 5],
+                  ["jump", 6],
                   ["push", false],
-                  ["if_not_true_jump", 3],
+                  ["if_not_true_jump", 4],
+                  ["arg_start"],
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
                   ["invoke", 0, true],
@@ -168,14 +180,16 @@ describe("bytecode compiler", function() {
 
     it("should compile lambda that contains an invocation on no arguments", function() {
       expect(util.stripBc(c(util.getNodeAt(p("{ a() }"), ["top", "do", 0, "return"]))[0][1].bc))
-        .toEqual([["get_env", "a"],
+        .toEqual([["arg_start"],
+                  ["get_env", "a"],
                   ["invoke", 0, true],
                   ["return"]]);
     });
 
     it("should compile lambda that contains an invocation with some arguments", function() {
       expect(util.stripBc(c(util.getNodeAt(p("{ a(1 2) }"), ["top", "do", 0, "return"]))[0][1].bc))
-        .toEqual([["push", 1],
+        .toEqual([["arg_start"],
+                  ["push", 1],
                   ["push", 2],
                   ["get_env", "a"],
                   ["invoke", 2, true],
@@ -185,7 +199,8 @@ describe("bytecode compiler", function() {
     it("should compile invocation of lambda literal", function() {
       var code = util.stripBc(c(util.getNodeAt(p("{ {}() }"),
                                                ["top", "do", 0, "return"]))[0][1].bc);
-      expect(code).toEqual([["push_lambda", { bc: [["push", undefined],
+      expect(code).toEqual([["arg_start"],
+                            ["push_lambda", { bc: [["push", undefined],
                                                    ["return"]] }],
                             ["invoke", 0, true],
                             ["return"]]);

@@ -1,9 +1,13 @@
 var _ = require("underscore");
 var langUtil = require("./lang-util");
+var chk = require("./check-args");
 
 var createStandardLibrary = module.exports = function () {
   var lib = {
     add: function(meta, a, b) {
+      chk(arguments,
+          chk.num("a number to add"),
+          chk.num("a number to add"));
       return parseFloat(a) + parseFloat(b);
     },
 
@@ -71,6 +75,10 @@ var createStandardLibrary = module.exports = function () {
     },
 
     print: langUtil.hasSideEffects(
+      function(meta, itemToPrint) {
+        chk(arguments,
+            chk.any("something to print"));
+
         console.log(itemToPrint);
         return itemToPrint + "\n";
       }),
