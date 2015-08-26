@@ -7,8 +7,8 @@ var createStandardLibrary = module.exports = function () {
       return _.reduce(_.rest(arguments), function(a, n) { return a + n; });
     },
 
-    subtract: function(meta) {
-      return _.reduce(_.rest(arguments), function(a, n) { return a - n; });
+    subtract: function(meta, a, b) {
+      return a - b;
     },
 
     multiply: function(meta) {
