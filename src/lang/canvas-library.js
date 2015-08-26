@@ -36,6 +36,10 @@ var programFns = {
     cachedDrawOperations = [];
   },
 
+  shutDown: function() {
+    clearInterval(flushIntervalId);
+  },
+
   stepForwards: function() {
     step++;
   },
@@ -94,23 +98,30 @@ var userFns = {
     }, "clear-screen", true);
   }),
 
-  write: langUtil.hasSideEffects(
-    function(meta, str, x, y, color) {
-      chk(arguments,
-          chk.any("Needs something to write to the screen"),
-          chk.num("Needs the distance from the left of the screen"),
-          chk.num("Needs the distance from the top of the screen"),
-          chk.color("Needs the color of the text"));
+  write: langUtil.hasSideEffects(function(meta, str, x, y, color) {
+    chk(arguments,
+        chk.any("Missing something to write to the screen"),
+        chk.num("Missing the distance from the left of the screen"),
+        chk.num("Missing the distance from the top of the screen"),
+        chk.set(COLORS, "Missing the color of the text"));
 
-      addOperation(function () {
-        screen.font = "20px Georgia";
-        screen.fillStyle = color;
-        screen.fillText(str, x, y);
-        screen.fillStyle = "black";
-      }, "write");
-    }),
+    addOperation(function () {
+      screen.font = "20px Georgia";
+      screen.fillStyle = color;
+      screen.fillText(str, x, y);
+      screen.fillStyle = "black";
+    }, "write");
+  }),
 
   "draw-oval": langUtil.hasSideEffects(function(meta, x, y, w, h, filledStr, color) {
+    chk(arguments,
+        chk.num("Missing the distance from the left of the screen"),
+        chk.num("Missing the distance from the top of the screen"),
+        chk.num("Missing a width"),
+        chk.num("Missing a height"),
+        chk.set(["filled", "unfilled"], 'Missing either "filled" or "unfilled"'),
+        chk.set(COLORS, "Missing the color of the text"));
+
     addOperation(function () {
       var kappa = 0.5522848;
       var ox = (w / 2) * kappa; // control point offset horizontal
@@ -140,6 +151,14 @@ var userFns = {
   }),
 
   "draw-rectangle": langUtil.hasSideEffects(function(meta, x, y, width, height, filledStr, color) {
+    chk(arguments,
+        chk.num("Missing the distance from the left of the screen"),
+        chk.num("Missing the distance from the top of the screen"),
+        chk.num("Missing a width"),
+        chk.num("Missing a height"),
+        chk.set(["filled", "unfilled"], 'Missing either "filled" or "unfilled"'),
+        chk.set(COLORS, "Missing the color of the text"));
+
     addOperation(function () {
       if (filledStr === "unfilled") {
         screen.strokeStyle = color;
@@ -165,9 +184,159 @@ var setScreen = module.exports = function(inScreen) {
   // run any unflushed cached ops - might get left if draw ops done,
   // program hasn't terminated and are outside a loop or loop has
   // ended
-  setInterval(programFns.flush, 100);
+  flushIntervalId = setInterval(programFns.flush, 100);
 
   screen = inScreen;
 
   return api;
 };
+
+function set(legalValues) {
+  return createSpec(message, function(arg) {
+    return legalValues.indexOf();
+  });
+};
+
+var COLORS = [
+  "aliceblue",
+  "antiquewhite",
+  "aqua",
+  "aquamarine",
+  "azure",
+  "beige",
+  "bisque",
+  "black",
+  "blanchedalmond",
+  "blue",
+  "blueviolet",
+  "brown",
+  "burlywood",
+  "cadetblue",
+  "chartreuse",
+  "chocolate",
+  "coral",
+  "cornflowerblue",
+  "cornsilk",
+  "crimson",
+  "cyan",
+  "darkblue",
+  "darkcyan",
+  "darkgoldenrod",
+  "darkgray",
+  "darkgreen",
+  "darkkhaki",
+  "darkmagenta",
+  "darkolivegreen",
+  "darkorange",
+  "darkorchid",
+  "darkred",
+  "darksalmon",
+  "darkseagreen",
+  "darkslateblue",
+  "darkslategray",
+  "darkturquoise",
+  "darkviolet",
+  "deeppink",
+  "deepskyblue",
+  "dimgray",
+  "dodgerblue",
+  "firebrick",
+  "floralwhite",
+  "forestgreen",
+  "fuchsia",
+  "gainsboro",
+  "ghostwhite",
+  "gold",
+  "goldenrod",
+  "gray",
+  "green",
+  "greenyellow",
+  "honeydew",
+  "hotpink",
+  "indianred",
+  "indigo",
+  "ivory",
+  "khaki",
+  "lavender",
+  "lavenderblush",
+  "lawngreen",
+  "lemonchiffon",
+  "lightblue",
+  "lightcoral",
+  "lightcyan",
+  "lightgoldenrodyellow",
+  "lightgray",
+  "lightgreen",
+  "lightpink",
+  "lightsalmon",
+  "lightseagreen",
+  "lightskyblue",
+  "lightslategray",
+  "lightsteelblue",
+  "lightyellow",
+  "lime",
+  "limegreen",
+  "linen",
+  "magenta",
+  "maroon",
+  "mediumaquamarine",
+  "mediumblue",
+  "mediumorchid",
+  "mediumpurple",
+  "mediumseagreen",
+  "mediumslateblue",
+  "mediumspringgreen",
+  "mediumturquoise",
+  "mediumvioletred",
+  "midnightblue",
+  "mintcream",
+  "mistyrose",
+  "moccasin",
+  "navajowhite",
+  "navy",
+  "oldlace",
+  "olive",
+  "olivedrab",
+  "orange",
+  "orangered",
+  "orchid",
+  "palegoldenrod",
+  "palegreen",
+  "paleturquoise",
+  "palevioletred",
+  "papayawhip",
+  "peachpuff",
+  "peru",
+  "pink",
+  "plum",
+  "powderblue",
+  "purple",
+  "rebeccapurple",
+  "red",
+  "rosybrown",
+  "royalblue",
+  "saddlebrown",
+  "salmon",
+  "sandybrown",
+  "seagreen",
+  "seashell",
+  "sienna",
+  "silver",
+  "skyblue",
+  "slateblue",
+  "slategray",
+  "snow",
+  "springgreen",
+  "steelblue",
+  "tan",
+  "teal",
+  "thistle",
+  "tomato",
+  "turquoise",
+  "violet",
+  "wheat",
+  "white",
+  "whitesmoke",
+  "yellow",
+  "yellowgreen"
+];
