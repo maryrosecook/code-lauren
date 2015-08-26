@@ -15,8 +15,8 @@ var createStandardLibrary = module.exports = function () {
       return a * b;
     },
 
-    divide: function(meta) {
-      return _.reduce(_.rest(arguments), function(a, n) { return a / n; });
+    divide: function(meta, a, b) {
+      return a / b;
     },
 
     modulus: function(meta, a, b) {
