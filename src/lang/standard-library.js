@@ -70,11 +70,10 @@ var createStandardLibrary = module.exports = function () {
       return dict[key];
     },
 
-    print: langUtil.hasSideEffects(function(meta) {
-      var output = _.map(_.rest(arguments), function(x) { return x.toString(); }).join(" ");
-      console.log(output);
-      return output + "\n";
-    }),
+    print: langUtil.hasSideEffects(
+        console.log(itemToPrint);
+        return itemToPrint + "\n";
+      }),
 
     counters: [],
     counted: function(meta, target) {

@@ -49,12 +49,9 @@ describe("library", function() {
       expect(standardLibrary().print({}, "a")).toEqual("a\n");
     });
 
-    it("should print newline if nothing passed", function() {
-      expect(standardLibrary().print()).toEqual("\n");
-    });
-
-    it("should concat items with spaces if many passed", function() {
-      expect(standardLibrary().print({}, "a", "b", "c")).toEqual("a b c\n");
+    it("should throw if nothing passed to print", function() {
+      var code = "print()";
+      expect(function() { v(code, c(p(code))) }).toThrow("something to print");
     });
   });
 
