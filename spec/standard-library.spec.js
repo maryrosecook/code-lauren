@@ -34,16 +34,13 @@ describe("library", function() {
   });
 
   describe("add", function() {
-    it("should be able to add many values", function() {
-      expect(standardLibrary().add({}, 1, 2, 3, 4)).toEqual(10);
+    it("should be able to add two values", function() {
+      expect(standardLibrary().add({}, 1, 2)).toEqual(3);
     });
 
-    it("should be able to add one value", function() {
-      expect(standardLibrary().add({}, 1)).toEqual(1);
-    });
 
-    it("should return undefined if nothing passed", function() {
-      expect(standardLibrary().add()).toBeUndefined();
+      var code = "add(1)";
+      expect(function() { v(code, c(p(code))) }).toThrow("a number to add");
     });
   });
 

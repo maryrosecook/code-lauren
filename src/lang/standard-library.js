@@ -3,8 +3,8 @@ var langUtil = require("./lang-util");
 
 var createStandardLibrary = module.exports = function () {
   var lib = {
-    add: function(meta) {
-      return _.reduce(_.rest(arguments), function(a, n) { return a + n; });
+    add: function(meta, a, b) {
+      return parseFloat(a) + parseFloat(b);
     },
 
     subtract: function(meta, a, b) {
