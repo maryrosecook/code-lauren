@@ -129,7 +129,8 @@ var createStandardLibrary = module.exports = function () {
     counters: [],
     counted: function(meta, target) {
       chk(arguments,
-          chk.num("Missing a number to count to"));
+          [chk.num("Missing a number to count to"),
+           chk.range(1, undefined, "Number to count to must be more than 0")]);
 
       var counter = lib.counters[meta.ast.s];
       if (counter === undefined) {

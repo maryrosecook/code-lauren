@@ -243,5 +243,11 @@ describe("library", function() {
       var code = "counted()";
       expect(function() { v(code, c(p(code))) }).toThrow("Missing a number to count to");
     });
+
+    it("should throw if count number not greater than 0", function() {
+      var code = "counted(0)";
+      expect(function() { v(code, c(p(code))) })
+        .toThrow("Number to count to must be more than 0");
+    });
   });
 });
