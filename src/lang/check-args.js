@@ -67,6 +67,14 @@ function num(message) {
   });
 };
 
+function range(low, high, message) {
+  low = low || Number.MIN_SAFE_INTEGER;
+  high = high || Number.MAX_SAFE_INTEGER;
+  return createSpec(message, function(arg) {
+    return arg < low || arg > high;
+  });
+};
+
 function set(legalValues, message) {
   return createSpec(message, function(arg) {
     if (arg == null) {
@@ -82,6 +90,7 @@ function set(legalValues, message) {
 checkBuiltinArgs.any = any;
 checkBuiltinArgs.num = num;
 checkBuiltinArgs.set = set;
+checkBuiltinArgs.range = range;
 checkBuiltinArgs.checkLambdaArity = checkLambdaArity;
 checkBuiltinArgs.checkBuiltinNoExtraArgs = checkBuiltinNoExtraArgs;
 checkBuiltinArgs.checkBuiltinArgs = checkBuiltinArgs;
