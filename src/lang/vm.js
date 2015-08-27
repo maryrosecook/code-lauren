@@ -169,7 +169,7 @@ function step(p, noSideEffects) {
 };
 
 function maybePrintError(e) {
-  if (window !== undefined && window.location.href.indexOf("localhost:") !== -1) {
+  if (typeof(window) === "undefined" || window.location.href.indexOf("localhost:") !== -1) {
     console.log(e.stack);
   }
 };
