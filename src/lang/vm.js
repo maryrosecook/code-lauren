@@ -154,7 +154,8 @@ function step(p, noSideEffects) {
       } else if (ins[0] === "arg_start") {
         return stepArgStart(ins, p);
       } else {
-        throw new langUtil.RuntimeError("I don't know how to run this instruction: " + ins, ins.ast);
+        throw new langUtil.RuntimeError("I don't know how to run this instruction: " + ins,
+                                        ins.ast);
       }
     } catch (e) {
       if (e instanceof langUtil.RuntimeError) {
