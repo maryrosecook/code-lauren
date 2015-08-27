@@ -193,20 +193,20 @@ describe("library", function() {
     });
   });
 
-  describe("greater-than", function() {
+  describe("more-than", function() {
     it("should return true for 2 and 1", function() {
-      expect(standardLibrary()["greater-than"]({}, 2, 1)).toEqual(true);
+      expect(standardLibrary()["more-than"]({}, 2, 1)).toEqual(true);
     });
 
     it("should return false for 1 and 2", function() {
-      expect(standardLibrary()["greater-than"]({}, 1, 2)).toEqual(false);
+      expect(standardLibrary()["more-than"]({}, 1, 2)).toEqual(false);
     });
 
     it("should throw if missing args", function() {
-      var code = "greater-than()";
+      var code = "more-than()";
       expect(function() { v(code, c(p(code))) }).toThrow("Missing two numbers");
 
-      var code = "greater-than(1)";
+      var code = "more-than(1)";
       expect(function() { v(code, c(p(code))) }).toThrow("Missing a second number");
     });
   });

@@ -92,7 +92,7 @@ var createStandardLibrary = module.exports = function () {
       return a < b;
     },
 
-    "greater-than": function(meta, a, b) {
+    "more-than": function(meta, a, b) {
       chk(arguments,
           chk.num("Missing two numbers"),
           chk.num("Missing a second number"));
