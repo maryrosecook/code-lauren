@@ -375,9 +375,10 @@ button:focus {
   padding: 0 4px;
 }
 
-.zero-width-mark {
-  background-color: rgba(0, 0, 255, 0.12);
-  padding: 0 2px;
+.zero-width-mark.error {
+  background-color: rgba(255, 0, 0, 0.3);
+  padding: 3px 2px 3px 2px;
+  margin: 0 -2px 0 -2px;
 };
 
 .cm-s-default { color: black; }
