@@ -144,6 +144,13 @@ describe("vm", function() {
         v(code, c(p(code)));
       }).toThrow("Never heard of blowup");
     });
+
+    it("shouldn't leave return stack val to be hoovered up by next forever invoke", function() {
+      var code = "stop: false \n forever { if stop { blowup } else { stop: true } \n 1 }";
+      expect(function() {
+        v(code, c(p(code)));
+      }).toThrow("Never heard of blowup");
+    });
   });
 
   describe("conditionals", function() {
