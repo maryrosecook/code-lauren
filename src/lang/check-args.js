@@ -5,7 +5,13 @@ function checkBuiltinArgs(fnArgs) {
   var meta = fnArgs[0];
   var testArgs = _.rest(fnArgs);
   var specs = _.rest(arguments);
-  specs.forEach(function(spec, i) { spec(meta, testArgs[i]); });
+  specs.forEach(function(specOrSpecs, i) {
+    if (_.isArray(specOrSpecs)) {
+      specOrSpecs.forEach(function(spec) { spec(meta, testArgs[i]); });
+    } else {
+      specOrSpecs(meta, testArgs[i]);
+    }
+  });
 };
 
 function checkLambdaArity(fnStackItem, argContainers, invocationAst) {
