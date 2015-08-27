@@ -286,11 +286,11 @@ var ProgramPlayer = React.createClass({
                   className={"player-button step-backwards-button" +
                              stepBackwardsEnabledClassName} />
 
-          <button onClick={this.onPlayPauseClick} className={playPauseClassName} />
-
           <button onMouseDown={this.stepForwardsClickHandler}
                   onMouseUp={this.stepForwardsClickHandler}
                   className={"player-button step-forwards-button" + stepForwardsEnabledClassName} />
+
+          <button onClick={this.onPlayPauseClick} className={playPauseClassName} />
         </div>
     );
   }
