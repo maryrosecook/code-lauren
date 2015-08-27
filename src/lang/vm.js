@@ -42,7 +42,6 @@ function stepArgStart(ins, p) {
 function stepGetEnv(ins, p) {
   var value = currentCallFrame(p).env.getScopedBinding(ins[1]);
   if (value === undefined) {
-    p.crashed = true;
     throw new langUtil.RuntimeError("Never heard of " + ins[1], ins.ast);
   } else {
     p.stack.push({ v: value, ast: ins.ast });
@@ -88,7 +87,6 @@ function stepInvoke(ins, p, noSideEffects) {
       return p;
     }
   } else {
-    p.crashed = true;
     throw new langUtil.RuntimeError("This is not an action", fnStackItem.ast);
   }
 };
@@ -134,29 +132,35 @@ function step(p, noSideEffects) {
 
     p.currentInstruction = ins;
 
-    if (ins[0] === "push") {
-      return stepPush(ins, p);
-    } else if (ins[0] === "push_lambda") {
-      return stepPushLambda(ins, p);
-    } else if (ins[0] === "pop") {
-      return stepPop(ins, p);
-    } else if (ins[0] === "get_env") {
-      return stepGetEnv(ins, p);
-    } else if (ins[0] === "set_env") {
-      return stepSetEnv(ins, p);
-    } else if (ins[0] === "invoke") {
-      return stepInvoke(ins, p, noSideEffects);
-    } else if (ins[0] === "if_not_true_jump") {
-      return stepIfNotTrueJump(ins, p);
-    } else if (ins[0] === "jump") {
-      return stepJump(ins, p);
-    } else if (ins[0] === "return") {
-      return stepReturn(ins, p);
-    } else if (ins[0] === "arg_start") {
-      return stepArgStart(ins, p);
-    } else {
-      p.crashed = true;
-      throw new langUtil.RuntimeError("I don't know how to run this instruction: " + ins, ins.ast);
+    try {
+      if (ins[0] === "push") {
+        return stepPush(ins, p);
+      } else if (ins[0] === "push_lambda") {
+        return stepPushLambda(ins, p);
+      } else if (ins[0] === "pop") {
+        return stepPop(ins, p);
+      } else if (ins[0] === "get_env") {
+        return stepGetEnv(ins, p);
+      } else if (ins[0] === "set_env") {
+        return stepSetEnv(ins, p);
+      } else if (ins[0] === "invoke") {
+        return stepInvoke(ins, p, noSideEffects);
+      } else if (ins[0] === "if_not_true_jump") {
+        return stepIfNotTrueJump(ins, p);
+      } else if (ins[0] === "jump") {
+        return stepJump(ins, p);
+      } else if (ins[0] === "return") {
+        return stepReturn(ins, p);
+      } else if (ins[0] === "arg_start") {
+        return stepArgStart(ins, p);
+      } else {
+        throw new langUtil.RuntimeError("I don't know how to run this instruction: " + ins, ins.ast);
+      }
+    } catch (e) {
+      if (e instanceof langUtil.RuntimeError) {
+        p.crashed = true;
+        throw e;
+      }
     }
   }
 };
@@ -204,7 +208,6 @@ function initProgramStateAndComplete(bc, env, stack) {
 function throwIfUninvokedStackFunctions(p) {
   var unrunFn = _.chain(p.stack).find(o => langUtil.isFunction(o.v)).value();
   if (unrunFn !== undefined) {
-    p.crashed = true;
     throw new langUtil.RuntimeError("This is an action. Type " +
                                     p.code.slice(unrunFn.ast.s, unrunFn.ast.e) +
                                     "() to run it.",
