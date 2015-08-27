@@ -169,8 +169,8 @@ function step(p, noSideEffects) {
 };
 
 function maybePrintError(e) {
-  if (window && window.location.href.indexOf("localhost:") !== -1) {
-    console.log(e.message);
+  if (window !== undefined && window.location.href.indexOf("localhost:") !== -1) {
+    console.log(e.stack);
   }
 };
 
