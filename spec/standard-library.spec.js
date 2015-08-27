@@ -226,6 +226,26 @@ describe("library", function() {
   });
 
   describe("counted", function() {
+    it("should always return true when passed 1", function() {
+      var lib = standardLibrary();
+      var meta = { ast: { s: 10 } };
+
+      expect(lib.counted(meta, 1)).toEqual(true);
+      expect(lib.counted(meta, 1)).toEqual(true);
+      expect(lib.counted(meta, 1)).toEqual(true);
+    });
+
+    it("should return false true false true when passed 2", function() {
+      var lib = standardLibrary();
+      var meta = { ast: { s: 10 } };
+
+      expect(lib.counted(meta, 2)).toEqual(false);
+      expect(lib.counted(meta, 2)).toEqual(true);
+
+      expect(lib.counted(meta, 2)).toEqual(false);
+      expect(lib.counted(meta, 2)).toEqual(true);
+    });
+
     it("should be able to count to three twice times", function() {
       var lib = standardLibrary();
       var meta = { ast: { s: 10 } };
