@@ -62,7 +62,7 @@ function compileConditional(a) {
   var bc = [];
   for (var i = clauses.length - 1; i >= 0; i--) {
     var bcLength = bc.length
-    bc = clauses[i].concat(ins(["jump", bcLength], clauses[i]).concat(bc));
+    bc = clauses[i].concat(ins(["jump", bcLength], parts[i]).concat(bc));
   };
 
   return bc;
