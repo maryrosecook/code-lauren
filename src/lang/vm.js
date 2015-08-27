@@ -158,11 +158,19 @@ function step(p, noSideEffects) {
                                         ins.ast);
       }
     } catch (e) {
+      p.crashed = true;
       if (e instanceof langUtil.RuntimeError) {
-        p.crashed = true;
         throw e;
+      } else {
+        maybePrintError(e);
       }
     }
+  }
+};
+
+function maybePrintError(e) {
+  if (window && window.location.href.indexOf("localhost:") !== -1) {
+    console.log(e.message);
   }
 };
 
