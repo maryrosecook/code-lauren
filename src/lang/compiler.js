@@ -70,8 +70,8 @@ function compileConditional(a) {
 
 function compileForever(a) {
   var invocation = compile(a.c);
-  invocation[0].annotate = DO_NOT_ANNOTATE; // push_lambda
-  invocation[1].annotate = DO_NOT_ANNOTATE; // invocation
+  invocation[1].annotate = DO_NOT_ANNOTATE; // push_lambda
+  invocation[2].annotate = DO_NOT_ANNOTATE; // invocation
   var bc = invocation.concat(ins(["pop"]),
                              ins(["jump", -4], a));
   return bc;
