@@ -375,12 +375,6 @@ button:focus {
   padding: 0 4px;
 }
 
-.zero-width-mark.error {
-  background-color: rgba(255, 0, 0, 0.3);
-  padding: 3px 2px 3px 2px;
-  margin: 0 -2px 0 -2px;
-};
-
 .cm-s-default { color: black; }
 .cm-s-default .cm-string { color: #578622; }
 .cm-s-default .cm-number { color: #FF5BAE; }
@@ -389,6 +383,18 @@ button:focus {
 
 .error { background-color: rgba(255, 0, 0, 0.2); }
 .currently-executing { background-color: rgba(0, 0, 255, 0.12); }
+
+.zero-width-mark.error {
+  background-color: rgba(255, 0, 0, 0.3);
+  padding: 3px 2px 3px 2px;
+  margin: 0 -2px 0 -2px;
+}
+
+.zero-width-mark.currently-executing {
+  background-color: rgba(0, 0, 255, 0.12);
+  padding: 3px 2px 3px 2px;
+  margin: 0 -2px 0 -2px;
+}
 
 pre {
   margin: 1em 0 1em 0;
