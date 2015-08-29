@@ -120,7 +120,7 @@ var createStandardLibrary = module.exports = function () {
     print: langUtil.hasSideEffects(
       function(meta, itemToPrint) {
         chk(arguments,
-            chk.any("something to print"));
+            chk.any("Missing something to print"));
 
         console.log(itemToPrint);
         return itemToPrint + "\n";

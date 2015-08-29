@@ -171,7 +171,7 @@ describe("library", function() {
 
     it("should throw if nothing passed to print", function() {
       var code = "print()";
-      expect(function() { v(code, c(p(code))) }).toThrow("something to print");
+      expect(function() { v(code, c(p(code))) }).toThrow("Missing something to print");
     });
   });
 
