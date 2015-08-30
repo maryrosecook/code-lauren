@@ -1,6 +1,7 @@
 var createScope = require("./lang/scope");
 var compiler = require("./lang/compiler");
 var vm = require("./lang/vm");
+var langUtil = require("./lang/lang-util");
 var _ = require("underscore");
 
 function copyProgramState(o) {
@@ -44,7 +45,7 @@ function copyValue(o, visited) {
   } else {
     visited.push(o);
 
-    if (isLambda(o)) {
+    if (langUtil.isLambda(o)) {
       return { bc: o.bc, parameters: o.parameters, closureEnv: copyEnv(o.closureEnv, visited) };
     } else if (_.isObject(o)) {
       return Object.keys(o)
@@ -58,11 +59,6 @@ function copyValue(o, visited) {
       throw "Got value to copy that didn't match any cases: " + o;
     }
   }
-};
-
-function isLambda(o) {
-  return o !== undefined &&
-    o.bc !== undefined && o.parameters !== undefined && o.closureEnv !== undefined;
 };
 
 copyProgramState.copyProgramState = copyProgramState;
