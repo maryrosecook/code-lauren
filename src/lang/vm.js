@@ -210,8 +210,8 @@ function createCallFrame(bc, bcPointer, env, tail) {
   return { bc: bc, bcPointer: bcPointer, env: env, tail: tail };
 };
 
-function initProgramStateAndComplete(bc, env, stack) {
-  return complete(initProgramState(bc, env, stack));
+function initProgramStateAndComplete(code, bc, env, stack) {
+  return complete(initProgramState(code, bc, env, stack));
 };
 
 function throwIfUninvokedStackFunctions(p) {
