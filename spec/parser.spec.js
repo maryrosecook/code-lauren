@@ -447,6 +447,11 @@ describe("parser", function() {
       expect(function() { parse.balanceParentheses("{}(\n{}("); })
         .toThrow("Missing a closing )");
     });
+
+    it("should mark open quote that has no closing quote", function() {
+      expect(function() { parse.balanceParentheses("{}()\n\""); })
+        .toThrow("Missing a closing \"");
+    });
   });
 
   describe("error messages", function() {

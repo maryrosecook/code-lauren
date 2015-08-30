@@ -26,9 +26,9 @@ function parse(codeStr) {
   }
 };
 
-var parenthesisPairs = { "(": ")", "{": "}", ")": "(", "}": "{" };
-var openParentheses = util.defaultObj(["(", "{"], true);
-var closeParentheses = util.defaultObj([")", "}"], true);
+var parenthesisPairs = { "(": ")", "{": "}", ")": "(", "}": "{", '"': '"' };
+var openParentheses = util.defaultObj(["(", "{", '"'], true);
+var closeParentheses = util.defaultObj([")", "}", '"'], true);
 function balanceParentheses(codeStr) {
   function firstError(parenObj) {
     return Object.keys(parenObj)
@@ -43,7 +43,8 @@ function balanceParentheses(codeStr) {
 
   for (var i = 0; i < codeStr.length; i++) {
     var c = codeStr[i];
-    if (c in openParentheses) {
+    if (c in openParentheses &&
+        (parenthesisPairs[c] !== c || opens[c].length === 0)) { // only open " if none open
       opens[c].push(i);
     } else if (c in closeParentheses) {
       var open = parenthesisPairs[c];
