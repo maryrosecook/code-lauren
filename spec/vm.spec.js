@@ -2,9 +2,6 @@ var p = require("../src/lang/parser");
 var c = require("../src/lang/compiler");
 var v = require("../src/lang/vm");
 
-var standardLibrary = require("../src/lang/standard-library");
-var createScope = require("../src/lang/scope");
-
 var util = require("../src/util");
 
 describe("vm", function() {
