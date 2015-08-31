@@ -51,10 +51,19 @@ function compileConditional(a) {
 
   var clauses = [];
   for (var i = 0; i < parts.length; i += 2) {
+    var conditionalBc = compile(parts[i]);
+    if (parts[i].t === "boolean") { // else clause
+      conditionalBc[0].annotate = DO_NOT_ANNOTATE;
+    }
+
+    var bodyBc = compile(parts[i + 1]); // will push condition's lambda inv onto stack
+    bodyBc[1].annotate = DO_NOT_ANNOTATE; // push lambda
+    bodyBc[2].annotate = DO_NOT_ANNOTATE; // invoke lambda
+
     clauses.push(
-      compile(parts[i]).concat( // put conditional value to evaluate on stack
+      conditionalBc.concat( // put conditional value to evaluate on stack
         ins(["if_not_true_jump", 4], parts[i]), // skip block if !condition
-        compile(parts[i + 1]) // push condition's lambda inv onto stack (skipped if !condition)
+        bodyBc // (skipped if !condition)
       )
     );
   }
