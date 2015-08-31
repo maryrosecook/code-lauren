@@ -29,6 +29,15 @@ var langUtil = module.exports = {
     return fn;
   },
 
+  internalStateBuiltin: function(state, fn) {
+    fn.state = state;
+    return fn;
+  },
+
+  isInternalStateBuiltin: function(o) {
+    return _.isFunction(o) && o.state !== undefined;
+  },
+
   NO_SIDE_EFFECTS: "no_side_effects",
 
   RuntimeError: RuntimeError,
