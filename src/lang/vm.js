@@ -81,7 +81,8 @@ function stepInvoke(ins, p, noSideEffects) {
         checkArgs.checkBuiltinNoExtraArgs(fnStackItem, argContainers, fn.length);
 
         var meta = new langUtil.Meta(ins.ast);
-        p.stack.push({ v: fn.apply(null, [meta].concat(argValues)), ast: ins.ast });
+        // make fn its own context so it can access its internal state var if required
+        p.stack.push({ v: fn.apply(fn, [meta].concat(argValues)), ast: ins.ast });
       }
 
       return p;
