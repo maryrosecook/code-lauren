@@ -126,15 +126,14 @@ var createStandardLibrary = module.exports = function () {
         return itemToPrint + "\n";
       }),
 
-    counters: [],
-    counted: function(meta, target) {
+    counted: langUtil.internalStateBuiltin([], function(meta, target) {
       chk(arguments,
           [chk.num("Missing a number to count to"),
            chk.range(1, undefined, "Number to count to must be more than 0")]);
 
-      var counter = lib.counters[meta.ast.s];
+      var counter = this.state[meta.ast.s];
       if (counter === undefined) {
-        counter = lib.counters[meta.ast.s] = { count: 0, target: target };
+        counter = this.state[meta.ast.s] = { count: 0, target: target };
       }
 
       counter.count++;
@@ -145,7 +144,7 @@ var createStandardLibrary = module.exports = function () {
       } else {
         return false;
       }
-    }
+    })
   };
 
   return lib;

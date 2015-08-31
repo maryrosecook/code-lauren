@@ -3,6 +3,7 @@ var standardLibrary = require("../src/lang/standard-library.js");
 var p = require("../src/lang/parser");
 var c = require("../src/lang/compiler");
 var v = require("../src/lang/vm");
+var envModule = require("../src/env");
 
 describe("library", function() {
   describe("new-dictionary", function() {
@@ -227,36 +228,31 @@ describe("library", function() {
 
   describe("counted", function() {
     it("should always return true when passed 1", function() {
-      var lib = standardLibrary();
-      var meta = { ast: { s: 10 } };
-
-      expect(lib.counted(meta, 1)).toEqual(true);
-      expect(lib.counted(meta, 1)).toEqual(true);
-      expect(lib.counted(meta, 1)).toEqual(true);
+      var code = "counted(1)";
+      expect(v(code, c(p(code))).stack.pop().v).toEqual(true);
+      expect(v(code, c(p(code))).stack.pop().v).toEqual(true);
     });
 
-    it("should return false true false true when passed 2", function() {
-      var lib = standardLibrary();
-      var meta = { ast: { s: 10 } };
+    it("should repeatedly return false true when passed 2", function() {
+      var code = "x: 0 \n forever { collect(counted(2)) \n if equal(3 x) { blowup } else { x: add(x 1) } }";
 
-      expect(lib.counted(meta, 2)).toEqual(false);
-      expect(lib.counted(meta, 2)).toEqual(true);
+      var env = envModule.createEnv(standardLibrary());
+      var counts = [];
+      env.bindings.collect = function(__, count) { counts.push(count); };
 
-      expect(lib.counted(meta, 2)).toEqual(false);
-      expect(lib.counted(meta, 2)).toEqual(true);
+      expect(function() { v(code, c(p(code)), env) }).toThrow(); // catch blowup
+      expect(counts).toEqual([false, true, false, true]);
     });
 
-    it("should be able to count to three twice times", function() {
-      var lib = standardLibrary();
-      var meta = { ast: { s: 10 } };
+    it("should repeatedly return false false true when passed 3", function() {
+      var code = "x: 0 \n forever { collect(counted(3)) \n if equal(5 x) { blowup } else { x: add(x 1) } }";
 
-      expect(lib.counted(meta, 3)).toEqual(false);
-      expect(lib.counted(meta, 3)).toEqual(false);
-      expect(lib.counted(meta, 3)).toEqual(true);
+      var env = envModule.createEnv(standardLibrary());
+      var counts = [];
+      env.bindings.collect = function(__, count) { counts.push(count); };
 
-      expect(lib.counted(meta, 3)).toEqual(false);
-      expect(lib.counted(meta, 3)).toEqual(false);
-      expect(lib.counted(meta, 3)).toEqual(true);
+      expect(function() { v(code, c(p(code)), env) }).toThrow(); // catch blowup
+      expect(counts).toEqual([false, false, true, false, false, true]);
     });
 
     it("should throw if missing args", function() {
