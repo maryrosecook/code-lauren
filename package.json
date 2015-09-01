@@ -17,6 +17,7 @@
   "dependencies": {
     "brfs": "^1.4.0",
     "codemirror": "^5.4.0",
+    "immutable": "^3.7.4",
     "jquery": "^1.11.2",
     "live-server": "^0.7.1",
     "marked": "^0.3.3",
