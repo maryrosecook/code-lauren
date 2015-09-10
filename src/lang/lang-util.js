@@ -1,4 +1,5 @@
 var _ = require("underscore");
+var im = require("immutable");
 
 function RuntimeError(message, ast) {
   this.message = message;
@@ -7,35 +8,46 @@ function RuntimeError(message, ast) {
 };
 RuntimeError.prototype = Object.create(Error.prototype);
 
-function Meta(ast) {
+function Meta(ast, state) {
   this.ast = ast;
+  this.state = state;
 };
 
 var langUtil = module.exports = {
   isFunction: function(o) {
-    return langUtil.isLambda(o) || langUtil.isJsFn(o);
+    return langUtil.isLambda(o) || langUtil.isBuiltin(o);
   },
 
   isLambda: function(o) {
     return o !== undefined && o.bc !== undefined;
   },
 
-  isJsFn: function(o) {
-    return o instanceof Function;
+  isBuiltin: function(o) {
+    return o instanceof Function || langUtil.isInternalStateFn(o);
   },
 
-  hasSideEffects: function(fn) {
+  setSideEffecting: function(fn) {
     fn.hasSideEffects = true;
     return fn;
   },
 
-  internalStateBuiltin: function(state, fn) {
-    fn.state = state;
-    return fn;
+  isSideEffecting: function(o) {
+    var fn = langUtil.isInternalStateFn(o) ? o.get("fn") : o;
+    return fn.hasSideEffects === true;
   },
 
-  isInternalStateBuiltin: function(o) {
-    return _.isFunction(o) && o.state !== undefined;
+  createInternalStateFn: function(state, fn) {
+    return im.Map({
+      state: state,
+      fn: fn
+    });
+  },
+
+  isInternalStateFn: function(o) {
+    return o !== undefined &&
+      o.get !== undefined &&
+      o.get("state") !== undefined &&
+      o.get("fn") !== undefined;
   },
 
   NO_SIDE_EFFECTS: "no_side_effects",

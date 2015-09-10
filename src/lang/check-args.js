@@ -17,13 +17,13 @@ function checkBuiltinArgs(fnArgs) {
 function checkLambdaArity(fnStackItem, argContainers, invocationAst) {
   var fn = fnStackItem.v;
 
-  if (fn.parameters.length > argContainers.length) {
+  if (fn.parameters.length > argContainers.size) {
     var markerIndex = invocationAst.e - 1;
-    var firstMissingParameterIndex = argContainers.length;
+    var firstMissingParameterIndex = argContainers.size;
     var firstMissingParameterName = fn.parameters[firstMissingParameterIndex];
     throw new langUtil.RuntimeError('Missing a "' + firstMissingParameterName  + '"',
                                     { s: markerIndex, e: markerIndex });
-  } else if (fn.parameters.length < argContainers.length) {
+  } else if (fn.parameters.length < argContainers.size) {
     checkNoExtraArgs(fnStackItem, argContainers, fn.parameters.length);
   }
 };
@@ -33,14 +33,13 @@ function checkBuiltinNoExtraArgs(fnStackItem, argContainers, fnParameterCount) {
 };
 
 function checkNoExtraArgs(fnStackItem, argContainers, parameterCount) {
-  if (argContainers.length > parameterCount) {
+  if (argContainers.size > parameterCount) {
     var fnName = fnStackItem.ast.c;
     var firstExtraArgumentIndex = parameterCount;
     var extraArgumentAsts = argContainers.slice(firstExtraArgumentIndex);
-    var thisPluralised = extraArgumentAsts.length > 1 ? "these" : "this";
-    var markerStartIndex = extraArgumentAsts[0].ast.s;
-    var markerEndIndex = _.last(extraArgumentAsts).ast.e;
-
+    var thisPluralised = extraArgumentAsts.size > 1 ? "these" : "this";
+    var markerStartIndex = extraArgumentAsts.get(0).ast.s;
+    var markerEndIndex = extraArgumentAsts.last().ast.e;
     throw new langUtil.RuntimeError('"' + fnName + '" ' + "does not need " + thisPluralised,
                                     { s: markerStartIndex, e: markerEndIndex });
   }

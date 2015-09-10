@@ -1,9 +1,11 @@
 var _ = require("underscore");
 var langUtil = require("./lang-util");
+var util = require("../util");
 var chk = require("./check-args");
+var im = require("immutable");
 
 var createStandardLibrary = module.exports = function () {
-  var lib = {
+  var lib = im.Map({
     add: function(meta, a, b) {
       chk(arguments,
           chk.num("Missing two numbers"),
@@ -47,21 +49,21 @@ var createStandardLibrary = module.exports = function () {
       chk(arguments,
           chk.num("Missing an angle to get the sine of"));
 
-      return Math.sin(lib.radians(meta, x));
+      return Math.sin(lib.get("radians")(meta, x));
     },
 
     cosine: function(meta, x) {
       chk(arguments,
           chk.num("Missing an angle to get the cosine of"));
 
-      return Math.cos(lib.radians(meta, x));
+      return Math.cos(lib.get("radians")(meta, x));
     },
 
     tangent: function(meta, x) {
       chk(arguments,
           chk.num("Missing an angle to get the tangent of"));
 
-      return Math.tan(lib.radians(meta, x));
+      return Math.tan(lib.get("radians")(meta, x));
     },
 
     radians: function(meta, x) {
@@ -117,7 +119,7 @@ var createStandardLibrary = module.exports = function () {
       return dict[key];
     },
 
-    print: langUtil.hasSideEffects(
+    print: langUtil.setSideEffecting(
       function(meta, itemToPrint) {
         chk(arguments,
             chk.any("Missing something to print"));
@@ -126,26 +128,25 @@ var createStandardLibrary = module.exports = function () {
         return itemToPrint + "\n";
       }),
 
-    counted: langUtil.internalStateBuiltin([], function(meta, target) {
+    counted: langUtil.createInternalStateFn(im.Map(), function(meta, target) {
       chk(arguments,
           [chk.num("Missing a number to count to"),
            chk.range(1, undefined, "Number to count to must be more than 0")]);
 
-      var counter = this.state[meta.ast.s];
-      if (counter === undefined) {
-        counter = this.state[meta.ast.s] = { count: 0, target: target };
+      if (meta.state.get(meta.ast.s) === undefined) {
+        meta.state = meta.state.set(meta.ast.s, im.Map({ count: 0, target: target }));
       }
 
-      counter.count++;
+      meta.state = meta.state.updateIn([meta.ast.s, "count"], util.inc);
 
-      if (counter.count === counter.target) {
-        counter.count = 0;
-        return true;
+      if (meta.state.getIn([meta.ast.s, "count"]) === meta.state.getIn([meta.ast.s, "target"])) {
+        meta.state = meta.state.setIn([meta.ast.s, "count"], 0);
+        return { v: true, state: meta.state };
       } else {
-        return false;
+        return { v: false, state: meta.state };
       }
     })
-  };
+  });
 
   return lib;
 };

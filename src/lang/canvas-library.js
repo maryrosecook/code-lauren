@@ -1,4 +1,6 @@
 var _ = require("underscore");
+var im = require("immutable");
+
 var langUtil = require("./lang-util");
 var chk = require("./check-args");
 
@@ -91,14 +93,14 @@ var programFns = {
   }
 };
 
-var userFns = {
-  "clear-screen": langUtil.hasSideEffects(function(meta) {
+var userFns = im.Map({
+  "clear-screen": langUtil.setSideEffecting(function(meta) {
     addOperation(function () {
       programFns.clearScreen();
     }, "clear-screen", true);
   }),
 
-  write: langUtil.hasSideEffects(function(meta, str, x, y, color) {
+  write: langUtil.setSideEffecting(function(meta, str, x, y, color) {
     chk(arguments,
         chk.any("Missing something to write to the screen"),
         chk.num("Missing the distance from the left of the screen"),
@@ -113,7 +115,7 @@ var userFns = {
     }, "write");
   }),
 
-  "draw-oval": langUtil.hasSideEffects(function(meta, x, y, w, h, filledStr, color) {
+  "draw-oval": langUtil.setSideEffecting(function(meta, x, y, w, h, filledStr, color) {
     chk(arguments,
         chk.num("Missing the distance from the left of the screen"),
         chk.num("Missing the distance from the top of the screen"),
@@ -150,7 +152,7 @@ var userFns = {
     }, "draw-oval");
   }),
 
-  "draw-rectangle": langUtil.hasSideEffects(function(meta, x, y, width, height, filledStr, color) {
+  "draw-rectangle": langUtil.setSideEffecting(function(meta, x, y, width, height, filledStr, color) {
     chk(arguments,
         chk.num("Missing the distance from the left of the screen"),
         chk.num("Missing the distance from the top of the screen"),
@@ -171,7 +173,7 @@ var userFns = {
       }
     }, "draw-rectangle");
   })
-};
+});
 
 var api = {
   programFns: programFns,

@@ -1,91 +1,114 @@
 var _ = require("underscore");
+var im = require("immutable");
 
 var util = require("../util");
 var standardLibrary = require("./standard-library");
-var envModule = require("../env");
-var scope = require("./scope");
+var setupEnv = require("../env");
+var addScope = require("./scope");
 var langUtil = require("./lang-util");
 var checkArgs = require("./check-args");
 
-var copyProgramState;
 function stepPush(ins, p) {
-  copyProgramState = copyProgramState || require("../copy-program-state");
-  p.stack.push({ v: copyProgramState.copyValue(ins[1]), ast: ins.ast });
-  return p;
+  // TODO: when have lists and objects in lang, will need to detect them and use immutablejs
+
+  return p.set("stack", p.get("stack").unshift({ v: ins[1], ast: ins.ast }));
 };
 
 function stepPushLambda(ins, p) {
   var lambda = ins[1];
-  lambda.closureEnv = currentCallFrame(p).env;
-  p.stack.push({ v: lambda, ast: ins.ast });
-  return p;
+
+  // once created, will have this id for rest of program, so done need
+  // immutable data
+  lambda.closureScope = currentCallFrame(p).get("scope"); // an id into the p.scopes object
+
+  return p.set("stack", p.get("stack").unshift({ v: lambda, ast: ins.ast }));
 };
 
 function stepPop(ins, p) {
   throwIfUninvokedStackFunctions(p);
-  p.stack.pop();
-  return p;
+  return p.set("stack", p.get("stack").shift());
 };
 
 function stepReturn(ins, p) {
   throwIfUninvokedStackFunctions(p);
-  p.callStack.pop();
-  return p;
+  return p.deleteIn(["callStack", -1]);
 };
 
 var ARG_START = ["ARG_START"];
 function stepArgStart(ins, p) {
-  p.stack.push({ v: ARG_START });
-  return p;
+  return p.set("stack", p.get("stack").push({ v: ARG_START }));
 };
 
 function stepGetEnv(ins, p) {
-  var value = currentCallFrame(p).env.getScopedBinding(ins[1]);
+  var value = addScope.getScopedBinding(p.get("scopes"),
+                                        currentCallFrame(p).get("scope"),
+                                        ins[1]);
   if (value === undefined) {
     throw new langUtil.RuntimeError("Never heard of " + ins[1], ins.ast);
   } else {
-    p.stack.push({ v: value, ast: ins.ast });
-    return p;
+    return p.set("stack", p.get("stack").push({ v: value, ast: ins.ast }));
   }
 };
 
 function stepSetEnv(ins, p) {
-  currentCallFrame(p).env.setGlobalBinding(ins[1], p.stack.pop().v);
-  return p;
+  var v = p.get("stack").peek().v;
+  var currentScopeId = currentCallFrame(p).get("scope");
+  return p.set("stack", p.get("stack").shift())
+    .set("scopes",
+         addScope.setGlobalBinding(p.get("scopes"), currentScopeId, ins[1], v));
 };
 
 function stepInvoke(ins, p, noSideEffects) {
-  var fnStackItem = p.stack.pop();
-  var fn = fnStackItem.v;
+  var fnStackItem = p.get("stack").peek();
+  p = p.set("stack", p.get("stack").shift());
+  var fnObj = fnStackItem.v;
 
-  if (langUtil.isFunction(fn)) {
-    var argContainers = getTopArgsOnStack(p.stack).reverse();
-    var argValues = _.pluck(argContainers, "v");
+  if (langUtil.isFunction(fnObj)) {
+    var pAndArgContainers = popTopArgsOnStack(p);
+    var p = pAndArgContainers[0];
+    var argContainers = pAndArgContainers[1].reverse();
+    var argValuesArr = argContainers.map(function(c) { return c.v; }).toArray();
 
-    if (langUtil.isLambda(fn)) {
+    if (langUtil.isLambda(fnObj)) {
       checkArgs.checkLambdaArity(fnStackItem, argContainers, ins.ast);
+      p = addScope(p, im.Map(_.object(fnObj.parameters, argValuesArr)), fnObj.closureScope);
 
-      var lambdaEnv = scope(_.object(fn.parameters, argValues), fn.closureEnv);
-      var tailIndex = tailCallIndex(p.callStack, fn);
+      var tailIndex = tailCallIndex(p.get("callStack"), fnObj);
       if (tailIndex !== undefined) { // if tail position exprs all way to recursive call then tco
-        p.callStack = p.callStack.slice(0, tailIndex + 1);
-        currentCallFrame(p).env = lambdaEnv;
-        currentCallFrame(p).bcPointer = 0;
+        return p
+          .set("callStack", p.get("callStack").slice(0, tailIndex + 1))
+          .setIn(["callStack", -1, "scope"], addScope.lastScopeId(p))
+          .setIn(["callStack", -1, "bcPointer"], 0);
       } else {
-        p.callStack.push(createCallFrame(fn.bc, 0, lambdaEnv, ins[2]));
+        return pushCallFrame(p, fnObj.bc, 0, addScope.lastScopeId(p), ins[2]);
       }
+    } else if (langUtil.isBuiltin(fnObj)) {
+      if (noSideEffects !== langUtil.NO_SIDE_EFFECTS ||
+          !langUtil.isSideEffecting(fnObj)) {
 
-      return p;
-    } else if (langUtil.isJsFn(fn)) {
-      if (noSideEffects !== langUtil.NO_SIDE_EFFECTS || fn.hasSideEffects !== true) {
+        var fn, meta;
+        if (langUtil.isInternalStateFn(fnObj)) {
+          fn = fnObj.get("fn");
+          meta = new langUtil.Meta(ins.ast, fnObj.get("state"));
+        } else {
+          fn = fnObj;
+          meta = new langUtil.Meta(ins.ast);
+        }
+
         checkArgs.checkBuiltinNoExtraArgs(fnStackItem, argContainers, fn.length);
+        var result = fn.apply(null, [meta].concat(argValuesArr));
 
-        var meta = new langUtil.Meta(ins.ast);
-        // make fn its own context so it can access its internal state var if required
-        p.stack.push({ v: fn.apply(fn, [meta].concat(argValues)), ast: ins.ast });
+        if (langUtil.isInternalStateFn(fnObj)) {
+          var fnName = fnStackItem.ast.c;
+
+          return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }))
+            .setIn(["scopes", 0, "bindings", fnName, "state"], result.state);
+        } else {
+          return p.set("stack", p.get("stack").unshift({ v: result, ast: ins.ast }));
+        }
+      } else {
+        return p;
       }
-
-      return p;
     }
   } else {
     throw new langUtil.RuntimeError("This is not an action", fnStackItem.ast);
@@ -96,42 +119,44 @@ function tailCallIndex(callStack, fn) {
   var recursiveIndex = previousRecursionCallFrameIndex(callStack, fn);
   if (recursiveIndex !== undefined) {
     var calls = callStack.slice(recursiveIndex);
-    if (calls.length === calls.filter(function(c) { return c.tail === true; }).length) {
+    if (calls.size === calls.filter(function(c) { return c.get("tail") === true; }).size) {
       return recursiveIndex;
     }
   }
 };
 
 function previousRecursionCallFrameIndex(callStack, fn) {
-  for (var i = callStack.length - 1; i >= 0; i--) {
-    if (callStack[i].bc === fn.bc) {
+  for (var i = callStack.size - 1; i >= 0; i--) {
+    if (callStack.getIn([i, "bc"]) === fn.bc) {
       return i;
     }
   }
 };
 
 function stepIfNotTrueJump(ins, p) {
-  if (p.stack.pop().v !== true) {
-    currentCallFrame(p).bcPointer += ins[1];
-  }
+  var boolToTest = p.get("stack").peek().v;
+  p = p.set("stack", p.get("stack").shift());
 
-  return p;
+  if (boolToTest !== true) {
+    return p.updateIn(["callStack", -1, "bcPointer"],
+                      function(bcPointer) { return bcPointer + ins[1] });
+  } else {
+    return p;
+  }
 };
 
 function stepJump(ins, p) {
-  currentCallFrame(p).bcPointer += ins[1];
-  return p;
+  return p.updateIn(["callStack", -1, "bcPointer"],
+                    function(bcPointer) { return bcPointer + ins[1] });
 };
 
 function step(p, noSideEffects) {
-  var callFrame = currentCallFrame(p);
-  if (callFrame === undefined) {
+  if (currentCallFrame(p) === undefined) {
     return p;
   } else {
-    var ins = callFrame.bc[callFrame.bcPointer];
-    callFrame.bcPointer++;
-
-    p.currentInstruction = ins;
+    var ins = currentCallFrame(p).get("bc")[currentCallFrame(p).get("bcPointer")];
+    p = p.updateIn(["callStack", -1, "bcPointer"], util.inc)
+      .set("currentInstruction", ins);
 
     try {
       if (ins[0] === "push") {
@@ -159,12 +184,13 @@ function step(p, noSideEffects) {
                                         ins.ast);
       }
     } catch (e) {
-      p.crashed = true;
       if (e instanceof langUtil.RuntimeError) {
-        throw e;
+        p = p.set("exception", e);
       } else {
         maybePrintError(e);
       }
+
+      return p;
     }
   }
 };
@@ -176,7 +202,7 @@ function maybePrintError(e) {
 };
 
 function complete(p) {
-  while (!isComplete(p)) {
+  while (!isComplete(p) && !isCrashed(p)) {
     p = step(p);
   }
 
@@ -184,31 +210,45 @@ function complete(p) {
 };
 
 function currentCallFrame(p) {
-  return _.last(p.callStack);
+  return p.get("callStack").last();
 };
 
 function isComplete(p) {
   var callFrame = currentCallFrame(p);
   return callFrame === undefined ||
-    callFrame.bcPointer === callFrame.bc.length;
+    callFrame.get("bcPointer") === callFrame.get("bc").length;
 };
 
 function isCrashed(p) {
-  return p.crashed === true;
+  return p.get("exception") !== undefined;
 };
 
-function initProgramState(code, bc, env, stack) {
-  return {
-    crashed: false,
+function initProgramState(code, bc, builtinBindings, stack) {
+  if (stack instanceof Array) { throw new Error("Use immutable Stack for stack"); }
+  builtinBindings = builtinBindings || standardLibrary();
+
+  var bcPointer = 0;
+  var topScopeId = 1;
+
+  var p = im.Map({
+    exception: undefined,
     code: code,
-    callStack: [createCallFrame(bc, 0, env ? env : envModule.createEnv(standardLibrary()))],
-    stack: stack || [],
-    currentInstruction: undefined
-  };
+    currentInstruction: undefined,
+    stack: stack || im.Stack(),
+    callStack: im.List(), // can't be a stack because too much editing of head
+    scopes: im.List()
+  });
+
+  p = addScope(p, builtinBindings);
+  p = addScope(p, im.Map(), 0);
+  p = pushCallFrame(p, bc, bcPointer, topScopeId);
+  return p;
 };
 
-function createCallFrame(bc, bcPointer, env, tail) {
-  return { bc: bc, bcPointer: bcPointer, env: env, tail: tail };
+function pushCallFrame(p, bc, bcPointer, scopeId, tail) {
+  return p
+    .update("callStack",
+            util.push(im.Map({ bc: bc, bcPointer: bcPointer, scope: scopeId, tail: tail })));
 };
 
 function initProgramStateAndComplete(code, bc, env, stack) {
@@ -216,23 +256,23 @@ function initProgramStateAndComplete(code, bc, env, stack) {
 };
 
 function throwIfUninvokedStackFunctions(p) {
-  var unrunFn = _.chain(p.stack).find(o => langUtil.isFunction(o.v)).value();
+  var unrunFn = p.get("stack").find(o => langUtil.isFunction(o.v));
   if (unrunFn !== undefined) {
     throw new langUtil.RuntimeError("This is an action. Type " +
-                                    p.code.slice(unrunFn.ast.s, unrunFn.ast.e) +
+                                    p.get("code").slice(unrunFn.ast.s, unrunFn.ast.e) +
                                     "() to run it.",
                                     unrunFn.ast);
   }
 };
 
-function getTopArgsOnStack(stack) {
-  var args = [];
-  while (stack.length > 0 && _.last(stack).v !== ARG_START) {
-    args.push(stack.pop());
-  }
+function popTopArgsOnStack(p) {
+  var stack = p.get("stack");
+  var args = stack.takeUntil(function(e) { return e.v === ARG_START; });
 
-  stack.pop(); // throw away arg_start instruction
-  return args;
+  return [
+    p.set("stack", stack.skip(args.size + 1)), // chuck args, arg_start
+    args
+  ];
 };
 
 initProgramStateAndComplete.initProgramStateAndComplete = initProgramStateAndComplete;
@@ -241,6 +281,5 @@ initProgramStateAndComplete.step = step;
 initProgramStateAndComplete.complete = complete;
 initProgramStateAndComplete.isComplete = isComplete;
 initProgramStateAndComplete.isCrashed = isCrashed;
-initProgramStateAndComplete.createCallFrame = createCallFrame;
 
 module.exports = initProgramStateAndComplete;

@@ -2,13 +2,10 @@ var $ = require('jquery');
 var React = require('react');
 var _ = require("underscore");
 
-var env = require("./env");
 var vm = require("./lang/vm");
 var parser = require("./lang/parser");
 var compile = require("./lang/compiler");
 var langUtil = require("../src/lang/lang-util");
-var copyProgramState = require("../src/copy-program-state");
-
 var STEP_TO_SAVE = 5000;
 
 function isTimeToYieldToEventLoop(lastYield) {
@@ -16,13 +13,20 @@ function isTimeToYieldToEventLoop(lastYield) {
 };
 
 function annotateCurrentInstruction(ps, annotator) {
-  if (ps.currentInstruction === undefined) { return; }
+  if (ps.get("currentInstruction") === undefined) { return; }
 
   annotator.clear();
-  annotator.codeHighlight(ps.code,
-                          ps.currentInstruction.ast.s,
-                          ps.currentInstruction.ast.e,
-                          "currently-executing");
+
+  var e = ps.get("exception");
+  if (vm.isCrashed(ps) && e instanceof langUtil.RuntimeError) {
+    annotator.codeHighlight(ps.get("code"), e.s, e.e, "error");
+    annotator.lineMessage(ps.get("code"), e.s, "error", e.message);
+  } else if (!vm.isCrashed(ps)) {
+    annotator.codeHighlight(ps.get("code"),
+                            ps.get("currentInstruction").ast.s,
+                            ps.get("currentInstruction").ast.e,
+                            "currently-executing");
+  }
 };
 
 function onClickOrHoldDown(onClick) {
@@ -51,10 +55,10 @@ function initProgramState(code, annotator, canvasLib) {
   canvasLib.programFns.reset();
   var ast = parse(code, annotator);
   if (ast !== undefined) {
-    var programEnv = env.createEnv(env.mergeLibraries(require("./lang/standard-library")(),
-                                                      canvasLib.userFns));
-    var ps = vm.initProgramState(code, compile(ast), programEnv);
-    ps.canvasLib = canvasLib.programFns;
+    var programBindings = require("./lang/standard-library")().merge(canvasLib.userFns);
+    var ps = vm
+        .initProgramState(code, compile(ast), programBindings)
+        .set("canvasLib", canvasLib.programFns);
     return ps;
   }
 };
@@ -95,17 +99,17 @@ var ProgramPlayer = React.createClass({
       while(true) {
         if (self.state !== null && self.state.ps !== undefined && !self.state.paused) {
           if (hitClearScreen) {
-            self.state.ps.canvasLib.clearScreen();
+            self.state.ps.get("canvasLib").clearScreen();
           }
 
           if (vm.isComplete(self.state.ps)) {
-            self.state.ps.canvasLib.flush();
+            self.state.ps.get("canvasLib").flush();
           } else {
             self.stepForwards();
 
-            hitClearScreen = self.state.ps.canvasLib.hitClearScreen();
+            hitClearScreen = self.state.ps.get("canvasLib").hitClearScreen();
             if (hitClearScreen === true) {
-              self.state.ps.canvasLib.flush();
+              self.state.ps.get("canvasLib").flush();
             }
           }
         }
@@ -152,7 +156,7 @@ var ProgramPlayer = React.createClass({
 
   pause: function() {
     this.state.paused = true;
-    this.state.ps.canvasLib.pause();
+    this.state.ps.get("canvasLib").pause();
     this.setState(this.state);
     annotateCurrentInstruction(this.state.ps, this.props.annotator);
   },
@@ -178,38 +182,46 @@ var ProgramPlayer = React.createClass({
       return;
     }
 
-    var originalPs = this.state.ps;
+    var loopCount = 0;
+    var ps = this.state.ps;
     var newPses = [];
     while (true) {
-      try {
-        newPses.push(copyProgramState(this.state.ps));
-        vm.step(this.state.ps);
-      } catch (e) {
-        if (e instanceof langUtil.RuntimeError) {
-          this.props.annotator.codeHighlight(this.state.ps.code, e.s, e.e, "error");
-          this.props.annotator.lineMessage(this.state.ps.code, e.s, "error", e.message);
+      newPses.push(ps);
+      ps = vm.step(ps);
+
+      if (vm.isCrashed(ps) || // assume want to annotate crashed instruction
+          (ps.get("currentInstruction") !== undefined &&
+           ps.get("currentInstruction").annotate === compile.ANNOTATE)) {
+        var e = ps.get("exception");
+        if (vm.isCrashed(ps) && e instanceof langUtil.RuntimeError) {
+          this.props.annotator.codeHighlight(ps.get("code"), e.s, e.e, "error");
+          this.props.annotator.lineMessage(ps.get("code"), e.s, "error", e.message);
         }
+
+        for (var i = 0; i < newPses.length; i++) {
+          if (this.state.pses.length > STEP_TO_SAVE) {
+            this.state.pses.shift();
+            this.state.ps.get("canvasLib").deleteOld(STEP_TO_SAVE); // ??
+          }
+
+          newPses[i].get("canvasLib").stepForwards();
+          this.state.pses.push(newPses[i]);
+        }
+
+        this.state.ps = ps;
+
+        if (vm.isCrashed(ps) && e instanceof langUtil.RuntimeError) {
+          annotateCurrentInstruction(this.state.ps, this.props.annotator);
+        }
+
+        return;
+      } else if (vm.isComplete(ps)) {
+        return;
+      } else if (loopCount > 100) { // something wrong - bail
+        throw new Error("Trapped in infinite loop trying to step");
       }
 
-      if (vm.isCrashed(this.state.ps) || // assume want to annotate crashed instruction
-          (this.state.ps.currentInstruction !== undefined &&
-           this.state.ps.currentInstruction.annotate === compile.ANNOTATE)) {
-        break;
-      } else if (vm.isComplete(this.state.ps)) {
-        newPses = [];
-        this.state.ps = originalPs;
-        break;
-      }
-    }
-
-    for (var i = 0; i < newPses.length; i++) {
-      if (this.state.pses.length > STEP_TO_SAVE) {
-        this.state.pses.shift();
-        this.state.ps.canvasLib.deleteOld(STEP_TO_SAVE);
-      }
-
-      newPses[i].canvasLib.stepForwards();
-      this.state.pses.push(newPses[i]);
+      loopCount++;
     }
   },
 
@@ -220,11 +232,11 @@ var ProgramPlayer = React.createClass({
       if (i === -1) { // couldn't find annotatable previous ps - don't step back
         this.state.ps = originalPs;
         break;
-      } else if (this.state.pses[i].currentInstruction !== undefined &&
-                 this.state.pses[i].currentInstruction.annotate === compile.ANNOTATE) {
+      } else if (this.state.pses[i].get("currentInstruction") !== undefined &&
+                 this.state.pses[i].get("currentInstruction").annotate === compile.ANNOTATE) {
         for (var j = this.state.pses.length - 1; j >= i; j--) {
           this.state.ps = this.state.pses.pop();
-          this.state.ps.canvasLib.stepBackwards();
+          this.state.ps.get("canvasLib").stepBackwards();
         }
 
         break;
@@ -248,14 +260,11 @@ var ProgramPlayer = React.createClass({
   canStepForwards: function() {
     if (this.state.ps === undefined) { return false; }
 
-    var testPs = copyProgramState(this.state.ps);
+    var testPs = this.state.ps;
     while(true) {
-      try {
-        vm.step(testPs, langUtil.NO_SIDE_EFFECTS);
-      } catch(e) {} // swallow any errors - program will get marked as crashed
-
-      if (testPs.currentInstruction !== undefined &&
-          testPs.currentInstruction.annotate === compile.ANNOTATE) {
+      testPs = vm.step(testPs, langUtil.NO_SIDE_EFFECTS);
+      if (testPs.get("currentInstruction") !== undefined &&
+          testPs.get("currentInstruction").annotate === compile.ANNOTATE) {
         return true;
       } else if (vm.isCrashed(testPs) || vm.isComplete(testPs)) {
         return false;

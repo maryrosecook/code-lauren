@@ -9,69 +9,70 @@ var canvasLib = canvasLibrary({});
 canvasLib.programFns.shutDown();
 
 function setupProgram(code) {
-  var programEnv = env.createEnv(env.mergeLibraries(standardLibrary(),
-                                                    canvasLib.userFns));
-  return vm.initProgramState(code, compile(parse(code)), programEnv);
+  return vm.initProgramState(code,
+                             compile(parse(code)),
+                             standardLibrary().merge(canvasLib.userFns));
 };
 
 describe("canvas library", function() {
   describe("write", function() {
     it("should report missing args", function() {
-      expect(function() { vm.complete(setupProgram('write()')) })
-        .toThrow("Missing something to write to the screen");
+      expect(vm.complete(setupProgram('write()')).get("exception").message)
+        .toEqual("Missing something to write to the screen");
 
-      expect(function() { vm.complete(setupProgram('write("hi")')) })
-        .toThrow("Missing the distance from the left of the screen");
+      expect(vm.complete(setupProgram('write("hi")')).get("exception").message)
+        .toEqual("Missing the distance from the left of the screen");
 
-      expect(function() { vm.complete(setupProgram('write("hi" 100)')) })
-        .toThrow("Missing the distance from the top of the screen");
+      expect(vm.complete(setupProgram('write("hi" 100)')).get("exception").message)
+        .toEqual("Missing the distance from the top of the screen");
 
-      expect(function() { vm.complete(setupProgram('write("hi" 100 100)')) })
-        .toThrow("Missing the color of the text");
+      expect(vm.complete(setupProgram('write("hi" 100 100)')).get("exception").message)
+        .toEqual("Missing the color of the text");
     });
   });
 
   describe("draw-oval", function() {
     it("should report missing args", function() {
-      expect(function() { vm.complete(setupProgram('draw-oval()')) })
-        .toThrow("Missing the distance from the left of the screen");
+      expect(vm.complete(setupProgram('draw-oval()')).get("exception").message)
+        .toEqual("Missing the distance from the left of the screen");
 
-      expect(function() { vm.complete(setupProgram('draw-oval(10)')) })
-        .toThrow("Missing the distance from the top of the screen");
+      expect(vm.complete(setupProgram('draw-oval(10)')).get("exception").message)
+        .toEqual("Missing the distance from the top of the screen");
 
-      expect(function() { vm.complete(setupProgram('draw-oval(10 10)')) })
-        .toThrow("Missing a width");
+      expect(vm.complete(setupProgram('draw-oval(10 10)')).get("exception").message)
+        .toEqual("Missing a width");
 
-      expect(function() { vm.complete(setupProgram('draw-oval(10 10 10)')) })
-        .toThrow("Missing a height");
+      expect(vm.complete(setupProgram('draw-oval(10 10 10)')).get("exception").message)
+        .toEqual("Missing a height");
 
-      expect(function() { vm.complete(setupProgram('draw-oval(10 10 10 10)')) })
-        .toThrow('Missing either "filled" or "unfilled"');
+      expect(vm.complete(setupProgram('draw-oval(10 10 10 10)')).get("exception").message)
+        .toEqual('Missing either "filled" or "unfilled"');
 
-      expect(function() { vm.complete(setupProgram('draw-oval(10 10 10 10 "filled")')) })
-        .toThrow("Missing the color of the text");
+      expect(vm.complete(setupProgram('draw-oval(10 10 10 10 "filled")')).get("exception").message)
+        .toEqual("Missing the color of the text");
     });
   });
 
   describe("draw-rectangle", function() {
     it("should report missing args", function() {
-      expect(function() { vm.complete(setupProgram('draw-rectangle()')) })
-        .toThrow("Missing the distance from the left of the screen");
+      expect(vm.complete(setupProgram('draw-rectangle()')).get("exception").message)
+        .toEqual("Missing the distance from the left of the screen");
 
-      expect(function() { vm.complete(setupProgram('draw-rectangle(10)')) })
-        .toThrow("Missing the distance from the top of the screen");
+      expect(vm.complete(setupProgram('draw-rectangle(10)')).get("exception").message)
+        .toEqual("Missing the distance from the top of the screen");
 
-      expect(function() { vm.complete(setupProgram('draw-rectangle(10 10)')) })
-        .toThrow("Missing a width");
+      expect(vm.complete(setupProgram('draw-rectangle(10 10)')).get("exception").message)
+        .toEqual("Missing a width");
 
-      expect(function() { vm.complete(setupProgram('draw-rectangle(10 10 10)')) })
-        .toThrow("Missing a height");
+      expect(vm.complete(setupProgram('draw-rectangle(10 10 10)')).get("exception").message)
+        .toEqual("Missing a height");
 
-      expect(function() { vm.complete(setupProgram('draw-rectangle(10 10 10 10)')) })
-        .toThrow('Missing either "filled" or "unfilled"');
+      expect(vm.complete(setupProgram('draw-rectangle(10 10 10 10)')).get("exception").message)
+        .toEqual('Missing either "filled" or "unfilled"');
 
-      expect(function() { vm.complete(setupProgram('draw-rectangle(10 10 10 10 "filled")')) })
-        .toThrow("Missing the color of the text");
+      expect(vm.complete(setupProgram('draw-rectangle(10 10 10 10 "filled")'))
+             .get("exception").message)
+        .toEqual("Missing the color of the text");
     });
   });
 });
