@@ -74,5 +74,16 @@ var util = module.exports = {
         return i;
       }
     }
+  },
+
+  inc: function(v) {
+    return v + 1;
+  },
+
+  push: function() {
+    var vals = arguments;
+    return function(coll) {
+      return coll.push.apply(coll, vals);
+    };
   }
 };
