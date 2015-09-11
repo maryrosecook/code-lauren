@@ -66,12 +66,12 @@ function stepInvoke(ins, p, noSideEffects) {
   if (langUtil.isFunction(fnObj)) {
     var pAndArgContainers = popTopArgsOnStack(p);
     var p = pAndArgContainers[0];
-    var argContainers = pAndArgContainers[1].reverse();
-    var argValuesArr = argContainers.map(function(c) { return c.v; }).toArray();
+    var argContainers = pAndArgContainers[1];
+    var argValues = argContainers.map(function(c) { return c.v; });
 
     if (langUtil.isLambda(fnObj)) {
       checkArgs.checkLambdaArity(fnStackItem, argContainers, ins.ast);
-      p = addScope(p, im.Map(_.object(fnObj.parameters, argValuesArr)), fnObj.closureScope);
+      p = addScope(p, im.Map(_.object(fnObj.parameters, argValues)), fnObj.closureScope);
 
       var tailIndex = tailCallIndex(p.get("callStack"), fnObj);
       if (tailIndex !== undefined) { // if tail position exprs all way to recursive call then tco
@@ -96,7 +96,7 @@ function stepInvoke(ins, p, noSideEffects) {
         }
 
         checkArgs.checkBuiltinNoExtraArgs(fnStackItem, argContainers, fn.length);
-        var result = fn.apply(null, [meta].concat(argValuesArr));
+        var result = fn.apply(null, [meta].concat(argValues));
 
         if (langUtil.isInternalStateFn(fnObj)) {
           var fnName = fnStackItem.ast.c;
@@ -151,11 +151,14 @@ function stepJump(ins, p) {
 };
 
 function step(p, noSideEffects) {
-  if (currentCallFrame(p) === undefined) {
+  var currentFrame = currentCallFrame(p);
+  if (currentFrame === undefined) {
     return p;
   } else {
-    var ins = currentCallFrame(p).get("bc")[currentCallFrame(p).get("bcPointer")];
-    p = p.updateIn(["callStack", -1, "bcPointer"], util.inc)
+    var bcPointer = currentFrame.get("bcPointer");
+    var ins = currentFrame.get("bc")[bcPointer];
+
+    p = p.setIn(["callStack", -1, "bcPointer"], bcPointer + 1)
       .set("currentInstruction", ins);
 
     try {
@@ -246,9 +249,10 @@ function initProgramState(code, bc, builtinBindings, stack) {
 };
 
 function pushCallFrame(p, bc, bcPointer, scopeId, tail) {
-  return p
-    .update("callStack",
-            util.push(im.Map({ bc: bc, bcPointer: bcPointer, scope: scopeId, tail: tail })));
+  return p.set("callStack",
+               p.get("callStack").push(im.Map({
+                 bc: bc, bcPointer: bcPointer, scope: scopeId, tail: tail
+               })));
 };
 
 function initProgramStateAndComplete(code, bc, env, stack) {
@@ -267,11 +271,20 @@ function throwIfUninvokedStackFunctions(p) {
 
 function popTopArgsOnStack(p) {
   var stack = p.get("stack");
-  var args = stack.takeUntil(function(e) { return e.v === ARG_START; });
+
+  var args = [];
+  var element = stack.peek();
+  while (element !== undefined && element.v !== ARG_START) {
+    stack = stack.shift();
+    args.push(element);
+    element = stack.peek();
+  }
+
+  stack = stack.shift();
 
   return [
-    p.set("stack", stack.skip(args.size + 1)), // chuck args, arg_start
-    args
+    p.set("stack", stack),
+    args.reverse()
   ];
 };
 

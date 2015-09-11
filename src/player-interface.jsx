@@ -8,9 +8,6 @@ var compile = require("./lang/compiler");
 var langUtil = require("../src/lang/lang-util");
 var STEP_TO_SAVE = 5000;
 
-function isTimeToYieldToEventLoop(lastYield) {
-  return new Date().getTime() - lastYield > 8;
-};
 
 function annotateCurrentInstruction(ps, annotator) {
   if (ps.get("currentInstruction") === undefined) { return; }
@@ -114,7 +111,7 @@ var ProgramPlayer = React.createClass({
           }
         }
 
-        if (hitClearScreen || isTimeToYieldToEventLoop(lastEventLoopYield)) {
+        if (hitClearScreen || Date.now() - lastEventLoopYield > 8) {
           requestAnimationFrame(() => tick(new Date().getTime()))
           break;
         }
@@ -189,19 +186,21 @@ var ProgramPlayer = React.createClass({
       newPses.push(ps);
       ps = vm.step(ps);
 
+      var currentInstruction = ps.get("currentInstruction");
       if (vm.isCrashed(ps) || // assume want to annotate crashed instruction
-          (ps.get("currentInstruction") !== undefined &&
-           ps.get("currentInstruction").annotate === compile.ANNOTATE)) {
-        var e = ps.get("exception");
-        if (vm.isCrashed(ps) && e instanceof langUtil.RuntimeError) {
+          (currentInstruction !== undefined &&
+           currentInstruction.annotate === compile.ANNOTATE)) {
+        if (vm.isCrashed(ps) && ps.get("exception") instanceof langUtil.RuntimeError) {
+          var e = ps.get("exception");
           this.props.annotator.codeHighlight(ps.get("code"), e.s, e.e, "error");
           this.props.annotator.lineMessage(ps.get("code"), e.s, "error", e.message);
+          annotateCurrentInstruction(ps, this.props.annotator);
         }
 
         for (var i = 0; i < newPses.length; i++) {
           if (this.state.pses.length > STEP_TO_SAVE) {
             this.state.pses.shift();
-            this.state.ps.get("canvasLib").deleteOld(STEP_TO_SAVE); // ??
+            this.state.ps.get("canvasLib").deleteOld(STEP_TO_SAVE);
           }
 
           newPses[i].get("canvasLib").stepForwards();
@@ -209,11 +208,6 @@ var ProgramPlayer = React.createClass({
         }
 
         this.state.ps = ps;
-
-        if (vm.isCrashed(ps) && e instanceof langUtil.RuntimeError) {
-          annotateCurrentInstruction(this.state.ps, this.props.annotator);
-        }
-
         return;
       } else if (vm.isComplete(ps)) {
         return;
