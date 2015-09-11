@@ -111,7 +111,7 @@ var ProgramPlayer = React.createClass({
           }
         }
 
-        if (hitClearScreen || Date.now() - lastEventLoopYield > 8) {
+        if (hitClearScreen || Date.now() - lastEventLoopYield > 33) {
           requestAnimationFrame(() => tick(new Date().getTime()))
           break;
         }
