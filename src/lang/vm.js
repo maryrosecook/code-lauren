@@ -31,7 +31,10 @@ function stepPop(ins, p) {
 
 function stepReturn(ins, p) {
   throwIfUninvokedStackFunctions(p);
-  return p.deleteIn(["callStack", -1]);
+  var callStack = p.get("callStack");
+  return p
+    .deleteIn(["scopes", callStack.last().get("scope")])
+    .set("callStack", callStack.pop());
 };
 
 var ARG_START = ["ARG_START"];
