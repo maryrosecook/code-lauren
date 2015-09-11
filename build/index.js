@@ -36253,9 +36253,6 @@
 	var langUtil = __webpack_require__(272);
 	var STEP_TO_SAVE = 5000;
 
-	function isTimeToYieldToEventLoop(lastYield) {
-	  return new Date().getTime() - lastYield > 8;
-	};
 
 	function annotateCurrentInstruction(ps, annotator) {
 	  if (ps.get("currentInstruction") === undefined) { return; }
@@ -36359,7 +36356,7 @@
 	          }
 	        }
 
-	        if (hitClearScreen || isTimeToYieldToEventLoop(lastEventLoopYield)) {
+	        if (hitClearScreen || Date.now() - lastEventLoopYield > 8) {
 	          requestAnimationFrame(function()  {return tick(new Date().getTime());})
 	          break;
 	        }
@@ -36434,19 +36431,21 @@
 	      newPses.push(ps);
 	      ps = vm.step(ps);
 
+	      var currentInstruction = ps.get("currentInstruction");
 	      if (vm.isCrashed(ps) || // assume want to annotate crashed instruction
-	          (ps.get("currentInstruction") !== undefined &&
-	           ps.get("currentInstruction").annotate === compile.ANNOTATE)) {
-	        var e = ps.get("exception");
-	        if (vm.isCrashed(ps) && e instanceof langUtil.RuntimeError) {
+	          (currentInstruction !== undefined &&
+	           currentInstruction.annotate === compile.ANNOTATE)) {
+	        if (vm.isCrashed(ps) && ps.get("exception") instanceof langUtil.RuntimeError) {
+	          var e = ps.get("exception");
 	          this.props.annotator.codeHighlight(ps.get("code"), e.s, e.e, "error");
 	          this.props.annotator.lineMessage(ps.get("code"), e.s, "error", e.message);
+	          annotateCurrentInstruction(ps, this.props.annotator);
 	        }
 
 	        for (var i = 0; i < newPses.length; i++) {
 	          if (this.state.pses.length > STEP_TO_SAVE) {
 	            this.state.pses.shift();
-	            this.state.ps.get("canvasLib").deleteOld(STEP_TO_SAVE); // ??
+	            this.state.ps.get("canvasLib").deleteOld(STEP_TO_SAVE);
 	          }
 
 	          newPses[i].get("canvasLib").stepForwards();
@@ -36454,11 +36453,6 @@
 	        }
 
 	        this.state.ps = ps;
-
-	        if (vm.isCrashed(ps) && e instanceof langUtil.RuntimeError) {
-	          annotateCurrentInstruction(this.state.ps, this.props.annotator);
-	        }
-
 	        return;
 	      } else if (vm.isComplete(ps)) {
 	        return;
@@ -44153,13 +44147,6 @@
 
 	  inc: function inc(v) {
 	    return v + 1;
-	  },
-
-	  push: function push() {
-	    var vals = arguments;
-	    return function (coll) {
-	      return coll.push.apply(coll, vals);
-	    };
 	  }
 	};
 
@@ -44459,54 +44446,33 @@
 	var im = __webpack_require__(270);
 	var util = __webpack_require__(265);
 
-	function getScopedBinding(_x, _x2, _x3) {
-	  var _again = true;
-
-	  _function: while (_again) {
-	    scope = undefined;
-	    _again = false;
-	    var scopes = _x,
-	        scopeId = _x2,
-	        k = _x3;
-
+	function getScopedBinding(scopes, scopeId, k) {
+	  while (scopeId !== undefined) {
 	    var scope = scopes.get(scopeId);
-	    if (scope.hasIn(["bindings", k])) {
-	      return scope.getIn(["bindings", k]);
-	    } else if (scope.get("parent") !== undefined) {
-	      _x = scopes;
-	      _x2 = scope.get("parent");
-	      _x3 = k;
-	      _again = true;
-	      continue _function;
+	    var bindings = scope.get("bindings");
+	    if (bindings.has(k)) {
+	      return bindings.get(k);
+	    } else {
+	      scopeId = scope.get("parent");
 	    }
 	  }
 	};
 
-	function setGlobalBinding(scopes, scopeId_, k, v) {
-	  var originalScopeId = scopeId_;
-
-	  return (function set(_x4) {
-	    var _again2 = true;
-
-	    _function2: while (_again2) {
-	      _again2 = false;
-	      var currentScopeId = _x4;
-
-	      if (scopes.getIn([currentScopeId, "bindings", k]) !== undefined) {
-	        return scopes.setIn([currentScopeId, "bindings", k], v);
-	      } else if (scopes.getIn([currentScopeId, "parent"]) !== undefined) {
-	        _x4 = scopes.getIn([currentScopeId, "parent"]);
-	        _again2 = true;
-	        continue _function2;
-	      } else {
-	        return scopes.setIn([originalScopeId, "bindings", k], v);
-	      }
+	function setGlobalBinding(scopes, originalScopeId, k, v) {
+	  var scopeId = originalScopeId;
+	  while (scopeId !== undefined) {
+	    if (scopes.getIn([scopeId, "bindings", k]) !== undefined) {
+	      return scopes.setIn([scopeId, "bindings", k], v);
+	    } else if (scopes.getIn([scopeId, "parent"]) !== undefined) {
+	      scopeId = scopes.getIn([scopeId, "parent"]);
+	    } else {
+	      return scopes.setIn([originalScopeId, "bindings", k], v);
 	    }
-	  })(originalScopeId);
+	  }
 	};
 
 	function addScope(p, bindings, parent) {
-	  return p.update("scopes", util.push(im.Map({ bindings: bindings, parent: parent })));
+	  return p.set("scopes", p.get("scopes").push(im.Map({ bindings: bindings, parent: parent })));
 	};
 
 	function lastScopeId(p) {
@@ -49722,8 +49688,8 @@
 
 	function checkBuiltinArgs(fnArgs) {
 	  var meta = fnArgs[0];
-	  var testArgs = _.rest(fnArgs);
-	  var specs = _.rest(arguments);
+	  var testArgs = _.toArray(fnArgs).slice(1);
+	  var specs = _.toArray(arguments).slice(1);
 	  specs.forEach(function (specOrSpecs, i) {
 	    if (_.isArray(specOrSpecs)) {
 	      specOrSpecs.forEach(function (spec) {
@@ -49738,12 +49704,12 @@
 	function checkLambdaArity(fnStackItem, argContainers, invocationAst) {
 	  var fn = fnStackItem.v;
 
-	  if (fn.parameters.length > argContainers.size) {
+	  if (fn.parameters.length > argContainers.length) {
 	    var markerIndex = invocationAst.e - 1;
-	    var firstMissingParameterIndex = argContainers.size;
+	    var firstMissingParameterIndex = argContainers.length;
 	    var firstMissingParameterName = fn.parameters[firstMissingParameterIndex];
 	    throw new langUtil.RuntimeError("Missing a \"" + firstMissingParameterName + "\"", { s: markerIndex, e: markerIndex });
-	  } else if (fn.parameters.length < argContainers.size) {
+	  } else if (fn.parameters.length < argContainers.length) {
 	    checkNoExtraArgs(fnStackItem, argContainers, fn.parameters.length);
 	  }
 	};
@@ -49753,13 +49719,13 @@
 	};
 
 	function checkNoExtraArgs(fnStackItem, argContainers, parameterCount) {
-	  if (argContainers.size > parameterCount) {
+	  if (argContainers.length > parameterCount) {
 	    var fnName = fnStackItem.ast.c;
 	    var firstExtraArgumentIndex = parameterCount;
 	    var extraArgumentAsts = argContainers.slice(firstExtraArgumentIndex);
-	    var thisPluralised = extraArgumentAsts.size > 1 ? "these" : "this";
-	    var markerStartIndex = extraArgumentAsts.get(0).ast.s;
-	    var markerEndIndex = extraArgumentAsts.last().ast.e;
+	    var thisPluralised = extraArgumentAsts.length > 1 ? "these" : "this";
+	    var markerStartIndex = extraArgumentAsts[0].ast.s;
+	    var markerEndIndex = _.last(extraArgumentAsts).ast.e;
 	    throw new langUtil.RuntimeError("\"" + fnName + "\" " + "does not need " + thisPluralised, { s: markerStartIndex, e: markerEndIndex });
 	  }
 	};
@@ -49853,7 +49819,8 @@
 
 	function stepReturn(ins, p) {
 	  throwIfUninvokedStackFunctions(p);
-	  return p.deleteIn(["callStack", -1]);
+	  var callStack = p.get("callStack");
+	  return p.deleteIn(["scopes", callStack.last().get("scope")]).set("callStack", callStack.pop());
 	};
 
 	var ARG_START = ["ARG_START"];
@@ -49884,14 +49851,14 @@
 	  if (langUtil.isFunction(fnObj)) {
 	    var pAndArgContainers = popTopArgsOnStack(p);
 	    var p = pAndArgContainers[0];
-	    var argContainers = pAndArgContainers[1].reverse();
-	    var argValuesArr = argContainers.map(function (c) {
+	    var argContainers = pAndArgContainers[1];
+	    var argValues = argContainers.map(function (c) {
 	      return c.v;
-	    }).toArray();
+	    });
 
 	    if (langUtil.isLambda(fnObj)) {
 	      checkArgs.checkLambdaArity(fnStackItem, argContainers, ins.ast);
-	      p = addScope(p, im.Map(_.object(fnObj.parameters, argValuesArr)), fnObj.closureScope);
+	      p = addScope(p, im.Map(_.object(fnObj.parameters, argValues)), fnObj.closureScope);
 
 	      var tailIndex = tailCallIndex(p.get("callStack"), fnObj);
 	      if (tailIndex !== undefined) {
@@ -49913,7 +49880,7 @@
 	        }
 
 	        checkArgs.checkBuiltinNoExtraArgs(fnStackItem, argContainers, fn.length);
-	        var result = fn.apply(null, [meta].concat(argValuesArr));
+	        var result = fn.apply(null, [meta].concat(argValues));
 
 	        if (langUtil.isInternalStateFn(fnObj)) {
 	          var fnName = fnStackItem.ast.c;
@@ -49971,11 +49938,14 @@
 	};
 
 	function step(p, noSideEffects) {
-	  if (currentCallFrame(p) === undefined) {
+	  var currentFrame = currentCallFrame(p);
+	  if (currentFrame === undefined) {
 	    return p;
 	  } else {
-	    var ins = currentCallFrame(p).get("bc")[currentCallFrame(p).get("bcPointer")];
-	    p = p.updateIn(["callStack", -1, "bcPointer"], util.inc).set("currentInstruction", ins);
+	    var bcPointer = currentFrame.get("bcPointer");
+	    var ins = currentFrame.get("bc")[bcPointer];
+
+	    p = p.setIn(["callStack", -1, "bcPointer"], bcPointer + 1).set("currentInstruction", ins);
 
 	    try {
 	      if (ins[0] === "push") {
@@ -50065,7 +50035,9 @@
 	};
 
 	function pushCallFrame(p, bc, bcPointer, scopeId, tail) {
-	  return p.update("callStack", util.push(im.Map({ bc: bc, bcPointer: bcPointer, scope: scopeId, tail: tail })));
+	  return p.set("callStack", p.get("callStack").push(im.Map({
+	    bc: bc, bcPointer: bcPointer, scope: scopeId, tail: tail
+	  })));
 	};
 
 	function initProgramStateAndComplete(code, bc, env, stack) {
@@ -50083,12 +50055,18 @@
 
 	function popTopArgsOnStack(p) {
 	  var stack = p.get("stack");
-	  var args = stack.takeUntil(function (e) {
-	    return e.v === ARG_START;
-	  });
 
-	  return [p.set("stack", stack.skip(args.size + 1)), // chuck args, arg_start
-	  args];
+	  var args = [];
+	  var element = stack.peek();
+	  while (element !== undefined && element.v !== ARG_START) {
+	    stack = stack.shift();
+	    args.push(element);
+	    element = stack.peek();
+	  }
+
+	  stack = stack.shift();
+
+	  return [p.set("stack", stack), args.reverse()];
 	};
 
 	initProgramStateAndComplete.initProgramStateAndComplete = initProgramStateAndComplete;
