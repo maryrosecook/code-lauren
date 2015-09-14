@@ -49,7 +49,7 @@ describe("canvas library", function() {
         .toEqual('Missing either "filled" or "unfilled"');
 
       expect(vm.complete(setupProgram('draw-oval(10 10 10 10 "filled")')).get("exception").message)
-        .toEqual("Missing the color of the text");
+        .toEqual("Missing the color of the oval");
     });
   });
 
@@ -72,7 +72,7 @@ describe("canvas library", function() {
 
       expect(vm.complete(setupProgram('draw-rectangle(10 10 10 10 "filled")'))
              .get("exception").message)
-        .toEqual("Missing the color of the text");
+        .toEqual("Missing the color of the rectangle");
     });
   });
 });

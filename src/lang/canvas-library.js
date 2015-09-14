@@ -122,7 +122,7 @@ var userFns = im.Map({
         chk.num("Missing a width"),
         chk.num("Missing a height"),
         chk.set(["filled", "unfilled"], 'Missing either "filled" or "unfilled"'),
-        chk.set(COLORS, "Missing the color of the text"));
+        chk.set(COLORS, "Missing the color of the oval"));
 
     addOperation(function () {
       var kappa = 0.5522848;
@@ -159,7 +159,7 @@ var userFns = im.Map({
         chk.num("Missing a width"),
         chk.num("Missing a height"),
         chk.set(["filled", "unfilled"], 'Missing either "filled" or "unfilled"'),
-        chk.set(COLORS, "Missing the color of the text"));
+        chk.set(COLORS, "Missing the color of the rectangle"));
 
     addOperation(function () {
       if (filledStr === "unfilled") {
