@@ -511,59 +511,37 @@ describe("parser", function() {
     });
 
     it("should report that comma is unnecessary after number", function() {
-      expect(function() {
-        parse("write(1, 1)");
-      }).toThrow("No comma required");
-
-      expect(function() {
-        parse("write(1, )");
-      }).toThrow("No comma required");
+      expect(function() { parse("write(1, 1)"); }).toThrow("No comma required");
+      expect(function() { parse("write(1, )"); }).toThrow("No comma required");
+      expect(function() { parse("write(1 , 1)"); }).toThrow("No comma required");
     });
 
     it("should report that comma is unnecessary after string", function() {
-      expect(function() {
-        parse('write("hi", 1)');
-      }).toThrow("No comma required");
-
-      expect(function() {
-        parse('write("hi", )');
-      }).toThrow("No comma required");
+      expect(function() { parse('write("hi", 1)'); }).toThrow("No comma required");
+      expect(function() { parse('write("hi", )'); }).toThrow("No comma required");
+      expect(function() { parse('write("hi" , 1)'); }).toThrow("No comma required");
     });
 
     it("should report that comma is unnecessary after var", function() {
-      expect(function() {
-        parse("write(name, 1)");
-      }).toThrow("No comma required");
-
-      expect(function() {
-        parse("write(name, )");
-      }).toThrow("No comma required");
+      expect(function() { parse("write(name, 1)"); }).toThrow("No comma required");
+      expect(function() { parse("write(name, )"); }).toThrow("No comma required");
+      expect(function() { parse("write(name , 1)"); }).toThrow("No comma required");
     });
 
     it("should report that comma is unnecessary after invocation", function() {
-      expect(function() {
-        parse("write(la(), 1)");
-      }).toThrow("No comma required");
-
-      expect(function() {
-        parse("write(la(), )");
-      }).toThrow("No comma required");
+      expect(function() { parse("write(la(), 1)"); }).toThrow("No comma required");
+      expect(function() { parse("write(la(), )"); }).toThrow("No comma required");
+      expect(function() { parse("write(la() , 1)"); }).toThrow("No comma required");
     });
 
     it("should report that comma is unnecessary after boolean", function() {
-      expect(function() {
-        parse("write(true, 1)");
-      }).toThrow("No comma required");
-
-      expect(function() {
-        parse("write(true, )");
-      }).toThrow("No comma required");
+      expect(function() { parse("write(true, 1)"); }).toThrow("No comma required");
+      expect(function() { parse("write(true, )"); }).toThrow("No comma required");
+      expect(function() { parse("write(true , 1)"); }).toThrow("No comma required");
     });
 
     it("should report that comma is unnecessary at beginning of arg list", function() {
-      expect(function() {
-        parse("write(,)");
-      }).toThrow("No comma required");
+      expect(function() { parse("write(,)"); }).toThrow("No comma required");
     });
   });
 

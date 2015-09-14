@@ -1,7 +1,7 @@
 {
   "examples": [
     {
-      "code":      ["write(1, 1)", "write(1, )"],
+      "code":      ["write(1, 1)", "write(1, )", "write(1 ,)"],
       "stack":     ["argument", "expression", "atom", "number"],
       "nextInput": ",",
       "message":   "No comma required"
@@ -39,6 +39,20 @@
     {
       "code":      ["write(,)"],
       "stack":     ["invocation", "application"],
+      "nextInput": ",",
+      "message":   "No comma required"
+    },
+
+    {
+      "code":      ["write(1 ,)", "all types of arg (except invoc) followed by whitespace + comma"],
+      "stack":     ["argument", "__"],
+      "nextInput": ",",
+      "message":   "No comma required"
+    },
+
+    {
+      "code":      ["write(la() , 1)", "invocation followed by whitespace + comma"],
+      "stack":     ["invocation", "_"],
       "nextInput": ",",
       "message":   "No comma required"
     },
