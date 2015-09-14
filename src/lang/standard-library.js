@@ -18,7 +18,7 @@ var createStandardLibrary = module.exports = function () {
           chk.num("Missing two numbers"),
           chk.num("Missing a number to subtract"));
 
-      return a - b;
+      return parseFloat(a) - parseFloat(b);
     },
 
     multiply: function(meta, a, b) {
@@ -26,7 +26,7 @@ var createStandardLibrary = module.exports = function () {
           chk.num("Missing two numbers to multiply"),
           chk.num("Missing a number to multiply by"));
 
-      return a * b;
+      return parseFloat(a) * parseFloat(b);
     },
 
     divide: function(meta, a, b) {
@@ -34,7 +34,7 @@ var createStandardLibrary = module.exports = function () {
           chk.num("Missing a number to divide and a number to divide by"),
           chk.num("Missing a number to divide by"));
 
-      return a / b;
+      return parseFloat(a) / parseFloat(b);
     },
 
     modulus: function(meta, a, b) {
@@ -42,42 +42,42 @@ var createStandardLibrary = module.exports = function () {
           chk.num("Missing a number to divide and a number to divide by"),
           chk.num("Missing a number to divide by"));
 
-      return a % b;
+      return parseFloat(a) % parseFloat(b);
     },
 
     sine: function(meta, x) {
       chk(arguments,
           chk.num("Missing an angle to get the sine of"));
 
-      return Math.sin(lib.get("radians")(meta, x));
+      return Math.sin(lib.get("radians")(meta, parseFloat(x)));
     },
 
     cosine: function(meta, x) {
       chk(arguments,
           chk.num("Missing an angle to get the cosine of"));
 
-      return Math.cos(lib.get("radians")(meta, x));
+      return Math.cos(lib.get("radians")(meta, parseFloat(x)));
     },
 
     tangent: function(meta, x) {
       chk(arguments,
           chk.num("Missing an angle to get the tangent of"));
 
-      return Math.tan(lib.get("radians")(meta, x));
+      return Math.tan(lib.get("radians")(meta, parseFloat(x)));
     },
 
     radians: function(meta, x) {
       chk(arguments,
           chk.num("Missing an angle to convert to radians"));
 
-      return 0.01745 * x;
+      return 0.01745 * parseFloat(x);
     },
 
     degrees: function(meta, x) {
       chk(arguments,
           chk.num("Missing some radians to convert to degrees"));
 
-      return x / 0.01745;
+      return parseFloat(x) / 0.01745;
     },
 
     "new-dictionary": function(meta) {
@@ -91,7 +91,7 @@ var createStandardLibrary = module.exports = function () {
           chk.num("Missing two numbers"),
           chk.num("Missing a second number"));
 
-      return a < b;
+      return parseFloat(a) < parseFloat(b);
     },
 
     "more-than": function(meta, a, b) {
@@ -99,7 +99,7 @@ var createStandardLibrary = module.exports = function () {
           chk.num("Missing two numbers"),
           chk.num("Missing a second number"));
 
-      return a > b;
+      return parseFloat(a) > parseFloat(b);
     },
 
     equal: function(meta, a, b) {
@@ -107,7 +107,7 @@ var createStandardLibrary = module.exports = function () {
           chk.num("Missing two numbers"),
           chk.num("Missing a second number"));
 
-      return a === b;
+      return a == b;
     },
 
     set: function(meta, dict, key, value) {
@@ -134,7 +134,7 @@ var createStandardLibrary = module.exports = function () {
            chk.range(1, undefined, "Number to count to must be more than 0")]);
 
       if (meta.state.get(meta.ast.s) === undefined) {
-        meta.state = meta.state.set(meta.ast.s, im.Map({ count: 0, target: target }));
+        meta.state = meta.state.set(meta.ast.s, im.Map({ count: 0, target: parseInt(target) }));
       }
 
       meta.state = meta.state.updateIn([meta.ast.s, "count"], util.inc);
