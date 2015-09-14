@@ -338,11 +338,4 @@ describe("vm", function() {
       });
     });
   });
-
-  describe("recursion", function() {
-    it("should trampoline a program where there is an if in the tail position", function() {
-      var code = 'tozero: { ?x if equal(x 0) { "done" } else { tozero(subtract(x 1)) } } \n tozero(20000)';
-      expect(v(code, c(p(code))).getIn(["stack", -1]).v).toEqual("done");
-    });
-  });
 });
