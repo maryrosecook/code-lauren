@@ -6,7 +6,7 @@ In the previous lesson, you did your first animation. But animating a shape is e
 left-dist: 1
 
 forever {
-  left-dist: add(left-dist 0.1)
+  left-dist: add(left-dist 1)
 
   clear-screen()
   draw-oval(left-dist 300 30 30 "filled" "blue")
