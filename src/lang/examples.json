@@ -8,11 +8,51 @@
     },
 
     {
+      "code":      ["write(\"\", 1)", "write(\"\", )"],
+      "stack":     ["argument", "expression", "atom", "string"],
+      "nextInput": ",",
+      "message":   "No comma required"
+    },
+
+    {
+      "code":      ["write(la, 1)", "write(la, )"],
+      "stack":     ["argument", "expression", "parenthetical", "invocation",
+                    "function", "label", "label_char"],
+      "nextInput": ",",
+      "message":   "No comma required"
+    },
+
+    {
+      "code":      ["write(true, 1)", "write(true, )"],
+      "stack":     ["argument", "expression", "atom", "boolean"],
+      "nextInput": ",",
+      "message":   "No comma required"
+    },
+
+    {
+      "code":      ["write(la(), 1)", "write(la(), )"],
+      "stack":     ["argument", "expression", "parenthetical", "invocation", "application"],
+      "nextInput": ",",
+      "message":   "No comma required"
+    },
+
+    {
+      "code":      ["write(,)"],
+      "stack":     ["invocation", "application"],
+      "nextInput": ",",
+      "message":   "No comma required"
+    },
+
+
+
+    {
       "code":      "1a",
       "stack":     ["number"],
       "nextInput": "[a-zA-Z0-9_\\-]+",
       "message":   "Can't have a name that starts with a number"
     },
+
+
 
     {
       "code":      "1()",
@@ -21,18 +61,13 @@
       "message":   "Can't run a number - it's not an action"
     },
 
+
+
     {
       "code":      "a: ",
       "stack":     ["assignment", "_"],
       "nextInput": "\n*$",
       "message":   "Name needs a value"
-    },
-
-    {
-      "code":      "a ()",
-      "stack":     ["_"],
-      "nextInput": "\\(\\)",
-      "message":   "Should be no spaces between\nthe name of the action and the ()"
     },
 
     {
@@ -62,6 +97,17 @@
       "nextInput": ":",
       "message":   "Needs a name on the left and a value on the right"
     },
+
+
+
+    {
+      "code":      "a ()",
+      "stack":     ["_"],
+      "nextInput": "\\(\\)",
+      "message":   "Should be no spaces between\nthe name of the action and the ()"
+    },
+
+
 
     {
       "code":      "a b",
