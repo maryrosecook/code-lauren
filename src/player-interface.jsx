@@ -220,7 +220,7 @@ var ProgramPlayer = React.createClass({
         return;
       } else if (vm.isComplete(ps)) {
         return;
-      } else if (loopCount > 100) { // something wrong - bail
+      } else if (loopCount > 100) {
         throw new Error("Trapped in infinite loop trying to step");
       }
 
