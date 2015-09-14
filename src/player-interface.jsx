@@ -118,16 +118,28 @@ var ProgramPlayer = React.createClass({
     this.stepBackwardsClickHandler = onClickOrHoldDown(this.stepBackwardsByHand);
     this.stepForwardsClickHandler = onClickOrHoldDown(this.stepForwardsByHand);
 
-    this.props.editor.on("change", function() {
+    this.setupProgramReevaluation();
+
+    return { ps: undefined, paused: false, pses: [] };
+  },
+
+  setupProgramReevaluation: function() {
+    var self = this;
+    function reevaluateProgram() {
       self.state.ps = initProgramState(self.props.editor.getValue(),
                                        self.props.annotator,
                                        self.props.canvasLib);
       self.state.paused = false;
       self.state.pses = [];
       self.setState(self.state);
-    });
+    };
 
-    return { ps: undefined, paused: false, pses: [] };
+    var rerunProgramTimer;
+    this.props.editor.on("change", function() {
+      self.props.annotator.clear();
+      clearTimeout(rerunProgramTimer);
+      rerunProgramTimer = setTimeout(reevaluateProgram, 400);
+    });
   },
 
   onRewindClick: function() {
