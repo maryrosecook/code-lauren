@@ -90,28 +90,25 @@ function displayRainbowParentheses(code, annotator) {
 var ProgramPlayer = React.createClass({
   getInitialState: function() {
     var self = this;
-    var hitClearScreen = false;
 
     (function tick(lastEventLoopYield) {
       while(true) {
         if (self.state !== null && self.state.ps !== undefined && !self.state.paused) {
-          if (hitClearScreen) {
-            self.state.ps.get("canvasLib").clearScreen();
-          }
-
           if (vm.isComplete(self.state.ps)) {
             self.state.ps.get("canvasLib").flush();
           } else {
             self.stepForwards();
 
-            hitClearScreen = self.state.ps.get("canvasLib").hitClearScreen();
-            if (hitClearScreen === true) {
+            if (self.state.ps.get("canvasLib").hitClearScreen() === true) {
+              self.state.ps.get("canvasLib").clearScreen();
               self.state.ps.get("canvasLib").flush();
+              requestAnimationFrame(() => tick(new Date().getTime()))
+              break;
             }
           }
         }
 
-        if (hitClearScreen || Date.now() - lastEventLoopYield > 33) {
+        if (Date.now() - lastEventLoopYield > 33) {
           requestAnimationFrame(() => tick(new Date().getTime()))
           break;
         }
