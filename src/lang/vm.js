@@ -229,8 +229,7 @@ function isCrashed(p) {
   return p.get("exception") !== undefined;
 };
 
-function initProgramState(code, bc, builtinBindings, stack) {
-  if (stack instanceof Array) { throw new Error("Use immutable Stack for stack"); }
+function initProgramState(code, bc, builtinBindings) {
   builtinBindings = builtinBindings || standardLibrary();
 
   var bcPointer = 0;
@@ -240,7 +239,7 @@ function initProgramState(code, bc, builtinBindings, stack) {
     exception: undefined,
     code: code,
     currentInstruction: undefined,
-    stack: stack || im.Stack(),
+    stack: im.Stack(),
     callStack: im.List(), // can't be a stack because too much editing of head
     scopes: im.List()
   });
@@ -258,8 +257,8 @@ function pushCallFrame(p, bc, bcPointer, scopeId, tail) {
                })));
 };
 
-function initProgramStateAndComplete(code, bc, env, stack) {
-  return complete(initProgramState(code, bc, env, stack));
+function initProgramStateAndComplete(code, bc, env) {
+  return complete(initProgramState(code, bc, env));
 };
 
 function throwIfUninvokedStackFunctions(p) {
