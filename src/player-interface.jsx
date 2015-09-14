@@ -6,8 +6,7 @@ var vm = require("./lang/vm");
 var parser = require("./lang/parser");
 var compile = require("./lang/compiler");
 var langUtil = require("../src/lang/lang-util");
-var STEP_TO_SAVE = 5000;
-
+var STEP_TO_SAVE = 2000;
 
 function annotateCurrentInstruction(ps, annotator) {
   if (ps.get("currentInstruction") === undefined) { return; }
