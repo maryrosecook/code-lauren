@@ -509,6 +509,16 @@ describe("parser", function() {
         parse("a: 1\n: 1");
       }).toThrow("Needs a name on the left and a value on the right");
     });
+
+    it("should report that comma is unnecessary", function() {
+      expect(function() {
+        parse("write(1, 1)");
+      }).toThrow("No comma required");
+
+      expect(function() {
+        parse("write(1, )");
+      }).toThrow("No comma required");
+    });
   });
 
   describe("offset annotation", function() {

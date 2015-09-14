@@ -1,6 +1,13 @@
 {
   "examples": [
     {
+      "code":      ["write(1, 1)", "write(1, )"],
+      "stack":     ["argument", "expression", "atom", "number"],
+      "nextInput": ",",
+      "message":   "No comma required"
+    },
+
+    {
       "code":      "1a",
       "stack":     ["number"],
       "nextInput": "[a-zA-Z0-9_\\-]+",
