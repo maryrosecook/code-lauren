@@ -125,7 +125,6 @@ describe("vm", function() {
       ps = v.step(ps);
       ps = v.step(ps);
 
-      // console.log(ps.getIn(["scopes", ps.getIn(["callStack", 0, "scope"])]));
       var binding = ps.getIn(["scopes", ps.getIn(["callStack", 0, "scope"]), "bindings", "a"]);
       expect(util.stripBc(binding.bc)).toEqual([["push", 1],
                                                 ["return"]]);
