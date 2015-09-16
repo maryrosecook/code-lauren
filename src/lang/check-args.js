@@ -51,7 +51,7 @@ function checkNoExtraArgs(fnName, argValues, argAsts, parameterCount) {
 };
 
 function createSpec(message, testFn) {
-  return { message: message, testFn: testFn }
+  return { message: message, testFn: testFn };
 };
 
 function any(message) {
