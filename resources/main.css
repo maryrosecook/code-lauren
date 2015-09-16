@@ -357,8 +357,8 @@ button:focus {
   font-size: 15px;
   position: absolute;
   top: 33px;
-  left: 0;
-  width: calc(100% - 450px);
+  right: 450px;
+  width: 400px;
   height: 100vh;
   padding-top: 3px;
   z-index: 0;
