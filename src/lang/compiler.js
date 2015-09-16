@@ -68,6 +68,8 @@ function compileConditional(a) {
     );
   }
 
+  // add jumps that, if a block is chosen and evaluated, will jump
+  // to the end of the conditional
   var bc = [];
   for (var i = clauses.length - 1; i >= 0; i--) {
     var bcLength = bc.length
