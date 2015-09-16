@@ -23,11 +23,13 @@ function isMatchingExample(example, code) {
     return false;
   } else {
     var codeStack = codeToFailedParseStack(code);
-    if (example.stack.length > codeStack.length) {
-      return false;
-    } else {
-      return _.isEqual(example.stack, _.last(codeStack, example.stack.length));
-    }
+    return _.find(example.stacks, function(stack) {
+      if (stack.length > codeStack.length) {
+        return false;
+      } else {
+        return _.isEqual(stack, _.last(codeStack, stack.length));
+      }
+    }) !== undefined;
   }
 };
 

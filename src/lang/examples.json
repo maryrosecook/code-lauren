@@ -2,57 +2,57 @@
   "examples": [
     {
       "code":      ["write(1, 1)", "write(1, )", "write(1 ,)"],
-      "stack":     ["argument", "expression", "atom", "number"],
+      "stacks":    [["argument", "expression", "atom", "number"]],
       "nextInput": ",",
       "message":   "No comma required"
     },
 
     {
       "code":      ["write(\"\", 1)", "write(\"\", )"],
-      "stack":     ["argument", "expression", "atom", "string"],
+      "stacks":    [["argument", "expression", "atom", "string"]],
       "nextInput": ",",
       "message":   "No comma required"
     },
 
     {
       "code":      ["write(la, 1)", "write(la, )"],
-      "stack":     ["argument", "expression", "parenthetical", "invocation",
-                    "function", "label", "label_char"],
+      "stacks":    [["argument", "expression", "parenthetical", "invocation",
+                    "function", "label", "label_char"]],
       "nextInput": ",",
       "message":   "No comma required"
     },
 
     {
       "code":      ["write(true, 1)", "write(true, )"],
-      "stack":     ["argument", "expression", "atom", "boolean"],
+      "stacks":    [["argument", "expression", "atom", "boolean"]],
       "nextInput": ",",
       "message":   "No comma required"
     },
 
     {
       "code":      ["write(la(), 1)", "write(la(), )"],
-      "stack":     ["argument", "expression", "parenthetical", "invocation", "application"],
+      "stacks":    [["argument", "expression", "parenthetical", "invocation", "application"]],
       "nextInput": ",",
       "message":   "No comma required"
     },
 
     {
       "code":      ["write(,)"],
-      "stack":     ["invocation", "application"],
+      "stacks":    [["invocation", "application"]],
       "nextInput": ",",
       "message":   "No comma required"
     },
 
     {
       "code":      ["write(1 ,)", "all types of arg (except invoc) followed by whitespace + comma"],
-      "stack":     ["argument", "__"],
+      "stacks":    [["argument", "__"]],
       "nextInput": ",",
       "message":   "No comma required"
     },
 
     {
       "code":      ["write(la() , 1)", "invocation followed by whitespace + comma"],
-      "stack":     ["invocation", "_"],
+      "stacks":    [["invocation", "_"]],
       "nextInput": ",",
       "message":   "No comma required"
     },
@@ -61,7 +61,7 @@
 
     {
       "code":      "1a",
-      "stack":     ["number"],
+      "stacks":    [["number"]],
       "nextInput": "[a-zA-Z0-9_\\-]+",
       "message":   "Can't have a name that starts with a number"
     },
@@ -70,7 +70,7 @@
 
     {
       "code":      "1()",
-      "stack":     ["expression", "atom", "number"],
+      "stacks":    [["expression", "atom", "number"]],
       "nextInput": "\\(\\)",
       "message":   "Can't run a number - it's not an action"
     },
@@ -79,35 +79,35 @@
 
     {
       "code":      "a: ",
-      "stack":     ["assignment", "_"],
+      "stacks":    [["assignment", "_"]],
       "nextInput": "\n*$",
       "message":   "Name needs a value"
     },
 
     {
       "code":      "a:",
-      "stack":     ["assignment", "colon"],
+      "stacks":    [["assignment", "colon"]],
       "nextInput": "\n*$",
       "message":   "Name needs a value"
     },
 
     {
       "code":      ": 1",
-      "stack":     ["start"],
+      "stacks":    [["start"]],
       "nextInput": ":",
       "message":   "Needs a name on the left and a value on the right"
     },
 
     {
       "code":      "a: 1\n: 1",
-      "stack":     ["nl"],
+      "stacks":    [["nl"]],
       "nextInput": ":",
       "message":   "Needs a name on the left and a value on the right"
     },
 
     {
       "code":      "a: 1\n: 1",
-      "stack":     ["nl"],
+      "stacks":    [["nl"]],
       "nextInput": ":",
       "message":   "Needs a name on the left and a value on the right"
     },
@@ -116,7 +116,7 @@
 
     {
       "code":      "a ()",
-      "stack":     ["_"],
+      "stacks":    [["_"]],
       "nextInput": "\\(\\)",
       "message":   "Should be no spaces between\nthe name of the action and the ()"
     },
@@ -125,7 +125,7 @@
 
     {
       "code":      "a b",
-      "stack":     ["_"],
+      "stacks":    [["_"]],
       "nextInput": "[a-zA-Z0-9_\\-]+",
       "message":   "Expected this to be on the next line"
     }
