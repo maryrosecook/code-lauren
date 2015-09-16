@@ -43,12 +43,14 @@ function stepArgStart(ins, p) {
 };
 
 function stepGetEnv(ins, p) {
-  var value = addScope.getScopedBinding(p.get("scopes"),
-                                        currentCallFrame(p).get("scope"),
-                                        ins[1]);
-  if (value === undefined) {
+  var scopes = p.get("scopes");
+  var currentScope = currentCallFrame(p).get("scope");
+  var key = ins[1];
+
+  if (!addScope.hasScopedBinding(scopes, currentScope, key)) {
     throw new langUtil.RuntimeError("Never heard of " + ins[1], ins.ast);
   } else {
+    var value = addScope.getScopedBinding(scopes, currentScope, key);
     return p.set("stack", p.get("stack").push({ v: value, ast: ins.ast }));
   }
 };

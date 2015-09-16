@@ -22,6 +22,13 @@ describe("vm", function() {
     });
   });
 
+  describe("variable lookup", function() {
+    it("should not complain has never heard of var that was instantiated as undef", function() {
+      var code = "none: {} \n a: none() \n a";
+      expect(v(code, c(p(code))).getIn(["stack", -1]).v).toEqual(undefined);
+    });
+  });
+
   describe("lambda invocation", function() {
     it("should return undefined from invoked empty lambda", function() {
       var code = "{}()";

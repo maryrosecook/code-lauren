@@ -13,6 +13,20 @@ function getScopedBinding(scopes, scopeId, k) {
   }
 };
 
+function hasScopedBinding(scopes, scopeId, k) {
+  while (scopeId !== undefined) {
+    var scope = scopes.get(scopeId);
+    var bindings = scope.get("bindings");
+    if (bindings.has(k)) {
+      return true;
+    } else {
+      scopeId = scope.get("parent");
+    }
+  }
+
+  return false;
+};
+
 function setGlobalBinding(scopes, originalScopeId, k, v) {
   var scopeId = originalScopeId;
   while (scopeId !== undefined) {
@@ -35,6 +49,7 @@ function lastScopeId(p) {
 };
 
 addScope.getScopedBinding = getScopedBinding;
+addScope.hasScopedBinding = hasScopedBinding;
 addScope.setGlobalBinding = setGlobalBinding;
 addScope.lastScopeId = lastScopeId;
 module.exports = addScope;
