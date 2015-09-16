@@ -32,6 +32,8 @@ function Annotator(editor) {
 
       if (start === end) {
         markers.push(editor.setBookmark(startPos, { widget: zeroLengthMarker(clazz) }));
+      } else if (start === code.length) {
+        markers.push(editor.setBookmark(startPos, { widget: zeroLengthMarker(clazz) }));
       } else {
         var endLAndC = parser.indexToLineAndColumn(end, code);
         var endPos = { line: endLAndC.line - 1, ch: endLAndC.column - 1 };
