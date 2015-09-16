@@ -287,7 +287,7 @@ describe("vm", function() {
     });
   });
 
-  describe("arity", function() {
+  describe("argument checking", function() {
     describe("lambda", function() {
       it("should not complain when right number of args passed", function() {
         var code = 'none: { 1 } \n none()';
