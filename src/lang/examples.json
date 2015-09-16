@@ -1,17 +1,17 @@
 {
-  "examples": [
+  "matchers": [
     {
       "code":      ["write(1, 1)", "write(1, )", "write(1 ,)"],
       "stacks":    [["argument", "expression", "atom", "number"]],
       "nextInput": ",",
-      "message":   "No comma required"
+      "message":   "$NO_COMMA"
     },
 
     {
       "code":      ["write(\"\", 1)", "write(\"\", )"],
       "stacks":    [["argument", "expression", "atom", "string"]],
       "nextInput": ",",
-      "message":   "No comma required"
+      "message":   "$NO_COMMA"
     },
 
     {
@@ -19,42 +19,42 @@
       "stacks":    [["argument", "expression", "parenthetical", "invocation",
                     "function", "label", "label_char"]],
       "nextInput": ",",
-      "message":   "No comma required"
+      "message":   "$NO_COMMA"
     },
 
     {
       "code":      ["write(true, 1)", "write(true, )"],
       "stacks":    [["argument", "expression", "atom", "boolean"]],
       "nextInput": ",",
-      "message":   "No comma required"
+      "message":   "$NO_COMMA"
     },
 
     {
       "code":      ["write(la(), 1)", "write(la(), )"],
       "stacks":    [["argument", "expression", "parenthetical", "invocation", "application"]],
       "nextInput": ",",
-      "message":   "No comma required"
+      "message":   "$NO_COMMA"
     },
 
     {
       "code":      ["write(,)"],
       "stacks":    [["invocation", "application"]],
       "nextInput": ",",
-      "message":   "No comma required"
+      "message":   "$NO_COMMA"
     },
 
     {
       "code":      ["write(1 ,)", "all types of arg (except invoc) followed by whitespace + comma"],
       "stacks":    [["argument", "__"]],
       "nextInput": ",",
-      "message":   "No comma required"
+      "message":   "$NO_COMMA"
     },
 
     {
       "code":      ["write(la() , 1)", "invocation followed by whitespace + comma"],
       "stacks":    [["invocation", "_"]],
       "nextInput": ",",
-      "message":   "No comma required"
+      "message":   "$NO_COMMA"
     },
 
 
@@ -95,21 +95,21 @@
       "code":      ": 1",
       "stacks":    [["start"]],
       "nextInput": ":",
-      "message":   "Needs a name on the left and a value on the right"
+      "message":   "$NEEDS_NAME_AND_VALUE"
     },
 
     {
       "code":      "a: 1\n: 1",
       "stacks":    [["nl"]],
       "nextInput": ":",
-      "message":   "Needs a name on the left and a value on the right"
+      "message":   "$NEEDS_NAME_AND_VALUE"
     },
 
     {
       "code":      "a: 1\n: 1",
       "stacks":    [["nl"]],
       "nextInput": ":",
-      "message":   "Needs a name on the left and a value on the right"
+      "message":   "$NEEDS_NAME_AND_VALUE"
     },
 
 
@@ -129,5 +129,10 @@
       "nextInput": "[a-zA-Z0-9_\\-]+",
       "message":   "Expected this to be on the next line"
     }
-  ]
+  ],
+
+  "strings": {
+    "NO_COMMA": "No comma required",
+    "NEEDS_NAME_AND_VALUE": "Needs a name on the left and a value on the right"
+  }
 }

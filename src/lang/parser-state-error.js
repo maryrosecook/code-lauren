@@ -2,7 +2,8 @@ var peg = require("pegjs");
 var fs = require("fs");
 var _ = require("underscore");
 
-var examples = require("./examples.json").examples;
+var examples = require("./examples.json");
+var matchers = examples.matchers;
 
 var pegParseTrace = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegjs", "utf8"),
                                     { cache: true, trace: true }).parse;
@@ -11,10 +12,18 @@ var pegParseNoTrace = peg.buildParser(fs.readFileSync(__dirname + "/grammar.pegj
                                       { cache: true }).parse;
 
 function parserStateError(code) {
-  for (var i = 0; i < examples.length; i++) {
-    if (isMatchingExample(examples[i], code)) {
-      return examples[i].message;
+  for (var i = 0; i < matchers.length; i++) {
+    if (isMatchingExample(matchers[i], code)) {
+      return lookupMessage(matchers[i].message);
     }
+  }
+};
+
+function lookupMessage(message) {
+  if (message[0] === "$") {
+    return examples.strings[message.slice(1)];
+  } else {
+    return message;
   }
 };
 
