@@ -221,9 +221,28 @@ describe("vm", function() {
       expect(v(code, c(p(code))).getIn(["stack", -1]).v).toEqual(2);
     });
 
-    it("should return undefined if false and no second branch", function() {
+    it("should put undefined on stack if false and no second branch", function() {
       var code = "if false { 1 }";
-      expect(v(code, c(p(code))).getIn(["stack", -1])).toBeUndefined();
+      var ps = v.initProgramState(code, c(p(code)));
+
+      ps = v.step(ps);
+      expect(ps.get("currentInstruction")[0]).toEqual("push");
+
+      ps = v.step(ps);
+      expect(ps.get("currentInstruction")[0]).toEqual("if_not_true_jump");
+
+      ps = v.step(ps);
+      expect(ps.get("currentInstruction")[0]).toEqual("push");
+
+      ps = v.step(ps);
+      expect(ps.get("currentInstruction")[0]).toEqual("jump");
+
+      ps = v.step(ps);
+      expect(ps.get("currentInstruction")[0]).toEqual("return");
+
+      var stack = ps.get("stack");
+      expect(stack.get(-1).v).toEqual(undefined);
+      expect(stack.has(-1)).toEqual(true);
     });
 
     it("should allow s-expression in branch", function() {
