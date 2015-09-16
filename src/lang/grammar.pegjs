@@ -115,7 +115,8 @@ elseif
 
 else
   = 'else' _* lambda:lambda
-    { return [{ t: "boolean", c: true }, node("invocation", [lambda], lambda.s, lambda.text)]; }
+    { return [node("else", undefined, lambda.s - 5, "else"),
+              node("invocation", [lambda], lambda.s, lambda.text)]; }
 
 forever
   = 'forever' _* lambda: lambda

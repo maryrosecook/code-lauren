@@ -46,16 +46,16 @@ function compileInvocation(a) {
   return code;
 };
 
+function compileElse(a) {
+  return ins(["push", true], a, ANNOTATE);
+};
+
 function compileConditional(a) {
   var parts = a.c;
 
   var clauses = [];
   for (var i = 0; i < parts.length; i += 2) {
     var conditionalBc = compile(parts[i]);
-    if (parts[i].t === "boolean") { // else clause
-      conditionalBc[0].annotate = DO_NOT_ANNOTATE;
-    }
-
     var bodyBc = compile(parts[i + 1]); // will push condition's lambda inv onto stack
     bodyBc[1].annotate = DO_NOT_ANNOTATE; // push lambda
     bodyBc[2].annotate = DO_NOT_ANNOTATE; // invoke lambda
@@ -133,6 +133,8 @@ function compile(a) {
     return compileForever(a);
   } else if (a.t === "label") {
     return compileLabel(a);
+  } else if (a.t === "else") {
+    return compileElse(a);
   } else if (a.t === "number" || a.t === "string" || a.t === "boolean") {
     return compileLiteral(a);
   }

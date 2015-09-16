@@ -356,7 +356,7 @@ describe("parser", function() {
                                          c: [{ t: "return",
                                                c: { t: "number", c: 2 }}]}]}]},
 
-                       { t: "boolean", c: true },
+                       { t: "else", c: undefined },
                        { t: "invocation",
                          c: [{ t: "lambda",
                                c: [[], { t: "do",
@@ -394,7 +394,7 @@ describe("parser", function() {
                                                         c: { t: "undefined",
                                                              c: undefined }  }]}]}]},
 
-                       { t: "boolean", c: true },
+                       { t: "else", c: undefined },
                        { t: "invocation",
                          c: [{ t: "lambda",
                                c: [[], { t: "do", c: [{ t: "return",
