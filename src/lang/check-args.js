@@ -7,10 +7,14 @@ function checkBuiltinArgs(fnArgs) {
   var specs = _.toArray(arguments).slice(1);
   specs.forEach(function(specOrSpecs, i) {
     var specOrSpecs = _.isArray(specOrSpecs) ? specOrSpecs : [specOrSpecs];
+
     specOrSpecs.forEach(function(spec) {
       if (i >= testArgs.length) {
         throw new langUtil.RuntimeError("Needs " + spec.message,
                                         { s: meta.ast.e - 1, e: meta.ast.e - 1 });
+      } else if (testArgs[i] === undefined) {
+        throw new langUtil.RuntimeError('This has no value',
+                                        meta.ast.c[i + 1]);
       } else if (spec.testFn(testArgs[i])) {
         throw new langUtil.RuntimeError("Should be " + spec.message,
                                         meta.ast.c[i + 1]);
@@ -21,8 +25,15 @@ function checkBuiltinArgs(fnArgs) {
   checkNoExtraArgs(meta.ast.c[0].c, testArgs, meta.ast.c.slice(1), specs.length);
 };
 
-function checkLambdaArity(fnStackItem, argContainers, invocationAst) {
+function checkLambdaArgs(fnStackItem, argContainers, invocationAst) {
   var fn = fnStackItem.v;
+
+  argContainers.forEach(function(c, i) {
+    invocationAst.c.slice(1);
+    if (c.v === undefined) {
+      throw new langUtil.RuntimeError('This has no value', invocationAst.c.slice(1)[i]);
+    }
+  });
 
   if (fn.parameters.length > argContainers.length) {
     var markerIndex = invocationAst.e - 1;
@@ -90,6 +101,6 @@ checkBuiltinArgs.any = any;
 checkBuiltinArgs.num = num;
 checkBuiltinArgs.set = set;
 checkBuiltinArgs.range = range;
-checkBuiltinArgs.checkLambdaArity = checkLambdaArity;
+checkBuiltinArgs.checkLambdaArgs = checkLambdaArgs;
 checkBuiltinArgs.checkBuiltinArgs = checkBuiltinArgs;
 module.exports = checkBuiltinArgs;

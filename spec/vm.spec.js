@@ -315,6 +315,22 @@ describe("vm", function() {
         expect(v(code, c(p(code))).get("exception").message).toEqual('Missing a "b"');
       });
 
+      it("should complain if passed arg that is invocation that returns undefined", function() {
+        var code = 'ret-undefined: {} \n one: { ?a } \n one(ret-undefined())';
+        var e = v(code, c(p(code))).get("exception");
+        expect(e.message).toEqual('This has no value');
+        expect(e.s).toEqual(38);
+        expect(e.e).toEqual(53);
+      });
+
+      it("should complain if passed arg that has value of undefined", function() {
+        var code = 'ret-undefined: {} \n undef: ret-undefined() \n one: { ?a } \n one(undef)';
+        var e = v(code, c(p(code))).get("exception");
+        expect(e.message).toEqual('This has no value');
+        expect(e.s).toEqual(63);
+        expect(e.e).toEqual(68);
+      });
+
       it("should mark end of arg list if passed too few args", function() {
         var code = 'one: { ?a ?b ?c } \n one("a")';
         var ps = v(code, c(p(code)))
@@ -344,6 +360,22 @@ describe("vm", function() {
       it("should complain when too many args passed", function() {
         var code = 'add(1 2 3 4)';
         expect(v(code, c(p(code))).get("exception").message).toEqual('"add" does not need these');
+      });
+
+      it("should complain if passed undefined for an arg", function() {
+        var code = 'ret-undefined: {} \n add(1 ret-undefined())';
+        var e = v(code, c(p(code))).get("exception");
+        expect(e.message).toEqual('This has no value');
+        expect(e.s).toEqual(26);
+        expect(e.e).toEqual(41);
+      });
+
+      it("should complain if passed undef by conditional w/o matching condition", function() {
+        var code = 'ret-undefined: { if false {} } \n add(ret-undefined())';
+        var e = v(code, c(p(code))).get("exception");
+        expect(e.message).toEqual('This has no value');
+        expect(e.s).toEqual(37);
+        expect(e.e).toEqual(52);
       });
 
       it("should mark all extra args when too many passed", function() {

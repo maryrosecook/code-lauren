@@ -31,6 +31,7 @@ function stepPop(ins, p) {
 
 function stepReturn(ins, p) {
   throwIfUninvokedStackFunctions(p);
+
   var callStack = p.get("callStack");
   return p
     .deleteIn(["scopes", callStack.last().get("scope")])
@@ -75,7 +76,7 @@ function stepInvoke(ins, p, noSideEffects) {
     var argValues = argContainers.map(function(c) { return c.v; });
 
     if (langUtil.isLambda(fnObj)) {
-      checkArgs.checkLambdaArity(fnStackItem, argContainers, ins.ast);
+      checkArgs.checkLambdaArgs(fnStackItem, argContainers, ins.ast);
       p = addScope(p, im.Map(_.object(fnObj.parameters, argValues)), fnObj.closureScope);
 
       var tailIndex = tailCallIndex(p.get("callStack"), fnObj);
