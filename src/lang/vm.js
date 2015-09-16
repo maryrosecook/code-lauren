@@ -89,24 +89,18 @@ function stepInvoke(ins, p, noSideEffects) {
       if (noSideEffects !== langUtil.NO_SIDE_EFFECTS ||
           !langUtil.isSideEffecting(fnObj)) {
 
-        var fn, meta;
         if (langUtil.isInternalStateFn(fnObj)) {
-          fn = fnObj.get("fn");
-          meta = new langUtil.Meta(ins.ast, fnObj.get("state"));
-        } else {
-          fn = fnObj;
-          meta = new langUtil.Meta(ins.ast);
-        }
-
-        checkArgs.checkBuiltinNoExtraArgs(fnStackItem, argContainers, fn.length);
-        var result = fn.apply(null, [meta].concat(argValues));
-
-        if (langUtil.isInternalStateFn(fnObj)) {
+          var fn = fnObj.get("fn");
+          var meta = new langUtil.Meta(ins.ast, fnObj.get("state"));
+          var result = fn.apply(null, [meta].concat(argValues));
           var fnName = fnStackItem.ast.c;
 
           return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }))
             .setIn(["scopes", 0, "bindings", fnName, "state"], result.state);
         } else {
+          var fn = fnObj;
+          var meta = new langUtil.Meta(ins.ast);
+          var result = fn.apply(null, [meta].concat(argValues));
           return p.set("stack", p.get("stack").unshift({ v: result, ast: ins.ast }));
         }
       } else {

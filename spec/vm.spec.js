@@ -321,20 +321,44 @@ describe("vm", function() {
         expect(v(code, c(p(code))).get("exception").message).toEqual('"add" does not need these');
       });
 
-      it("should mark end of arg list when arg missing", function() {
-        var code = 'add()';
-        var ps = v(code, c(p(code)));
-        var e = ps.get("exception");
-        expect(e.s).toEqual(4);
-        expect(e.e).toEqual(4);
-      });
-
       it("should mark all extra args when too many passed", function() {
         var code = 'add(1 2 3 4)';
         var ps = v(code, c(p(code)))
         var e = ps.get("exception");
         expect(e.s).toEqual(8);
         expect(e.e).toEqual(11);
+      });
+
+      it("should complain about first wrong arg if it's in the first position", function() {
+        var code = 'add("a" 2 3)';
+        expect(v(code, c(p(code))).get("exception").message)
+          .toEqual('Should be a number to add to');
+
+        expect(v(code, c(p(code))).get("exception").s).toEqual(4);
+        expect(v(code, c(p(code))).get("exception").e).toEqual(7);
+      });
+
+      it("should complain about first wrong arg if it's in the second position", function() {
+        var code = 'add(1 "a" 3)';
+        expect(v(code, c(p(code))).get("exception").message)
+          .toEqual('Should be a number to add');
+
+        expect(v(code, c(p(code))).get("exception").s).toEqual(6);
+        expect(v(code, c(p(code))).get("exception").e).toEqual(9);
+      });
+
+      it("should mark end of arg list when arg missing", function() {
+        var code = 'add()';
+        var ps = v(code, c(p(code)));
+        var e = ps.get("exception");
+        expect(e.s).toEqual(4);
+        expect(e.e).toEqual(4);
+
+        var code = 'add(1)';
+        var ps = v(code, c(p(code)));
+        var e = ps.get("exception");
+        expect(e.s).toEqual(5);
+        expect(e.e).toEqual(5);
       });
     });
   });

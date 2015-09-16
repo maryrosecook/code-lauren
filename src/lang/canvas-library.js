@@ -102,10 +102,10 @@ var userFns = im.Map({
 
   write: langUtil.setSideEffecting(function(meta, str, x, y, color) {
     chk(arguments,
-        chk.any("Missing something to write to the screen"),
-        chk.num("Missing the distance from the left of the screen"),
-        chk.num("Missing the distance from the top of the screen"),
-        chk.set(COLORS, "Missing the color of the text"));
+        chk.any("something to write to the screen"),
+        chk.num("the distance from the left of the screen"),
+        chk.num("the distance from the top of the screen"),
+        chk.set(COLORS, "the color of the text"));
 
     addOperation(function () {
       screen.font = "20px Georgia";
@@ -117,12 +117,12 @@ var userFns = im.Map({
 
   "draw-oval": langUtil.setSideEffecting(function(meta, x, y, w, h, filledStr, color) {
     chk(arguments,
-        chk.num("Missing the distance from the left of the screen"),
-        chk.num("Missing the distance from the top of the screen"),
-        chk.num("Missing a width"),
-        chk.num("Missing a height"),
-        chk.set(["filled", "unfilled"], 'Missing either "filled" or "unfilled"'),
-        chk.set(COLORS, "Missing the color of the oval"));
+        chk.num("the distance from the left of the screen"),
+        chk.num("the distance from the top of the screen"),
+        chk.num("the width"),
+        chk.num("the height"),
+        chk.set(["filled", "unfilled"], 'either "filled" or "unfilled"'),
+        chk.set(COLORS, "the color of the oval"));
 
     addOperation(function () {
       var kappa = 0.5522848;
@@ -154,12 +154,12 @@ var userFns = im.Map({
 
   "draw-rectangle": langUtil.setSideEffecting(function(meta, x, y, width, height, filledStr, color) {
     chk(arguments,
-        chk.num("Missing the distance from the left of the screen"),
-        chk.num("Missing the distance from the top of the screen"),
-        chk.num("Missing a width"),
-        chk.num("Missing a height"),
-        chk.set(["filled", "unfilled"], 'Missing either "filled" or "unfilled"'),
-        chk.set(COLORS, "Missing the color of the rectangle"));
+        chk.num("the distance from the left of the screen"),
+        chk.num("the distance from the top of the screen"),
+        chk.num("the width"),
+        chk.num("the height"),
+        chk.set(["filled", "unfilled"], 'either "filled" or "unfilled"'),
+        chk.set(COLORS, "the color of the rectangle"));
 
     addOperation(function () {
       if (filledStr === "unfilled") {

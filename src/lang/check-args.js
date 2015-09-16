@@ -6,12 +6,19 @@ function checkBuiltinArgs(fnArgs) {
   var testArgs = _.toArray(fnArgs).slice(1);
   var specs = _.toArray(arguments).slice(1);
   specs.forEach(function(specOrSpecs, i) {
-    if (_.isArray(specOrSpecs)) {
-      specOrSpecs.forEach(function(spec) { spec(meta, testArgs[i]); });
-    } else {
-      specOrSpecs(meta, testArgs[i]);
-    }
+    var specOrSpecs = _.isArray(specOrSpecs) ? specOrSpecs : [specOrSpecs];
+    specOrSpecs.forEach(function(spec) {
+      if (i >= testArgs.length) {
+        throw new langUtil.RuntimeError("Needs " + spec.message,
+                                        { s: meta.ast.e - 1, e: meta.ast.e - 1 });
+      } else if (spec.testFn(testArgs[i])) {
+        throw new langUtil.RuntimeError("Should be " + spec.message,
+                                        meta.ast.c[i + 1]);
+      }
+    });
   });
+
+  checkNoExtraArgs(meta.ast.c[0].c, testArgs, meta.ast.c.slice(1), specs.length);
 };
 
 function checkLambdaArity(fnStackItem, argContainers, invocationAst) {
@@ -23,35 +30,28 @@ function checkLambdaArity(fnStackItem, argContainers, invocationAst) {
     var firstMissingParameterName = fn.parameters[firstMissingParameterIndex];
     throw new langUtil.RuntimeError('Missing a "' + firstMissingParameterName  + '"',
                                     { s: markerIndex, e: markerIndex });
-  } else if (fn.parameters.length < argContainers.length) {
-    checkNoExtraArgs(fnStackItem, argContainers, fn.parameters.length);
+  } else {
+    checkNoExtraArgs(fnStackItem.ast.c,
+                     argContainers.map(function(c) { return c.v; }),
+                     argContainers.map(function(c) { return c.ast; }),
+                     fn.parameters.length);
   }
 };
 
-function checkBuiltinNoExtraArgs(fnStackItem, argContainers, fnParameterCount) {
-  checkNoExtraArgs(fnStackItem, argContainers, fnParameterCount - 1);
-};
-
-function checkNoExtraArgs(fnStackItem, argContainers, parameterCount) {
-  if (argContainers.length > parameterCount) {
-    var fnName = fnStackItem.ast.c;
+function checkNoExtraArgs(fnName, argValues, argAsts, parameterCount) {
+  if (argValues.length > parameterCount) {
     var firstExtraArgumentIndex = parameterCount;
-    var extraArgumentAsts = argContainers.slice(firstExtraArgumentIndex);
+    var extraArgumentAsts = argAsts.slice(firstExtraArgumentIndex);
     var thisPluralised = extraArgumentAsts.length > 1 ? "these" : "this";
-    var markerStartIndex = extraArgumentAsts[0].ast.s;
-    var markerEndIndex = _.last(extraArgumentAsts).ast.e;
+    var markerStartIndex = extraArgumentAsts[0].s;
+    var markerEndIndex = _.last(extraArgumentAsts).e;
     throw new langUtil.RuntimeError('"' + fnName + '" ' + "does not need " + thisPluralised,
                                     { s: markerStartIndex, e: markerEndIndex });
   }
 };
 
 function createSpec(message, testFn) {
-  return function(meta, arg) {
-    if (testFn(arg)) {
-      var markerIndex = meta.ast.e - 1;
-      throw new langUtil.RuntimeError(message, { s: markerIndex, e: markerIndex });
-    }
-  };
+  return { message: message, testFn: testFn }
 };
 
 function any(message) {
@@ -91,6 +91,5 @@ checkBuiltinArgs.num = num;
 checkBuiltinArgs.set = set;
 checkBuiltinArgs.range = range;
 checkBuiltinArgs.checkLambdaArity = checkLambdaArity;
-checkBuiltinArgs.checkBuiltinNoExtraArgs = checkBuiltinNoExtraArgs;
 checkBuiltinArgs.checkBuiltinArgs = checkBuiltinArgs;
 module.exports = checkBuiltinArgs;

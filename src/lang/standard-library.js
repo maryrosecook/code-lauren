@@ -8,74 +8,74 @@ var createStandardLibrary = module.exports = function () {
   var lib = im.Map({
     add: function(meta, a, b) {
       chk(arguments,
-          chk.num("Missing two numbers"),
-          chk.num("Missing a number to add"));
+          chk.num("a number to add to"),
+          chk.num("a number to add"));
       return parseFloat(a) + parseFloat(b);
     },
 
     subtract: function(meta, a, b) {
       chk(arguments,
-          chk.num("Missing two numbers"),
-          chk.num("Missing a number to subtract"));
+          chk.num("a number to subtract from"),
+          chk.num("a number to subtract"));
 
       return parseFloat(a) - parseFloat(b);
     },
 
     multiply: function(meta, a, b) {
       chk(arguments,
-          chk.num("Missing two numbers to multiply"),
-          chk.num("Missing a number to multiply by"));
+          chk.num("a number to multiply"),
+          chk.num("a number to multiply by"));
 
       return parseFloat(a) * parseFloat(b);
     },
 
     divide: function(meta, a, b) {
       chk(arguments,
-          chk.num("Missing a number to divide and a number to divide by"),
-          chk.num("Missing a number to divide by"));
+          chk.num("a number to divide"),
+          chk.num("a number to divide by"));
 
       return parseFloat(a) / parseFloat(b);
     },
 
     modulus: function(meta, a, b) {
       chk(arguments,
-          chk.num("Missing a number to divide and a number to divide by"),
-          chk.num("Missing a number to divide by"));
+          chk.num("a number to divide"),
+          chk.num("a number to divide by"));
 
       return parseFloat(a) % parseFloat(b);
     },
 
     sine: function(meta, x) {
       chk(arguments,
-          chk.num("Missing an angle to get the sine of"));
+          chk.num("an angle to get the sine of"));
 
       return Math.sin(lib.get("radians")(meta, parseFloat(x)));
     },
 
     cosine: function(meta, x) {
       chk(arguments,
-          chk.num("Missing an angle to get the cosine of"));
+          chk.num("an angle to get the cosine of"));
 
       return Math.cos(lib.get("radians")(meta, parseFloat(x)));
     },
 
     tangent: function(meta, x) {
       chk(arguments,
-          chk.num("Missing an angle to get the tangent of"));
+          chk.num("an angle to get the tangent of"));
 
       return Math.tan(lib.get("radians")(meta, parseFloat(x)));
     },
 
     radians: function(meta, x) {
       chk(arguments,
-          chk.num("Missing an angle to convert to radians"));
+          chk.num("an angle to convert to radians"));
 
       return 0.01745 * parseFloat(x);
     },
 
     degrees: function(meta, x) {
       chk(arguments,
-          chk.num("Missing some radians to convert to degrees"));
+          chk.num("a number to convert from radians to degrees"));
 
       return parseFloat(x) / 0.01745;
     },
@@ -88,24 +88,24 @@ var createStandardLibrary = module.exports = function () {
 
     "less-than": function(meta, a, b) {
       chk(arguments,
-          chk.num("Missing two numbers"),
-          chk.num("Missing a second number"));
+          chk.num("a number"),
+          chk.num("a number to compare"));
 
       return parseFloat(a) < parseFloat(b);
     },
 
     "more-than": function(meta, a, b) {
       chk(arguments,
-          chk.num("Missing two numbers"),
-          chk.num("Missing a second number"));
+          chk.num("a number"),
+          chk.num("a number to compare"));
 
       return parseFloat(a) > parseFloat(b);
     },
 
     equal: function(meta, a, b) {
       chk(arguments,
-          chk.num("Missing two numbers"),
-          chk.num("Missing a second number"));
+          chk.num("a number"),
+          chk.num("a number to compare"));
 
       return a == b;
     },
@@ -122,7 +122,7 @@ var createStandardLibrary = module.exports = function () {
     print: langUtil.setSideEffecting(
       function(meta, itemToPrint) {
         chk(arguments,
-            chk.any("Missing something to print"));
+            chk.any("something to print"));
 
         console.log(itemToPrint);
         return itemToPrint + "\n";
@@ -130,8 +130,8 @@ var createStandardLibrary = module.exports = function () {
 
     counted: langUtil.createInternalStateFn(im.Map(), function(meta, target) {
       chk(arguments,
-          [chk.num("Missing a number to count to"),
-           chk.range(1, undefined, "Number to count to must be more than 0")]);
+          [chk.num("a number to count to that is more than 0"),
+           chk.range(1, undefined, "a number to count that is more than 0")]);
 
       if (meta.state.get(meta.ast.s) === undefined) {
         meta.state = meta.state.set(meta.ast.s, im.Map({ count: 0, target: parseInt(target) }));
