@@ -55,9 +55,13 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
                   ["invoke", 0, true],
+                  ["jump", 2],
+
+                  ["push", undefined],
                   ["jump", 0],
 
                   ["return"]]);
+
     });
 
     it("should compile an if/else", function() {
@@ -68,7 +72,7 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 6],
+                  ["jump", 8],
 
                   ["push", true],
                   ["if_not_true_jump", 4],
@@ -76,9 +80,13 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
                   ["invoke", 0, true],
+                  ["jump", 2],
+
+                  ["push", undefined],
                   ["jump", 0],
 
                   ["return"]]);
+
     });
 
     it("should compile an if/elseif/else", function() {
@@ -89,7 +97,7 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 12],
+                  ["jump", 14],
 
                   ["push", false],
                   ["if_not_true_jump", 4],
@@ -97,7 +105,7 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 6],
+                  ["jump", 8],
 
                   ["push", true],
                   ["if_not_true_jump", 4],
@@ -105,9 +113,13 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 3],
                                          ["return"]] }],
                   ["invoke", 0, true],
+                  ["jump", 2],
+
+                  ["push", undefined],
                   ["jump", 0],
 
                   ["return"]]);
+
     });
 
     it("should compile an if/elseif/elseif/else", function() {
@@ -118,7 +130,7 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 18],
+                  ["jump", 20],
 
                   ["push", false],
                   ["if_not_true_jump", 4],
@@ -126,7 +138,7 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 12],
+                  ["jump", 14],
 
                   ["push", true],
                   ["if_not_true_jump", 4],
@@ -134,7 +146,7 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 3],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 6],
+                  ["jump", 8],
 
                   ["push", true],
                   ["if_not_true_jump", 4],
@@ -142,6 +154,9 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 4],
                                          ["return"]] }],
                   ["invoke", 0, true],
+                  ["jump", 2],
+
+                  ["push", undefined],
                   ["jump", 0],
 
                   ["return"]]);
@@ -155,16 +170,20 @@ describe("bytecode compiler", function() {
                   ["push_lambda", { bc: [["push", 1],
                                          ["return"]] }],
                   ["invoke", 0, true],
-                  ["jump", 6],
+                  ["jump", 8],
                   ["push", false],
                   ["if_not_true_jump", 4],
                   ["arg_start"],
                   ["push_lambda", { bc: [["push", 2],
                                          ["return"]] }],
                   ["invoke", 0, true],
+                  ["jump", 2],
+
+                  ["push", undefined],
                   ["jump", 0],
 
                   ["return"]]);
+
     });
   });
 

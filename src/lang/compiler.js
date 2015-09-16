@@ -68,6 +68,11 @@ function compileConditional(a) {
     );
   }
 
+  // add final else clause that will run if none of user's clauses
+  // run.  Will push undefined onto stack to be the return value of
+  // the whole conditional.
+  clauses.push(ins(["push", undefined], a));
+
   // add jumps that, if a block is chosen and evaluated, will jump
   // to the end of the conditional
   var bc = [];
