@@ -10,7 +10,11 @@ function fillWindowWithScreen(screen) {
 
 function setupCanvasLib(screen) {
   fillWindowWithScreen(screen);
-  $(window).resize(function() { fillWindowWithScreen(screen); });
+  $(window).resize(function() {
+    window.scrollTo(0, 0); // might have been scrolled down if changing from mobile to desktop view
+    fillWindowWithScreen(screen);
+  });
+
   return require("./lang/canvas-library")(screen);
 };
 
