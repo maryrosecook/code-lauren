@@ -150,11 +150,11 @@ string
     { return node('string', all.join(""), offset(), text()); }
 
 boolean
-  = 'true'  { return node("boolean", true, offset(), text()); }
-  / 'false' { return node("boolean", false, offset(), text()); }
+  = true_keyword  { return node("boolean", true, offset(), text()); }
+  / false_keyword { return node("boolean", false, offset(), text()); }
 
 label
-  = not_keyword first:start_label_char others:label_char*
+  = !keyword first:start_label_char others:label_char*
     { return node("label", [first].concat(others).join(""), offset(), text()); }
 
 start_label_char
@@ -175,7 +175,28 @@ _
 __ ""
   = [ \t\r\n]+
 
-not_keyword
-  = !('if' !label_char)
-  / !('elseif' !label_char)
-  / !('else' !label_char)
+if_keyword
+  = 'if'
+
+elseif_keyword
+  = 'elseif'
+
+else_keyword
+  = 'else'
+
+forever_keyword
+  = 'forever'
+
+true_keyword
+  = 'true'
+
+false_keyword
+  = 'false'
+
+keyword
+  = if_keyword !label_char
+  / elseif_keyword !label_char
+  / else_keyword !label_char
+  / forever_keyword !label_char
+  / true_keyword !label_char
+  / false_keyword !label_char

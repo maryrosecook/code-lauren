@@ -2,6 +2,8 @@ var parse = require("../src/lang/parser.js");
 var _ = require("underscore");
 var util = require("../src/util");
 
+var exampleMessages = require("../src/lang/examples.json").strings;
+
 describe("parser", function() {
   describe("atoms", function() {
     it("should parse an int", function() {
@@ -471,6 +473,11 @@ describe("parser", function() {
       }).toThrow("Can't run a number - it's not an action");
     });
 
+    it("should say there should be no space between name and colon", function() {
+      expect(function() { parse("a : 1"); })
+        .toThrow("There should be no space between the name and the colon");
+    });
+
     it("should expect fn name and application separated by space to be together", function() {
       expect(function() {
         parse("a ()");
@@ -534,14 +541,62 @@ describe("parser", function() {
       expect(function() { parse("write(la() , 1)"); }).toThrow("No comma required");
     });
 
-    it("should report that comma is unnecessary after boolean", function() {
+    it("should report that comma is unnecessary after true", function() {
       expect(function() { parse("write(true, 1)"); }).toThrow("No comma required");
       expect(function() { parse("write(true, )"); }).toThrow("No comma required");
       expect(function() { parse("write(true , 1)"); }).toThrow("No comma required");
     });
 
+    it("should report that comma is unnecessary after false", function() {
+      expect(function() { parse("write(false, 1)"); }).toThrow("No comma required");
+      expect(function() { parse("write(false, )"); }).toThrow("No comma required");
+      expect(function() { parse("write(false , 1)"); }).toThrow("No comma required");
+    });
+
     it("should report that comma is unnecessary at beginning of arg list", function() {
       expect(function() { parse("write(,)"); }).toThrow("No comma required");
+    });
+
+    it("should report can't do if:", function() {
+      expect(function() { parse("if: 1"); })
+        .toThrow(exampleMessages.IF_KEYWORD_COLON);
+      expect(function() { parse("if : 1"); })
+        .toThrow("There should be no space between the name and the colon");
+    });
+
+    it("should report can't do else:", function() {
+      expect(function() { parse("if true {} else:"); })
+        .toThrow(exampleMessages.ELSE_KEYWORD_COLON);
+      expect(function() { parse("if true {} else :"); })
+        .toThrow("There should be no space between the name and the colon");
+    });
+
+    it("should report can't do elseif:", function() {
+      expect(function() { parse("if true {} elseif:"); })
+        .toThrow(exampleMessages.ELSEIF_KEYWORD_COLON);
+      expect(function() { parse("if true {} elseif :"); })
+        .toThrow("There should be no space between the name and the colon");
+    });
+
+    it("should report can't name something forever", function() {
+      expect(function() { parse("forever: 1"); })
+        .toThrow(exampleMessages.FOREVER_KEYWORD_COLON);
+      expect(function() { parse("forever : 1"); })
+        .toThrow("There should be no space between the name and the colon");
+    });
+
+    it("should report can't name something true", function() {
+      expect(function() { parse("true: 1"); })
+        .toThrow(exampleMessages.TRUE_KEYWORD_COLON);
+      expect(function() { parse("true : 1"); })
+        .toThrow("There should be no space between the name and the colon");
+    });
+
+    it("should report can't name something false", function() {
+      expect(function() { parse("false: 1"); })
+        .toThrow(exampleMessages.FALSE_KEYWORD_COLON);
+      expect(function() { parse("false : 1"); })
+        .toThrow("There should be no space between the name and the colon");
     });
   });
 

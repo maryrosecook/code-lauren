@@ -24,7 +24,10 @@
 
     {
       "code":      ["write(true, 1)", "write(true, )"],
-      "stacks":    [["argument", "expression", "atom", "boolean"]],
+      "stacks":    [["argument", "expression", "parenthetical", "invocation",
+                     "function", "label", "keyword", "true_keyword"],
+                    ["argument", "expression", "parenthetical", "invocation",
+                     "function", "label", "keyword", "false_keyword"]],
       "nextInput": ",",
       "message":   "$NO_COMMA"
     },
@@ -76,6 +79,12 @@
     },
 
 
+    {
+      "code":      "a : 1",
+      "stacks":    [["_"]],
+      "nextInput": "^:",
+      "message":   "There should be no space between the name and the colon"
+    },
 
     {
       "code":      "a: ",
@@ -124,15 +133,72 @@
 
 
     {
+      "code":      "if: 1",
+      "stacks":    [["conditional"]],
+      "nextInput": ":",
+      "message":   "$IF_KEYWORD_COLON"
+    },
+
+    {
+      "code":      "elseif: 1",
+      "stacks":    [["elseif"]],
+      "nextInput": ":",
+      "message":   "$ELSEIF_KEYWORD_COLON"
+    },
+
+    {
+      "code":      "else: 1",
+      "stacks":    [["else"]],
+      "nextInput": ":",
+      "message":   "$ELSE_KEYWORD_COLON"
+    },
+
+    {
+      "code":      "forever: 1",
+      "stacks":    [["expression", "forever"]],
+      "nextInput": "^:",
+      "message":   "$FOREVER_KEYWORD_COLON"
+    },
+
+    {
+      "code":      "true: 1",
+      "stacks":    [["label", "keyword", "true_keyword"]],
+      "nextInput": "^:",
+      "message":   "$TRUE_KEYWORD_COLON"
+    },
+
+    {
+      "code":      "false: 1",
+      "stacks":    [["label", "keyword", "false_keyword"]],
+      "nextInput": "^:",
+      "message":   "$FALSE_KEYWORD_COLON"
+    },
+
+
+
+    {
       "code":      "a b",
       "stacks":    [["_"]],
-      "nextInput": "[a-zA-Z0-9_\\-]+",
+      "nextInput": "^[a-zA-Z0-9_\\-]+",
       "message":   "Expected this to be on the next line"
     }
   ],
 
   "strings": {
     "NO_COMMA": "No comma required",
-    "NEEDS_NAME_AND_VALUE": "Needs a name on the left and a value on the right"
+
+    "NEEDS_NAME_AND_VALUE": "Needs a name on the left and a value on the right",
+
+    "IF_KEYWORD_COLON": "Making a name? You cannot use \"if\". Doing an if/elseif? You do not need a colon.",
+
+    "ELSE_KEYWORD_COLON": "Making a name? You cannot use \"else\". Doing an if/else? You do not need a colon.",
+
+    "ELSEIF_KEYWORD_COLON": "Making a name? You cannot use \"elseif\". Doing an if/elseif? You do not need a colon.",
+
+    "FOREVER_KEYWORD_COLON": "Making a name? You cannot use \"forever\". Doing a forever? You do not need a colon.",
+
+    "TRUE_KEYWORD_COLON": "You cannot name something \"true\"",
+
+    "FALSE_KEYWORD_COLON": "You cannot name something \"false\""
   }
 }
