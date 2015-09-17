@@ -436,10 +436,6 @@ table {
   margin-bottom: 0.6em;
 }
 
-#mobile-description {
-  display: none;
-}
-
 @media handheld, only screen and (max-width: 767px) {
   body {
     font-family: "Gill Sans W01 Light";
@@ -467,7 +463,7 @@ table {
   }
 
   #mobile-description {
-    display: block;
+    display: block !important;
     position: fixed;
     top: 32px;
     padding: 5px;
