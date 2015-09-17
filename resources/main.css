@@ -435,3 +435,67 @@ table {
   border-collapse: collapse;
   margin-bottom: 0.6em;
 }
+
+#mobile-description {
+  display: none;
+}
+
+@media handheld, only screen and (max-width: 767px) {
+  body {
+    font-family: "Gill Sans W01 Light";
+    font-size: 18px;
+  }
+
+  p {
+    line-height: 22px;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .topbar {
+    background-color: black;
+  }
+
+  .topbar h1 {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  #mobile-description {
+    display: block;
+    position: fixed;
+    top: 32px;
+    padding: 5px;
+  }
+
+  /* hide the editor stuff */
+  #line-message-sidebar-holder { display: none; }
+  #screen { display: none; }
+  .search { display: none; }
+  .navigation { display: none; }
+  .CodeMirror { display: none; }
+  .program-player { display: none; }
+
+  /* resize videos to screen size */
+
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 30px; height: 0; overflow: hidden;
+  }
+
+  .video-container iframe,
+  .video-container object,
+  .video-container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
