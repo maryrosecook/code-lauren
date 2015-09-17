@@ -36,6 +36,18 @@ describe("parser", function() {
         .toEqual({ t: "number", c: 0.5 });
     });
 
+    it("should parse a number with only a floating point part", function() {
+      var ast = parse(".5");
+      expect(util.stripAst(util.getNodeAt(ast, ["top", "do", 0, "return"])))
+        .toEqual({ t: "number", c: 0.5 });
+    });
+
+    it("should parse a negative number with only a floating point part", function() {
+      var ast = parse("-.5");
+      expect(util.stripAst(util.getNodeAt(ast, ["top", "do", 0, "return"])))
+        .toEqual({ t: "number", c: -0.5 });
+    });
+
     it("should parse a string", function() {
       var ast = parse('"hello my name is mary"');
       expect(util.stripAst(util.getNodeAt(ast,

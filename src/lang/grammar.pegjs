@@ -146,6 +146,13 @@ number
                                        c + d.join(""), 10),
                                        offset(),
                                        text()); }
+  / a:'-'? b:[.] c:[0-9]+
+    { return node("number", parseFloat((a || "") +
+                                       b +
+                                       c.join(""), 10),
+                                       offset(),
+                                       text()); }
+
 
 string
   = '"' all:[A-Za-z0-9.,# ]* '"'
