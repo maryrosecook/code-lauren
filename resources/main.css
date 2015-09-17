@@ -454,6 +454,7 @@ table {
   }
 
   .topbar {
+    position: relative;
     background-color: black;
   }
 
