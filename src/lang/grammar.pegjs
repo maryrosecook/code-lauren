@@ -140,10 +140,12 @@ parameter
     { return node("parameter", label.c, offset(), text()); }
 
 number
-  = a:[0-9]+ b:[.] c:[0-9]+
-    { return node("number", parseFloat(a.join("") + b + c.join(""), 10), offset(), text()); }
-  / all:[0-9]+
-    { return node("number", parseInt(all.join(""), 10), offset(), text()); }
+  = a:'-'? b:[0-9]+ c:[.]? d:[0-9]*
+    { return node("number", parseFloat((a || "") +
+                                       b.join("") +
+                                       c + d.join(""), 10),
+                                       offset(),
+                                       text()); }
 
 string
   = '"' all:[A-Za-z0-9.,# ]* '"'

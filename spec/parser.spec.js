@@ -14,6 +14,21 @@ describe("parser", function() {
         .toEqual({ t: "number", c: 123 });
     });
 
+    it("should parse a negative int", function() {
+      expect(util.stripAst(util.getNodeAt(parse("-1"), ["top", "do", 0, "return"])))
+        .toEqual({ t: "number", c: -1 });
+
+      expect(util.stripAst(util.getNodeAt(parse("-123"), ["top", "do", 0, "return"])))
+        .toEqual({ t: "number", c: -123 });
+    });
+
+    it("should parse a negative float", function() {
+      var ast = parse("-0.5");
+      expect(util.stripAst(util.getNodeAt(ast,
+                                          ["top", "do", 0, "return"])))
+        .toEqual({ t: "number", c: -0.5 });
+    });
+
     it("should parse a float", function() {
       var ast = parse("0.5");
       expect(util.stripAst(util.getNodeAt(ast,
