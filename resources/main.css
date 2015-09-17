@@ -440,6 +440,7 @@ table {
   body {
     font-family: "Gill Sans W01 Light";
     font-size: 18px;
+    overflow: scroll;
   }
 
   p {
@@ -464,7 +465,7 @@ table {
 
   #mobile-description {
     display: block !important;
-    position: fixed;
+    position: absolute;
     top: 32px;
     padding: 5px;
   }
