@@ -195,7 +195,7 @@ h1 {
   font-family: "Gill Sans W01 Book";
   font-size: 22px;
   margin: -4px 0 0 -3px;
-  padding: 4px 0 3px 4px;
+  padding: 4px 0 4px 4px;
   color: white;
   background-color: black;
   width: 110px;
@@ -446,6 +446,10 @@ table {
   p {
     line-height: 22px;
     margin-bottom: 10px;
+  }
+
+  h1 {
+    padding-bottom: 3px; /* fix for iOS */
   }
 
   h2 {
