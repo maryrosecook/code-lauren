@@ -217,9 +217,11 @@ function currentCallFrame(p) {
 };
 
 function isComplete(p) {
-  var callFrame = currentCallFrame(p);
+  var callStack = p.get("callStack");
+  var callFrame = callStack.get(0);
   return callFrame === undefined ||
-    callFrame.get("bcPointer") === callFrame.get("bc").length;
+    (callStack.size === 1 &&
+     callFrame.get("bcPointer") === callFrame.get("bc").length);
 };
 
 function isCrashed(p) {
