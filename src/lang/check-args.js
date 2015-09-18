@@ -73,7 +73,7 @@ function any(message) {
 
 function num(message) {
   return createSpec(message, function(arg) {
-    return isNaN(parseFloat(arg));
+    return !_.isNumber(arg);
   });
 };
 
