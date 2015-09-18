@@ -146,6 +146,7 @@ var ProgramPlayer = React.createClass({
                                      this.props.annotator,
                                      this.props.canvasLib);
     this.state.pses = [];
+    this.props.canvasLib.programFns.reset();
     this.stepForwardsByHand();
   },
 
