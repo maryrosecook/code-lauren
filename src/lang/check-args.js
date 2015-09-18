@@ -85,6 +85,12 @@ function range(low, high, message) {
   });
 };
 
+function numOrBoolean(message) {
+  return createSpec(message, function(arg) {
+    return !_.isNumber(arg) && !_.isBoolean(arg);
+  });
+};
+
 function set(legalValues, message) {
   return createSpec(message, function(arg) {
     if (arg == null) {
@@ -101,6 +107,7 @@ checkBuiltinArgs.any = any;
 checkBuiltinArgs.num = num;
 checkBuiltinArgs.set = set;
 checkBuiltinArgs.range = range;
+checkBuiltinArgs.numOrBoolean = numOrBoolean;
 checkBuiltinArgs.checkLambdaArgs = checkLambdaArgs;
 checkBuiltinArgs.checkBuiltinArgs = checkBuiltinArgs;
 module.exports = checkBuiltinArgs;
