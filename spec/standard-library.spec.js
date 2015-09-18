@@ -306,4 +306,37 @@ describe("library", function() {
         .toEqual("Should be a number to count that is more than 0");
     });
   });
+
+  describe("opposite", function() {
+    it("should be able to get opposite of a boolean", function() {
+      var code = "opposite(true)"
+      expect(v(code, c(p(code))).getIn(["stack", -1]).v).toEqual(false);
+
+      var code = "opposite(false)"
+      expect(v(code, c(p(code))).getIn(["stack", -1]).v).toEqual(true);
+    });
+
+    it("should be able to get opposite of a number", function() {
+      var code = "opposite(1)"
+      expect(v(code, c(p(code))).getIn(["stack", -1]).v).toEqual(-1);
+
+      var code = "opposite(-1)"
+      expect(v(code, c(p(code))).getIn(["stack", -1]).v).toEqual(1);
+    });
+
+    it("should throw if missing arg", function() {
+      var code = "opposite()";
+      expect(v(code, c(p(code))).get("exception").message)
+        .toEqual("Needs a number or true or false");
+    });
+  });
+
+  describe("random", function() {
+    it("should return a number between 0 and 1", function() {
+      var code = "random-number()"
+      var randomNumber = v(code, c(p(code))).getIn(["stack", -1]).v;
+      expect(randomNumber > 0).toEqual(true);
+      expect(randomNumber < 0.9999999).toEqual(true);
+    });
+  });
 });

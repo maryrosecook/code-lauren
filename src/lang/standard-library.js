@@ -110,6 +110,23 @@ var createStandardLibrary = module.exports = function () {
       return a == b;
     },
 
+    opposite: function(meta, o) {
+      chk(arguments,
+          chk.numOrBoolean("a number or true or false"));
+
+      if (_.isBoolean(o)) {
+        return !o;
+      } else if (_.isNumber(o)) {
+        return -o;
+      }
+    },
+
+    "random-number": function() {
+      // TODO: should produce the same stream of numbers for a single program
+
+      return Math.random();
+    },
+
     set: function(meta, dict, key, value) {
       dict[key] = value;
       return dict;
