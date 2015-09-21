@@ -44,10 +44,9 @@ function matchIndices(regex, str) {
 function maybeMarkdownLinkToOnClick(link) {
   var pageMatch = link.match(/\(#([^\)]+)\)$/);
   if (pageMatch) {
-    var pageName = pageMatch[1];
+    var page = pageMatch[1];
     var text = link.match(/^\[([^\]]+)\]/)[1];
-    return ['<a href="#', pageName, '"',
-            '>',
+    return ['<a href="#" onclick="pub.loadHelpPage(event, \'', page, '\');">',
             text,
             "</a>"].join("");
   } else {

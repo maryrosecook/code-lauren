@@ -2,6 +2,7 @@ var React = require('react');
 var summarizeMarkdown = require("summarize-markdown");
 var stripHtml = require("strip");
 var util = require("./util");
+var url = require("./url");
 var pageContent = cleanData(require("../pages/all-pages"));
 
 var DEFAULT_SEARCH_TEXT = "How do I...?";
@@ -71,7 +72,7 @@ var Search = React.createClass({
   resultPicked: function(slug) {
     this.state.showResults = false;
     this.setState(this.state);
-    window.location.href = "/#" + slug;
+    url.goToHelpPage(slug);
   },
 
   resultSelected: function(slug, isSelected) {

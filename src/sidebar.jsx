@@ -1,5 +1,6 @@
 var React = require('react');
 var $ = require("jquery");
+var url = require("./url");
 
 var pageContent = require("../pages/all-pages");
 
@@ -8,16 +9,20 @@ require("./lib/jquery.mousewheel.js"); // enable sidebar mousewheel scrolling
 
 var Sidebar = React.createClass({
   getInitialState: function() {
-    var page = route(urlToPage(window.location.href));
-    history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), pageToUrl(page));
+    var page = url.route(url.urlToPage(window.location.href));
+    history.replaceState({ page: page },
+                         page[0].toUpperCase() + page.slice(1),
+                         url.setDatum(window.location.href, "page", page));
     return { page: page, wasBackOrForwards: false };
   },
 
   load: function(page) {
-    page = route(page);
+    page = url.route(page);
     this.state.wasBackOrForwards = history.state !== null;
     if (!this.state.wasBackOrForwards) {
-      history.replaceState({ page: page }, page[0].toUpperCase() + page.slice(1), pageToUrl(page));
+      history.replaceState({ page: page },
+                           page[0].toUpperCase() + page.slice(1),
+                           url.setDatum(window.location.href, "page", page));
     }
 
     this.state.page = page;
@@ -49,7 +54,7 @@ var Sidebar = React.createClass({
 
     var self = this;
     $(window).on('hashchange', function(e) {
-      self.load(urlToPage(e.originalEvent.newURL));
+      self.load(url.urlToPage(e.originalEvent.newURL));
     });
 
     $("#sidebar").scroll(function() {
@@ -57,35 +62,12 @@ var Sidebar = React.createClass({
         var page = history.state.page;
         history.replaceState({ page: page, scroll: self.scrollApi.getContentPositionY() },
                              page[0].toUpperCase() + page.slice(1),
-                             pageToUrl(page));
+                             url.setDatum(window.location.href, "page", page));
       }
     });
 
     $(window).resize(() => self.scrollApi.reinitialise());
   }
 });
-
-function urlToPage(url) {
-  var urlPageMatch = url.match(/#(.+)/);
-  if (urlPageMatch) {
-    return urlPageMatch[1];
-  }
-};
-
-function pageToUrl(page) {
-  if (page === "home") {
-    return "/";
-  } else {
-    return "/#" + page;
-  }
-};
-
-function route(page) {
-  if (page === undefined) {
-    return localStorage["page"] || "home";
-  } else {
-    return page;
-  }
-};
 
 module.exports = Sidebar;

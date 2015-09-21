@@ -8,9 +8,13 @@ var canvasLib = env.setupCanvasLib($("#screen")[0].getContext("2d"));
 
 var Topbar = React.createClass({
   render: function() {
+    function load(page) {
+      return function (event) { pub.loadHelpPage(event, page); };
+    };
+
     return (
       <div className="topbar">
-        <h1><a href="/#home">code lauren</a></h1>
+        <h1><a href="#" onClick={load("home")}>code lauren</a></h1>
 
         <ProgramPlayer editor={this.props.editor}
                        annotator={this.props.annotator}
@@ -19,7 +23,7 @@ var Topbar = React.createClass({
         <Search />
 
         <div className="navigation">
-          <a href="/#suggestions">Suggestions?</a>
+          <a href="#" onClick={load("suggestions")}>Suggestions?</a>
         </div>
       </div>
     );
