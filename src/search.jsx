@@ -54,11 +54,17 @@ var Search = React.createClass({
         this.resultPicked(selectedResult.slug);
       }
     } else if (e.keyCode === 38) { // up arrow
+      this.state.showResults = true;
+      this.setState(this.state);
+
       var index = util.findIndex(this.state.results, r => r.selected === true);
       if (index !== undefined && index > 0) {
         this.resultSelected(this.state.results[index - 1].slug, true);
       }
     } else if (e.keyCode === 40) { // down arrow
+      this.state.showResults = true;
+      this.setState(this.state);
+
       var index = util.findIndex(this.state.results, r => r.selected === true);
       if (index !== undefined && index < this.state.results.length - 1) {
         this.resultSelected(this.state.results[index + 1].slug, true);
