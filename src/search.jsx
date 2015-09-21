@@ -52,9 +52,6 @@ var Search = React.createClass({
       var selectedResult = this.state.results.filter(r => r.selected === true)[0];
       if (selectedResult !== undefined) {
         this.resultPicked(selectedResult.slug);
-      } else {
-        this.state.showResults = false;
-        this.setState(this.state);
       }
     } else if (e.keyCode === 38) { // up arrow
       var index = util.findIndex(this.state.results, r => r.selected === true);
