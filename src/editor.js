@@ -4,6 +4,8 @@ var CodeMirror = require('codemirror');
 require("./lib/simplescrollbars.js"); // codemirror scrollbar plugin
 require('./mode-lauren');
 
+var sourceSaver = require("./source-saver");
+
 var createEditor = module.exports = function() {
   var editor = CodeMirror(document.body, {
     mode:  "lauren",
@@ -17,7 +19,15 @@ var createEditor = module.exports = function() {
     }
   });
 
-  // restore focus to editor if user ever starts typing
+  var saveProgramTimer;
+  editor.on("change", function() {
+    clearTimeout(saveProgramTimer);
+    saveProgramTimer = setTimeout(function() {
+      sourceSaver.save(editor.getValue());
+    }, 1000);
+  });
+
+    // restore focus to editor if user ever starts typing
   $(window).keydown(function(e) {
     if (e.ctrlKey === false && e.metaKey === false && $("#searchbox").is(":focus") === false) {
       editor.focus();
