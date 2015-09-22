@@ -87,7 +87,7 @@ function
   / all: label
 
 application
-  = '(' arguments:argument* ')'
+  = '(' __* arguments:argument* ')'
     { return arguments; }
 
 argument

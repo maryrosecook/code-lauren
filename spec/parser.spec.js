@@ -240,6 +240,11 @@ describe("parser", function() {
                                                      c : { t : 'undefined',
                                                            c : undefined } }] }] }] }]}]});
     });
+
+    // regression
+    it("should allow leading whitespace before first arg", function() {
+      parse("a( )");
+    });
   });
 
   describe("lambda", function() {
