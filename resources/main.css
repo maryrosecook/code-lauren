@@ -358,7 +358,7 @@ button:focus {
   font-size: 15px;
   position: absolute;
   top: 33px;
-  right: 450px;
+  right: 461px; /* leave a bit of extra room for editor scrollbar if showing */
   width: 400px;
   height: 100vh;
   padding-top: 3px;
