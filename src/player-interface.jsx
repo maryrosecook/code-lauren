@@ -74,19 +74,9 @@ function parse(code, annotator) {
       annotator.lineMessage(code, e.s, "error", e.message);
     } else if (e instanceof parser.ParenthesisError) {
       annotator.codeHighlight(code, e.s, e.e, "error");
-      displayRainbowParentheses(code, annotator);
-
       annotator.lineMessage(code, e.s, "error", e.message);
     }
   }
-};
-
-function displayRainbowParentheses(code, annotator) {
-  parser.rainbowParentheses(code)
-    .forEach(function(p, i) {
-      p.map(function(offset) {
-        annotator.codeHighlight(code, offset, offset + 1, "rainbow-" + i % 4);  });
-    });
 };
 
 var ProgramPlayer = React.createClass({
