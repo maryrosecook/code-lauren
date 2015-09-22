@@ -16,7 +16,8 @@ function save(code) {
 function updateShareLink() {
   var sharePageProgramLink = $("#program-link");
   if (sharePageProgramLink) {
-    sharePageProgramLink.text(url.getUrl());
+    var text = get().trim().length > 0 ? url.getUrl() : "No program to share";
+    sharePageProgramLink.text(text);
   }
 };
 
