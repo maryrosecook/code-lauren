@@ -56,25 +56,28 @@ function nextInput(code) {
   throw "Looking for failed token but code parsed";
 };
 
-function eventsToTree(evs, node) {
-  function createNode(ev, parent) {
-    return { rule: ev.rule, i: ev.offset, type: ev.type, parent: parent, children: [] };
-  };
+function createNode(rule, offset, type, parent) {
+  return { rule: rule, i: offset, type: type, parent: parent, children: [] };
+};
 
-  if (evs.length === 0) {
-    return node;
-  } else if (node === undefined) {
-    node = createNode({ rule: "HOLDER", offset: "-", type: "-" });
-    eventsToTree(evs, node);
-    return node;
-  } else if (evs[0].type === "rule.enter") {
-    var child = createNode(evs[0], node);
-    node.children.push(child);
-    return eventsToTree(evs.slice(1), child);
-  } else if (evs[0].type === "rule.fail" || evs[0].type === "rule.match") {
-    node.parent.children.push(createNode(evs[0], node));
-    return eventsToTree(evs.slice(1), node.parent);
+function eventsToTree(evs, node) {
+  if (node === undefined) {
+    node = createNode("HOLDER", "-", "-");
   }
+
+  for (var i = 0; i < evs.length; i++) {
+    var ev = evs[i];
+    if (ev.type === "rule.enter") {
+      var child = createNode(ev.rule, ev.offset, ev.type, node);
+      node.children.push(child);
+      node = child;
+    } else if (ev.type === "rule.fail" || ev.type === "rule.match") {
+      node.parent.children.push(createNode(ev.rule, ev.offset, ev.type, node));
+      node = node.parent;
+    }
+  }
+
+  return node;
 };
 
 function codeToFailedParseStack(code) {
