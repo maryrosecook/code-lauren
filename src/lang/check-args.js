@@ -10,8 +10,9 @@ function checkBuiltinArgs(fnArgs) {
 
     specOrSpecs.forEach(function(spec) {
       if (i >= testArgs.length) {
+        var markerIndex = meta.ast.s + meta.ast.text.trim().length - 1;
         throw new langUtil.RuntimeError("Needs " + spec.message,
-                                        { s: meta.ast.e - 1, e: meta.ast.e - 1 });
+                                        { s: markerIndex, e: markerIndex });
       } else if (testArgs[i] === undefined) {
         throw new langUtil.RuntimeError('This has no value',
                                         meta.ast.c[i + 1]);

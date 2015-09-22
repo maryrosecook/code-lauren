@@ -428,6 +428,17 @@ describe("vm", function() {
         expect(e.s).toEqual(5);
         expect(e.e).toEqual(5);
       });
+
+      // regression bug #88 (but for builtins)
+      it("should mark correct location of missing arg if extra whitespace on line", function() {
+        var code = "print(   )        ";
+
+        var ps = v(code, c(p(code)));
+
+        expect(ps.get("exception").message).toEqual('Needs something to print');
+        expect(ps.get("exception").s).toEqual(9);
+        expect(ps.get("exception").e).toEqual(9);
+      });
     });
   });
 });
