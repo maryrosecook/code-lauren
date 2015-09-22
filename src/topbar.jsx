@@ -3,6 +3,7 @@ var $ = require("jquery");
 var ProgramPlayer = require("./player-interface.jsx");
 var Search = require("./search.jsx");
 var env = require("./env");
+var sourceSaver = require("./source-saver");
 
 var canvasLib = env.setupCanvasLib($("#screen")[0].getContext("2d"));
 
@@ -20,9 +21,13 @@ var Topbar = React.createClass({
                        annotator={this.props.annotator}
                        canvasLib={canvasLib} />
 
+        <div className="left-navigation">
+          <a href="#" onClick={load("share-program")}>Share your program</a>
+        </div>
+
         <Search />
 
-        <div className="navigation">
+        <div className="right-navigation">
           <a href="#" onClick={load("suggestions-for-improvement")}>Feedback</a>
         </div>
       </div>

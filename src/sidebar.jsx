@@ -1,6 +1,8 @@
 var React = require('react');
 var $ = require("jquery");
+
 var url = require("./url");
+var sourceSaver = require("./source-saver");
 
 var pageContent = require("../pages/all-pages");
 
@@ -27,6 +29,10 @@ var Sidebar = React.createClass({
 
     this.state.page = page;
     this.setState(this.state);
+
+    if (page === "share-program") {
+      sourceSaver.updateShareLink();
+    }
 
     localStorage["page"] = page;
   },

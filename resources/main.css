@@ -184,13 +184,27 @@ h1 a {
   background-color: white;
 }
 
-.topbar .navigation {
+.topbar {
+  font-family: "Gill Sans W01 Light";
+  font-size: 17px;
+}
+
+.topbar .right-navigation {
   position: absolute;
   top: 0;
   right: 9px;
   padding-top: 6px;
-  font-family: "Gill Sans W01 Light";
-  font-size: 17px;
+}
+
+.topbar .left-navigation {
+  position: absolute;
+  top: 0;
+  left: 281px;
+  padding-top: 6px;
+}
+
+#program-link {
+  word-wrap: break-word;
 }
 
 h1 {
