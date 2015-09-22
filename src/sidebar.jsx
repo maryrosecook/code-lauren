@@ -30,10 +30,6 @@ var Sidebar = React.createClass({
     this.state.page = page;
     this.setState(this.state);
 
-    if (page === "share-program") {
-      sourceSaver.updateShareLink();
-    }
-
     localStorage["page"] = page;
   },
 
@@ -49,13 +45,22 @@ var Sidebar = React.createClass({
     );
   },
 
+  runDynamicPageContent: function() {
+    if (this.state.page === "share-program") {
+      sourceSaver.updateShareLink();
+    }
+  },
+
   componentDidUpdate: function() {
+    this.runDynamicPageContent();
     var scrollY = this.state.wasBackOrForwards === true ? history.state.scroll : 0;
     this.scrollApi.reinitialise(); // calc scrollbars for height of new content
     this.scrollApi.scrollToY(scrollY);
   },
 
   componentDidMount: function() {
+    this.runDynamicPageContent();
+
     this.scrollApi = $('#sidebar').jScrollPane().data('jsp');
 
     var self = this;
