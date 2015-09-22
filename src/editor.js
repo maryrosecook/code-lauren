@@ -24,7 +24,7 @@ var createEditor = module.exports = function() {
     clearTimeout(saveProgramTimer);
     saveProgramTimer = setTimeout(function() {
       sourceSaver.save(editor.getValue());
-    }, 1000);
+    }, 400);
   });
 
     // restore focus to editor if user ever starts typing
