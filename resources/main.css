@@ -134,6 +134,7 @@ h1 a {
   right: 0;
   width: 450px;
   height: calc(100% - 31px);
+  background-color: white;
   z-index: 2;
   overflow: hidden;
 }
