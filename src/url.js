@@ -26,11 +26,11 @@ function urlHashObj(url) {
 };
 
 function getDatum(url, k) {
-  return urlHashObj(parseUrl(url, true).hash)[k];
+  return urlHashObj(parseUrl(url).hash)[k];
 };
 
 function setDatum(url, k, v) {
-  var urlObj = parseUrl(url, true);
+  var urlObj = parseUrl(url);
   var hashObj = urlHashObj(urlObj.hash);
   hashObj[k] = v;
   urlObj.set("hash", hashObjToString(hashObj));
