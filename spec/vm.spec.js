@@ -365,7 +365,6 @@ describe("vm", function() {
         expect(ps.get("exception").s).toEqual(28);
         expect(ps.get("exception").e).toEqual(28);
       });
-
     });
 
     describe("builtin", function() {
