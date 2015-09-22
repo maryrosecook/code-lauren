@@ -9,10 +9,10 @@ require("./lib/jquery.mousewheel.js"); // enable sidebar mousewheel scrolling
 
 var Sidebar = React.createClass({
   getInitialState: function() {
-    var page = url.route(url.urlToPage(window.location.href));
+    var page = url.route(url.urlToPage(url.getUrl()));
     history.replaceState({ page: page },
                          page[0].toUpperCase() + page.slice(1),
-                         url.setDatum(window.location.href, "page", page));
+                         url.setDatum(url.getUrl(), "page", page));
     return { page: page, wasBackOrForwards: false };
   },
 
@@ -22,7 +22,7 @@ var Sidebar = React.createClass({
     if (!this.state.wasBackOrForwards) {
       history.replaceState({ page: page },
                            page[0].toUpperCase() + page.slice(1),
-                           url.setDatum(window.location.href, "page", page));
+                           url.setDatum(url.getUrl(), "page", page));
     }
 
     this.state.page = page;
@@ -62,7 +62,7 @@ var Sidebar = React.createClass({
         var page = history.state.page;
         history.replaceState({ page: page, scroll: self.scrollApi.getContentPositionY() },
                              page[0].toUpperCase() + page.slice(1),
-                             url.setDatum(window.location.href, "page", page));
+                             url.setDatum(url.getUrl(), "page", page));
       }
     });
 

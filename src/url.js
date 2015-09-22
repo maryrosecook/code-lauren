@@ -25,6 +25,10 @@ function urlHashObj(url) {
   return _.object(keyValuePairs);
 };
 
+function getDatum(url, k) {
+  return urlHashObj(parseUrl(url, true).hash)[k];
+};
+
 function setDatum(url, k, v) {
   var urlObj = parseUrl(url, true);
   var hashObj = urlHashObj(urlObj.hash);
@@ -41,18 +45,24 @@ function route(page) {
   }
 };
 
-function goToHelpPage(page) {
-  window.location.href = setDatum(window.location.href, "page", page);
+function getUrl() {
+  return window.location.href;
+};
+
+function setUrl(url) {
+  window.location.href = url;
 };
 
 function loadHelpPage(event, page) {
-  goToHelpPage(page);
+  setUrl(setDatum(getUrl(), "page", page));
   event.preventDefault();
 };
 
 module.exports = {
   urlToPage: urlToPage,
+  getDatum: getDatum,
   setDatum: setDatum,
-  goToHelpPage: goToHelpPage,
+  setUrl: setUrl,
+  getUrl: getUrl,
   route: route
 }

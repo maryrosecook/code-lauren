@@ -75,7 +75,7 @@ var Search = React.createClass({
   resultPicked: function(slug) {
     this.state.showResults = false;
     this.setState(this.state);
-    url.goToHelpPage(slug);
+    url.setDatum(url.getUrl(), "page", page);
   },
 
   resultSelected: function(slug, isSelected) {

@@ -6,6 +6,9 @@ var vm = require("./lang/vm");
 var parser = require("./lang/parser");
 var compile = require("./lang/compiler");
 var langUtil = require("../src/lang/lang-util");
+var url = require("./url");
+var sourceSaver = require("./source-saver");
+
 var STEP_TO_SAVE = 2000;
 
 function annotateCurrentInstruction(ps, annotator) {
@@ -131,6 +134,7 @@ var ProgramPlayer = React.createClass({
       self.state.paused = false;
       self.state.pses = [];
       self.setState(self.state);
+      sourceSaver.save(self.props.editor.getValue());
     };
 
     var rerunProgramTimer;

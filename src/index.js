@@ -19,12 +19,11 @@ var Topbar = require("./topbar.jsx");
 var Sidebar = require("./sidebar.jsx");
 
 var createEditor = require("./editor");
-var setupSource = require("./source");
+var sourceSaver = require("./source-saver");
 var createAnnotator = require("./annotator");
 
 window.addEventListener("load", function() {
   var editor = createEditor();
-  var source = setupSource(editor);
 
   React.render(React.createElement(Topbar,
                                    { editor: editor, annotator: createAnnotator(editor) }),
@@ -35,11 +34,8 @@ window.addEventListener("load", function() {
   top.pub.editor = editor;
   top.pub.codeToFailedParseStack = require("./lang/parser-state-error").codeToFailedParseStack;
 
-  editor.on("change", function() {
-    source.save();
-  });
-
-  editor.setValue(source.get() !== undefined ?
-                  source.get() :
+  var code = sourceSaver.get();
+  editor.setValue(code !== undefined ?
+                  code :
                   fs.readFileSync(__dirname + "/demo-program.txt", "utf8"));
 });
