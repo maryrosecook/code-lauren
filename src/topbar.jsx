@@ -23,7 +23,7 @@ var Topbar = React.createClass({
         <Search />
 
         <div className="navigation">
-          <a href="#" onClick={load("suggestions")}>Suggestions?</a>
+          <a href="#" onClick={load("suggestions-for-improvement")}>Feedback</a>
         </div>
       </div>
     );
