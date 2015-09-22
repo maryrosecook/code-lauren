@@ -36,7 +36,7 @@ function checkLambdaArgs(fnStackItem, argContainers, invocationAst) {
   });
 
   if (fn.parameters.length > argContainers.length) {
-    var markerIndex = invocationAst.e - 1;
+    var markerIndex = invocationAst.s + invocationAst.text.trim().length - 1;
     var firstMissingParameterIndex = argContainers.length;
     var firstMissingParameterName = fn.parameters[firstMissingParameterIndex];
     throw new langUtil.RuntimeError('Missing a "' + firstMissingParameterName  + '"',

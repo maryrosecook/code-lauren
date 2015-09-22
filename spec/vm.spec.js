@@ -354,6 +354,18 @@ describe("vm", function() {
         var code = 'one: { ?a } \n one(1 2 3)';
         expect(v(code, c(p(code))).get("exception").message).toEqual('"one" does not need these');
       });
+
+      // regression bug #88
+      it("should mark correct location of missing arg if extra whitespace on line", function() {
+        var code = "identity: { ?x x }\nidentity()        ";
+
+        var ps = v(code, c(p(code)));
+
+        expect(ps.get("exception").message).toEqual('Missing a "x"');
+        expect(ps.get("exception").s).toEqual(28);
+        expect(ps.get("exception").e).toEqual(28);
+      });
+
     });
 
     describe("builtin", function() {
