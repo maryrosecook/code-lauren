@@ -25,6 +25,18 @@ Try changing the numbers. They describe:
 
 Which one is which?
 
-Do the numbers that describe the position of the oval indicate its middle or top left?
+Do the numbers that describe the position of the oval indicate the middle of the oval or the top left of the oval? To put the question another way, will this oval be half off the screen or fully visible?
+
+```
+draw-oval(0 0 100 100 "filled" "pink")
+```
+
+What about this one?
+
+```
+draw-oval(-50 -50 100 100 "filled" "pink")
+```
+
+Type in the code to find out!
 
 ### [← Previous](#home) <div class="next">[Draw lots of ovals →](#draw-lots-of-ovals)</div>
