@@ -263,7 +263,7 @@ h1 {
   height: 33px;
 }
 
-.rewind-button.disabled {
+.rewind-button.disabled, .rewind-button.disabled:active {
   background: url(/resources/images/rewind-disabled.png);
   background-size: 35.5px 33px;
   width: 35.5px;
@@ -271,8 +271,23 @@ h1 {
   cursor: default;
 }
 
+.rewind-button:active {
+  background: url(/resources/images/rewind-active.png);
+  background-size: 35.5px 33px;
+  width: 35.5px;
+  height: 33px;
+}
+
 .play-button {
   background: url(/resources/images/play.png);
+  background-size: 16.5px 33px;
+  width: 16.5px;
+  margin: 0 7px 0 9px; /* push play right and pull stepforward left to make play look correct */
+  height: 33px;
+}
+
+.play-button:active {
+  background: url(/resources/images/play-active.png);
   background-size: 16.5px 33px;
   width: 16.5px;
   margin: 0 7px 0 9px; /* push play right and pull stepforward left to make play look correct */
@@ -286,6 +301,13 @@ h1 {
   height: 33px;
 }
 
+.pause-button:active {
+  background: url(/resources/images/pause-active.png);
+  background-size: 16px 33px;
+  width: 16px;
+  height: 33px;
+}
+
 .step-forwards-button {
   background: url(/resources/images/step-forwards.png);
   background-size: 20px 33px;
@@ -293,12 +315,19 @@ h1 {
   height: 33px;
 }
 
-.step-forwards-button.disabled {
+.step-forwards-button.disabled, .step-forwards-button.disabled:active {
   background: url(/resources/images/step-forwards-disabled.png);
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
   cursor: default;
+}
+
+.step-forwards-button:active {
+  background: url(/resources/images/step-forwards-active.png);
+  background-size: 20px 33px;
+  width: 20px;
+  height: 33px;
 }
 
 .step-backwards-button {
@@ -308,12 +337,19 @@ h1 {
   height: 33px;
 }
 
-.step-backwards-button.disabled {
+.step-backwards-button.disabled, .step-backwards-button.disabled:active {
   background: url(/resources/images/step-backwards-disabled.png);
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
   cursor: default;
+}
+
+.step-backwards-button:active {
+  background: url(/resources/images/step-backwards-active.png);
+  background-size: 20px 33px;
+  width: 20px;
+  height: 33px;
 }
 
 .example-play-button {
