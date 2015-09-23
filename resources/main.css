@@ -495,7 +495,8 @@ table {
   #line-message-sidebar-holder { display: none; }
   #screen { display: none; }
   .search { display: none; }
-  .navigation { display: none; }
+  .left-navigation { display: none; }
+  .right-navigation { display: none; }
   .CodeMirror { display: none; }
   .program-player { display: none; }
 
