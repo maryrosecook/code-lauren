@@ -89,7 +89,13 @@ var programFns = {
     step = 0;
     allDrawOperations = [];
     cachedDrawOperations = [];
+
+    // clear screen to handle broken program add clear-screen() to ops
+    // to handle initial clear screen on program execution when
+    // stepping backwards through programs without an explicit
+    // clear-screen()
     screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
+    userFns.get("clear-screen")();
   }
 };
 
