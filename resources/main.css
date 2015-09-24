@@ -20,6 +20,10 @@ h1 a {
   text-decoration: none;
 }
 
+video {
+  border: 1px solid black;
+}
+
 .CodeMirror {
   margin-top: 32px;
   font-family: "courier";

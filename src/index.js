@@ -6,8 +6,13 @@ var React = require('react');
 // require css
 require("../resources/jquery.jscrollpane.css");
 require("../resources/simplescrollbars.css");
+require("../node_modules/video.js/dist/video-js/video-js.css");
 require("../resources/codemirror.css");
 require("../resources/main.css");
+
+// video-js
+require("../node_modules/video.js/dist/video-js/video.js");
+videojs.options.flash.swf = "../node_modules/video.js/dist/video-js/video-js.swf"
 
 // analytics
 require("./analytics");
