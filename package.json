@@ -27,7 +27,8 @@
     "strip": "0.0.7",
     "summarize-markdown": "^0.3.0",
     "transform-loader": "^0.2.1",
-    "underscore": "^1.8.2"
+    "underscore": "^1.8.2",
+    "video.js": "^4.12.15"
   },
   "devDependencies": {
     "babel-core": "^5.1.11",
