@@ -82,6 +82,7 @@ video {
   font-size: 17px;
   padding-left: 5px;
   vertical-align: top;
+  width: 292px;
 }
 
 .search input.default {
@@ -195,8 +196,8 @@ video {
 .topbar .left-navigation {
   position: absolute;
   top: 0;
-  right: 460px;
-  padding-top: 7px;
+  right: 455px;
+  padding-top: 6px;
 }
 
 .topbar .right-navigation {
