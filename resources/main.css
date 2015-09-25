@@ -16,7 +16,7 @@ a { color: black; }
 a:hover { text-decoration: none; }
 
 h1 a {
-  color: white;
+  color: black;
   text-decoration: none;
 }
 
@@ -25,18 +25,18 @@ video {
 }
 
 .CodeMirror {
-  margin-top: 32px;
+  margin-top: 33px;
   font-family: "courier";
   font-size: 15px;
   width: calc(100% - 450px);
-  height: calc(100vh - 32px);
+  height: calc(100vh - 33px);
   z-index: 1;
   background-color: rgba(255, 255, 255, 0);
 }
 
 #screen {
   position: absolute;
-  top: 32px;
+  top: 33px;
   z-index: -1;
   opacity: 1;
 }
@@ -44,10 +44,9 @@ video {
 .program-player {
   position: absolute;
   top: 0;
-  left: 110px;
-  padding: 0 6px 0 0;
+  left: 200px;
+  padding: 0px 6px 0 0;
   z-index: 2;
-  background-color: black;
 }
 
 .search {
@@ -86,7 +85,7 @@ video {
 }
 
 .search input.default {
-  color: #999;
+  color: #000;
 }
 
 .search input.not-default {
@@ -138,7 +137,7 @@ video {
   right: 0;
   width: 450px;
   max-width: 450px;
-  height: calc(100% - 31px);
+  height: calc(100% - 32px);
   background-color: white;
   z-index: 2;
   overflow: hidden;
@@ -183,7 +182,6 @@ video {
   width: 100%;
   height: 26px;
   padding: 3px 0 3px 3px;
-  border-top: 1px black solid;
   border-bottom: 1px black solid;
   z-index: 3;
   background-color: white;
@@ -194,17 +192,17 @@ video {
   font-size: 17px;
 }
 
+.topbar .left-navigation {
+  position: absolute;
+  top: 0;
+  right: 460px;
+  padding-top: 7px;
+}
+
 .topbar .right-navigation {
   position: absolute;
   top: 0;
   right: 9px;
-  padding-top: 6px;
-}
-
-.topbar .left-navigation {
-  position: absolute;
-  top: 0;
-  left: 281px;
   padding-top: 6px;
 }
 
@@ -213,13 +211,12 @@ video {
 }
 
 h1 {
-  font-family: "Gill Sans W01 Book";
-  font-size: 22px;
+  font-family: "Gill Sans W01 Light";
+  font-size: 29px;
   margin: -4px 0 0 -3px;
-  padding: 4px 0 4px 4px;
+  padding: 1px 0 4px 4px;
   color: white;
-  background-color: black;
-  width: 110px;
+  width: 200px;
   font-weight: normal;
 }
 
@@ -257,7 +254,7 @@ h1 {
   border: 0;
   width: 30px;
   height: 30px;
-  margin: 0 8px 0 8px;
+  margin: 0 6px;
   vertical-align: top;
 }
 
@@ -266,6 +263,11 @@ h1 {
   background-size: 35.5px 33px;
   width: 35.5px;
   height: 33px;
+}
+
+.rewind-button:hover {
+  background: url(/resources/images/rewind-hover.png);
+  background-size: 35.5px 33px;
 }
 
 .rewind-button.disabled, .rewind-button.disabled:active {
@@ -286,17 +288,14 @@ h1 {
 .play-button {
   background: url(/resources/images/play.png);
   background-size: 16.5px 33px;
-  width: 16.5px;
-  margin: 0 7px 0 9px; /* push play right and pull stepforward left to make play look correct */
+  width: 16px;
+  margin: 0 10px 0 6px; /* push play right and pull stepforward left to make play look correct */
   height: 33px;
 }
 
-.play-button:active {
-  background: url(/resources/images/play-active.png);
-  background-size: 16.5px 33px;
-  width: 16.5px;
-  margin: 0 7px 0 9px; /* push play right and pull stepforward left to make play look correct */
-  height: 33px;
+.play-button:hover {
+  background: url(/resources/images/play-hover.png);
+  background-size: 16px 33px;
 }
 
 .pause-button {
@@ -306,11 +305,9 @@ h1 {
   height: 33px;
 }
 
-.pause-button:active {
-  background: url(/resources/images/pause-active.png);
+.pause-button:hover {
+  background: url(/resources/images/pause-hover.png);
   background-size: 16px 33px;
-  width: 16px;
-  height: 33px;
 }
 
 .step-forwards-button {
@@ -318,6 +315,11 @@ h1 {
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
+}
+
+.step-forwards-button:hover {
+  background: url(/resources/images/step-forwards-hover.png);
+  background-size: 20px 33px;
 }
 
 .step-forwards-button.disabled, .step-forwards-button.disabled:active {
@@ -340,6 +342,11 @@ h1 {
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
+}
+
+.step-backwards-button:hover {
+  background: url(/resources/images/step-backwards-hover.png);
+  background-size: 20px 33px;
 }
 
 .step-backwards-button.disabled, .step-backwards-button.disabled:active {
@@ -528,7 +535,7 @@ table {
   #mobile-description {
     display: block !important;
     position: absolute;
-    top: 32px;
+    top: 33px;
     padding: 5px;
   }
 

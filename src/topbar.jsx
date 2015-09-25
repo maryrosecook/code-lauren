@@ -15,7 +15,7 @@ var Topbar = React.createClass({
 
     return (
       <div className="topbar">
-        <h1><a href="#" onClick={load("home")}>code lauren</a></h1>
+        <h1><a href="#" onClick={load("home")}>CODE LAUREN</a></h1>
 
         <ProgramPlayer editor={this.props.editor}
                        annotator={this.props.annotator}
