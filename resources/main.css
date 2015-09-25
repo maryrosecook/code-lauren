@@ -518,13 +518,13 @@ table {
   }
 
   h2 {
+    font-family: "Gill Sans W01 Light";
     font-size: 22px;
     margin-bottom: 10px;
   }
 
   .topbar {
     position: relative;
-    background-color: black;
   }
 
   .topbar h1 {
