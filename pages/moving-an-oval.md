@@ -19,6 +19,6 @@ Again, if you're not sure how this code works, use the play controls at the top 
 
 ### Next
 
-That's the end of this tutorial. You've covered a lot. I'll publish more tutorials very soon. Please send feedback on things that could be better about Code Lauren to [mary@maryrosecook.com](mailto:mary@maryrosecook.com)
+That's the end of this tutorial. You've covered a lot. I'll publish [more tutorials](#tutorials) very soon. Please send feedback on things that could be better about Code Lauren to [mary@maryrosecook.com](mailto:mary@maryrosecook.com)
 
 ### [← Previous](#doing-an-action-a-lot-of-times) <div class="next">[Home](#home)</div>
