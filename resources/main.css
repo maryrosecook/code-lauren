@@ -501,6 +501,10 @@ table {
   margin-bottom: 0.6em;
 }
 
+td code {
+  background-color: white;
+}
+
 @media handheld, only screen and (max-width: 767px) {
   body {
     font-family: "Gill Sans W01 Light";
