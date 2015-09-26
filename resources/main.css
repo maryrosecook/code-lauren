@@ -518,6 +518,9 @@ td code {
   }
 
   h1 {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
     padding-bottom: 3px; /* fix for iOS */
   }
 
@@ -529,12 +532,6 @@ td code {
 
   .topbar {
     position: relative;
-  }
-
-  .topbar h1 {
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
   }
 
   #mobile-description {
