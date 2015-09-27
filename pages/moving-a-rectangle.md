@@ -4,7 +4,7 @@ Write some code that makes a blue rectangle move across the screen. If you've do
 
 Have you written some code?
 
-If you got stuck, email [mary@maryrosecook.com](mailto:mary@maryrosecook.com) and tell me what you got stuck on, or look at the code below.  If you didn't get stuck and managed to get a rectangle moving across the screen, compare your code with the code below.
+If you got stuck, email [mary@maryrosecook.com](mailto:mary@maryrosecook.com) and tell me what you got stuck on, or look at the code below.
 
 ```
 left-dist: 1
