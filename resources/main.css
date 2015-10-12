@@ -196,7 +196,7 @@ video {
 .topbar .left-navigation {
   position: absolute;
   top: 0;
-  right: 455px;
+  left: 345px;
   padding-top: 6px;
 }
 
