@@ -44,7 +44,7 @@ video {
 .program-player {
   position: absolute;
   top: 0;
-  left: 200px;
+  left: 206px;
   z-index: 2;
 }
 
@@ -195,7 +195,7 @@ video {
 .topbar .left-navigation {
   position: absolute;
   top: 0;
-  left: 346px;
+  left: 350px;
   padding-top: 6px;
 }
 
@@ -212,10 +212,10 @@ video {
 
 h1 {
   font-family: "Gill Sans W01 Light";
-  font-size: 29px;
+  font-size: 30px;
   margin: -4px 0 0 0;
   color: white;
-  width: 196px;
+  width: 210px;
   font-weight: normal;
 }
 
