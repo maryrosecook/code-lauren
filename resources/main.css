@@ -45,7 +45,6 @@ video {
   position: absolute;
   top: 0;
   left: 200px;
-  padding: 0px 6px 0 0;
   z-index: 2;
 }
 
@@ -196,7 +195,7 @@ video {
 .topbar .left-navigation {
   position: absolute;
   top: 0;
-  left: 345px;
+  left: 346px;
   padding-top: 6px;
 }
 
@@ -214,10 +213,9 @@ video {
 h1 {
   font-family: "Gill Sans W01 Light";
   font-size: 29px;
-  margin: -4px 0 0 -3px;
-  padding: 1px 0 4px 4px;
+  margin: -4px 0 0 0;
   color: white;
-  width: 200px;
+  width: 196px;
   font-weight: normal;
 }
 
@@ -261,8 +259,8 @@ h1 {
 
 .rewind-button {
   background: url(/resources/images/rewind.png);
-  background-size: 35.5px 33px;
-  width: 35.5px;
+  background-size: 36px 33px;
+  width: 36px;
   height: 33px;
 }
 
