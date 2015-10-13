@@ -2,7 +2,9 @@
 
 Draw oval is an action that draws an oval on the screen.  For example, this green oval can be drawn with the code below.
 
-![Green oval draw by code snippet](/resources/images/help/draw-oval-1.png)
+<img alt="Green oval draw by code snippet"
+     src="/resources/images/help/draw-oval-1.png"
+     width="434" height="50" />
 
 ```
 draw-oval(100 200 30 40 "filled" "green")

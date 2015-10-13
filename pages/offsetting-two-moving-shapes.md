@@ -34,7 +34,9 @@ If your code uses two different names, change it so it only uses one.  This make
 
 On this page, you will turn the blue rectangle into the bottom of the car and the red rectangle into the top:
 
-![Red box on top of blue box to represent a car](/resources/images/help/offsetting-two-moving-shapes-car.png)
+<img alt="Red box on top of blue box to represent a car"
+     src="/resources/images/help/offsetting-two-moving-shapes-car.png"
+     width="434" height="100" />
 
 #### Rectangles of the right sizes
 
