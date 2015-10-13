@@ -6,7 +6,8 @@ var url = require("./url");
 
 function save(code) {
   var compressedCode = lz.compressToBase64(code);
-  url.setUrl(url.setDatum(url.getUrl(), "code", compressedCode));
+  url.replaceUrl(history.state,
+                 url.setDatum(url.getUrl(), "code", compressedCode));
 
   localStorage.code = code;
 

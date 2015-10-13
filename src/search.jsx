@@ -75,7 +75,7 @@ var Search = React.createClass({
   resultPicked: function(slug) {
     this.state.showResults = false;
     this.setState(this.state);
-    url.setUrl(url.setDatum(url.getUrl(), "page", slug));
+    url.setNewUrl(url.setDatum(url.getUrl(), "page", slug));
   },
 
   resultSelected: function(slug, isSelected) {

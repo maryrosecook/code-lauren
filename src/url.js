@@ -49,12 +49,16 @@ function getUrl() {
   return window.location.href;
 };
 
-function setUrl(url) {
+function setNewUrl(url) {
   window.location.href = url;
 };
 
+function replaceUrl(state, url) {
+  history.replaceState(state, undefined, url);
+};
+
 function loadHelpPage(event, page) {
-  setUrl(setDatum(getUrl(), "page", page));
+  setNewUrl(setDatum(getUrl(), "page", page));
   event.preventDefault();
 };
 
@@ -62,7 +66,8 @@ module.exports = {
   urlToPage: urlToPage,
   getDatum: getDatum,
   setDatum: setDatum,
-  setUrl: setUrl,
+  setNewUrl: setNewUrl,
+  replaceUrl: replaceUrl,
   getUrl: getUrl,
   route: route
 }
