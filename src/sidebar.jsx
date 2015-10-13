@@ -19,6 +19,9 @@ var Sidebar = React.createClass({
   },
 
   load: function(page) {
+    // only update if page changed otherwise lose scroll pos on program change
+    if (page === this.state.page) { return; }
+
     page = url.route(page);
     this.state.wasBackOrForwards = history.state !== null;
     if (!this.state.wasBackOrForwards) {
