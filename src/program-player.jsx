@@ -50,13 +50,13 @@ function onClickOrHoldDown(onClick) {
 };
 
 function initProgramState(code, annotator, canvasLib) {
-  canvasLib.programFns.reset();
+  canvasLib.program.reset();
   var ast = parse(code, annotator);
   if (ast !== undefined) {
-    var programBindings = require("./lang/standard-library")().merge(canvasLib.userFns);
+    var programBindings = require("./lang/standard-library")().merge(canvasLib.user);
     var ps = vm
         .initProgramState(code, compile(ast), programBindings)
-        .set("canvasLib", canvasLib.programFns);
+        .set("canvasLib", canvasLib.program);
     return ps;
   }
 };

@@ -30,7 +30,7 @@ function addOperation(fn, name, isClearScreen) {
   }
 };
 
-var programFns = {
+var program = {
   flush: function() {
     cachedDrawOperations
       .filter(function(o) { return o.isClearScreen === false;  })
@@ -48,11 +48,11 @@ var programFns = {
 
   stepBackwards: function() {
     step--;
-    programFns.redraw();
+    program.redraw();
   },
 
   pause: function() {
-    programFns.redraw();
+    program.redraw();
   },
 
   hitClearScreen: function() {
@@ -95,14 +95,14 @@ var programFns = {
     // stepping backwards through programs without an explicit
     // clear-screen()
     screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
-    userFns.get("clear-screen")();
+    user.get("clear-screen")();
   }
 };
 
-var userFns = im.Map({
+var user = im.Map({
   "clear-screen": langUtil.setSideEffecting(function(meta) {
     addOperation(function () {
-      programFns.clearScreen();
+      program.clearScreen();
     }, "clear-screen", true);
   }),
 
@@ -182,8 +182,8 @@ var userFns = im.Map({
 });
 
 var api = {
-  programFns: programFns,
-  userFns: userFns
+  program: program,
+  user: user
 };
 
 var setScreen = module.exports = function(inScreen) {
@@ -192,7 +192,7 @@ var setScreen = module.exports = function(inScreen) {
   // run any unflushed cached ops - might get left if draw ops done,
   // program hasn't terminated and are outside a loop or loop has
   // ended
-  flushIntervalId = setInterval(programFns.flush, 100);
+  flushIntervalId = setInterval(program.flush, 100);
 
   screen = inScreen;
 
