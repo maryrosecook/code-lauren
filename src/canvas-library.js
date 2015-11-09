@@ -1,8 +1,8 @@
 var _ = require("underscore");
 var im = require("immutable");
 
-var langUtil = require("./lang-util");
-var chk = require("./check-args");
+var langUtil = require("./lang/lang-util");
+var chk = require("./lang/check-args");
 
 var screen;
 var step = 0;

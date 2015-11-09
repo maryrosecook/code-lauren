@@ -15,7 +15,7 @@ function setupCanvasLib(screen) {
     fillWindowWithScreen(screen);
   });
 
-  return require("./lang/canvas-library")(screen);
+  return require("./canvas-library")(screen);
 };
 
 module.exports = {
