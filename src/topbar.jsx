@@ -1,6 +1,6 @@
 var React = require('react');
 var $ = require("jquery");
-var ProgramPlayer = require("./player-interface.jsx");
+var ProgramPlayer = require("./program-player.jsx");
 var Search = require("./search.jsx");
 var env = require("./env");
 var sourceSaver = require("./source-saver");
