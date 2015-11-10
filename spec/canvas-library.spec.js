@@ -2,16 +2,16 @@ var parse = require("../src/lang/parser");
 var compile = require("../src/lang/compiler");
 var vm = require("../src/lang/vm");
 var standardLibrary = require("../src/lang/standard-library");
-var canvasLibrary = require("../src/lang/canvas-library");
+var canvasLibrary = require("../src/canvas-library");
 var env = require("../src/env");
 
 var canvasLib = canvasLibrary({});
-canvasLib.programFns.shutDown();
+canvasLib.program.shutDown();
 
 function setupProgram(code) {
   return vm.initProgramState(code,
                              compile(parse(code)),
-                             standardLibrary().merge(canvasLib.userFns));
+                             standardLibrary().merge(canvasLib.user));
 };
 
 describe("canvas library", function() {
