@@ -49,14 +49,16 @@ function onClickOrHoldDown(onClick) {
   };
 };
 
-function initProgramState(code, annotator, canvasLib) {
+function initProgramState(code, annotator, canvasLib, inputter) {
   canvasLib.program.reset();
   var ast = parse(code, annotator);
   if (ast !== undefined) {
-    var programBindings = require("./lang/standard-library")().merge(canvasLib.user);
+    var programBindings = require("./lang/standard-library")()
+        .merge(canvasLib.user);
     var ps = vm
         .initProgramState(code, compile(ast), programBindings)
         .set("canvasLib", canvasLib.program);
+    ps = vm.mergeTopLevelBindings(ps, inputter.getMouseBindings());
     return ps;
   }
 };
@@ -119,7 +121,8 @@ var ProgramPlayer = React.createClass({
     function reevaluateProgram() {
       self.state.ps = initProgramState(self.props.editor.getValue(),
                                        self.props.annotator,
-                                       self.props.canvasLib);
+                                       self.props.canvasLib,
+                                       self.props.inputter);
       self.state.paused = false;
       self.state.pses = [];
       self.setState(self.state);
@@ -136,7 +139,8 @@ var ProgramPlayer = React.createClass({
   onRewindClick: function() {
     this.state.ps = initProgramState(this.props.editor.getValue(),
                                      this.props.annotator,
-                                     this.props.canvasLib);
+                                     this.props.canvasLib,
+                                     this.props.inputter);
     this.state.pses = [];
     this.stepForwardsByHand();
   },
@@ -177,6 +181,11 @@ var ProgramPlayer = React.createClass({
     if (vm.isCrashed(this.state.ps) || vm.isComplete(this.state.ps)) {
       this.setState(this.state); // update buttons
       return;
+    }
+
+    if (!this.state.paused) {
+      this.state.ps = vm.mergeTopLevelBindings(this.state.ps,
+                                               this.props.inputter.getMouseBindings());
     }
 
     var loopCount = 0;

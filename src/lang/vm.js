@@ -8,6 +8,9 @@ var addScope = require("./scope");
 var langUtil = require("./lang-util");
 var checkArgs = require("./check-args");
 
+var BUILTIN_SCOPE_ID = 0;
+var GLOBAL_SCOPE_ID = 1;
+
 function stepPush(ins, p) {
   // TODO: when have lists and objects in lang, will need to detect them and use immutablejs
 
@@ -232,7 +235,6 @@ function initProgramState(code, bc, builtinBindings) {
   builtinBindings = builtinBindings || standardLibrary();
 
   var bcPointer = 0;
-  var topScopeId = 1;
 
   var p = im.Map({
     exception: undefined,
@@ -243,9 +245,20 @@ function initProgramState(code, bc, builtinBindings) {
     scopes: im.List()
   });
 
-  p = addScope(p, builtinBindings);
-  p = addScope(p, im.Map(), 0);
-  p = pushCallFrame(p, bc, bcPointer, topScopeId);
+  p = addScope(p, builtinBindings); // builtin scope
+  p = addScope(p, im.Map(), BUILTIN_SCOPE_ID); // global scope - mouse, keyboard etc
+  p = pushCallFrame(p, bc, bcPointer, GLOBAL_SCOPE_ID); // user top level scope
+  return p;
+};
+
+function mergeTopLevelBindings(p, bindings) {
+  for (var name in bindings) {
+    p = p.set("scopes", addScope.setBindingAtId(p.get("scopes"),
+                                                GLOBAL_SCOPE_ID,
+                                                name,
+                                                bindings[name]));
+  }
+
   return p;
 };
 
@@ -295,5 +308,6 @@ initProgramStateAndComplete.step = step;
 initProgramStateAndComplete.complete = complete;
 initProgramStateAndComplete.isComplete = isComplete;
 initProgramStateAndComplete.isCrashed = isCrashed;
+initProgramStateAndComplete.mergeTopLevelBindings = mergeTopLevelBindings;
 
 module.exports = initProgramStateAndComplete;

@@ -5,7 +5,9 @@ var Search = require("./search.jsx");
 var env = require("./env");
 var sourceSaver = require("./source-saver");
 
-var canvasLib = env.setupCanvasLib($("#screen")[0].getContext("2d"));
+var screen = $("#screen")[0].getContext("2d");
+var canvasLib = env.setupCanvasLib(screen);
+var inputter = env.setupInputter(window, screen);
 
 var Topbar = React.createClass({
   render: function() {
@@ -19,7 +21,8 @@ var Topbar = React.createClass({
 
         <ProgramPlayer editor={this.props.editor}
                        annotator={this.props.annotator}
-                       canvasLib={canvasLib} />
+                       canvasLib={canvasLib}
+                       inputter={inputter} />
 
         <div className="left-navigation">
           <a href="#" onClick={load("share-program")}>Share your program</a>
