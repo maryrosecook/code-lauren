@@ -40,6 +40,10 @@ function setGlobalBinding(scopes, originalScopeId, k, v) {
   }
 };
 
+function setBindingAtId(scopes, scopeId, k, v) {
+  return scopes.setIn([scopeId, "bindings", k], v);
+};
+
 function addScope(p, bindings, parent) {
   return p.set("scopes", p.get("scopes").push(im.Map({ bindings: bindings, parent: parent })));
 };
@@ -52,4 +56,5 @@ addScope.getScopedBinding = getScopedBinding;
 addScope.hasScopedBinding = hasScopedBinding;
 addScope.setGlobalBinding = setGlobalBinding;
 addScope.lastScopeId = lastScopeId;
+addScope.setBindingAtId = setBindingAtId;
 module.exports = addScope;
