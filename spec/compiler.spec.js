@@ -36,11 +36,8 @@ describe("bytecode compiler", function() {
   });
 
   describe("forever", function() {
-    it("should not annotate push lambda and invoke", function() {
+    it("should not annotate invoke", function() {
       var bc = c(p("forever {}"));
-      expect(bc[1][0]).toEqual("push_lambda");
-      expect(bc[1].annotate).toEqual(false);
-
       expect(bc[2][0]).toEqual("invoke");
       expect(bc[2].annotate).toEqual(false);
     });

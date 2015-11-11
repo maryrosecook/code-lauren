@@ -86,8 +86,20 @@ function compileConditional(a) {
 
 function compileForever(a) {
   var invocation = compile(a.c);
-  invocation[1].annotate = DO_NOT_ANNOTATE; // push_lambda
+
+  // doctor push_lambda so can annotate on forever keyword
+  invocation[1].ast = {
+    warning: "push_lambda ast faked to forever keyword for annotation",
+    t: "forever",
+    s: a.s,
+    e: a.s + "forever".length,
+    text: "forever"
+  };
+
+  invocation[1].isForever = true; // annotate so can rAF on each forever for rate limiting
+
   invocation[2].annotate = DO_NOT_ANNOTATE; // invocation
+
   var bc = invocation.concat(ins(["pop"]),
                              ins(["jump", -4], a));
   return bc;
