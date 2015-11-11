@@ -16,7 +16,9 @@ var setup = module.exports = function(window, inScreen) {
   }, false);
 
   window.addEventListener('mousedown', function(e) {
-    mouseDown = true;
+    if (mousePosition.y > 0) { // only set if mouse not over title bar
+      mouseDown = true;
+    }
   }, false);
 
   window.addEventListener('mouseup', function(e) {
