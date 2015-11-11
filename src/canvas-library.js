@@ -7,39 +7,37 @@ var chk = require("./lang/check-args");
 var screen;
 var step = 0;
 var allDrawOperations = [];
-var cachedDrawOperations = [];
-var flushIntervalId;
+var drawOperationsSinceLastRepaint = [];
 
-function addOperation(fn, name, isClearScreen) {
-  var op = {
+function makeOperation(fn, name, isClearScreen) {
+  return {
     fn: fn,
     step: step,
     name: name,
     isClearScreen: isClearScreen === true ? true : false
   };
+};
 
+function addOperation(op) {
   allDrawOperations.push(op);
-  cachedDrawOperations.push(op);
+  drawOperationsSinceLastRepaint.push(op);
 
   if (allDrawOperations.length > 5000) {
     allDrawOperations.shift();
-  }
-
-  if (cachedDrawOperations.length > 5000) {
-    throw new Error("Cached draw ops exceeded save state limit.");
   }
 };
 
 var program = {
   flush: function() {
-    cachedDrawOperations
+    drawOperationsSinceLastRepaint
       .filter(function(o) { return o.isClearScreen === false;  })
       .forEach(function(o) { o.fn(); });
-    cachedDrawOperations = [];
+    drawOperationsSinceLastRepaint = [];
   },
 
-  shutDown: function() {
-    clearInterval(flushIntervalId);
+  runDrawOperationsSinceLastRepaint: function() {
+    drawOperationsSinceLastRepaint.forEach(function(o) { o.fn(); });
+    drawOperationsSinceLastRepaint = [];
   },
 
   stepForwards: function() {
@@ -56,7 +54,7 @@ var program = {
   },
 
   hitClearScreen: function() {
-    return _.find(cachedDrawOperations,
+    return _.find(drawOperationsSinceLastRepaint,
                   function(o) { return o.isClearScreen === true; }) !== undefined;
   },
 
@@ -66,29 +64,30 @@ var program = {
 
   redraw: function() {
     var ops = [];
+    var foundClearScreen = false;
     for (var i = allDrawOperations.length - 1; i >= 0; i--) {
       if (allDrawOperations[i].step < step && allDrawOperations[i].isClearScreen === true) {
         ops.push(allDrawOperations[i]);
+        foundClearScreen = true;
         break;
       } else if (allDrawOperations[i].step < step) {
         ops.push(allDrawOperations[i]);
       }
     }
 
-    ops.reverse().forEach(function(o) { o.fn(); });
-  },
-
-  deleteOld: function(STEP_TO_SAVE) {
-    var stopClearing = step - STEP_TO_SAVE;
-    while (allDrawOperations[0] !== undefined && allDrawOperations[0].step < stopClearing) {
-      allDrawOperations.shift();
+    if (!foundClearScreen) {
+      ops.push(makeOperation(function() {
+        program.clearScreen();
+      }, "clear-screen", true));
     }
+
+    ops.reverse().forEach(function(o) { o.fn(); });
   },
 
   reset: function() {
     step = 0;
     allDrawOperations = [];
-    cachedDrawOperations = [];
+    drawOperationsSinceLastRepaint = [];
 
     // clear screen to handle broken program add clear-screen() to ops
     // to handle initial clear screen on program execution when
@@ -101,9 +100,9 @@ var program = {
 
 var user = im.Map({
   "clear-screen": langUtil.setSideEffecting(function(meta) {
-    addOperation(function () {
+    addOperation(makeOperation(function () {
       program.clearScreen();
-    }, "clear-screen", true);
+    }, "clear-screen", true));
   }),
 
   write: langUtil.setSideEffecting(function(meta, str, x, y, color) {
@@ -113,12 +112,12 @@ var user = im.Map({
         chk.num("the distance from the top of the screen"),
         chk.set(COLORS, "the color of the text"));
 
-    addOperation(function () {
+    addOperation(makeOperation(function () {
       screen.font = "20px Georgia";
       screen.fillStyle = color;
       screen.fillText(str, x, y);
       screen.fillStyle = "black";
-    }, "write");
+    }, "write"));
   }),
 
   "draw-oval": langUtil.setSideEffecting(function(meta, x, y, w, h, filledStr, color) {
@@ -130,7 +129,7 @@ var user = im.Map({
         chk.set(["filled", "unfilled"], 'either "filled" or "unfilled"'),
         chk.set(COLORS, "the color of the oval"));
 
-    addOperation(function () {
+    addOperation(makeOperation(function () {
       var kappa = 0.5522848;
       var ox = (w / 2) * kappa; // control point offset horizontal
       var oy = (h / 2) * kappa; // control point offset vertical
@@ -155,7 +154,7 @@ var user = im.Map({
         screen.fill();
         screen.fillStyle = "black";
       }
-    }, "draw-oval");
+    }, "draw-oval"));
   }),
 
   "draw-rectangle": langUtil.setSideEffecting(function(meta, x, y, width, height, filledStr, color) {
@@ -167,7 +166,7 @@ var user = im.Map({
         chk.set(["filled", "unfilled"], 'either "filled" or "unfilled"'),
         chk.set(COLORS, "the color of the rectangle"));
 
-    addOperation(function () {
+    addOperation(makeOperation(function () {
       if (filledStr === "unfilled") {
         screen.strokeStyle = color;
         screen.strokeRect(x, y, width, height);
@@ -177,7 +176,7 @@ var user = im.Map({
         screen.fillRect(x, y, width, height);
         screen.fillStyle = "black";
       }
-    }, "draw-rectangle");
+    }, "draw-rectangle"));
   })
 });
 
@@ -189,13 +188,7 @@ var api = {
 var setScreen = module.exports = function(inScreen) {
   if (screen !== undefined) { throw new Error("Already started"); }
 
-  // run any unflushed cached ops - might get left if draw ops done,
-  // program hasn't terminated and are outside a loop or loop has
-  // ended
-  flushIntervalId = setInterval(program.flush, 100);
-
   screen = inScreen;
-
   return api;
 };
 

@@ -6,7 +6,6 @@ var canvasLibrary = require("../src/canvas-library");
 var env = require("../src/env");
 
 var canvasLib = canvasLibrary({});
-canvasLib.program.shutDown();
 
 function setupProgram(code) {
   return vm.initProgramState(code,
