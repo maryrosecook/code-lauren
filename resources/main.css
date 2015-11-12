@@ -454,7 +454,7 @@ button:focus {
 .cm-s-default .cm-bracket { color: black; }
 
 .error { background-color: rgba(255, 0, 0, 0.2); }
-.currently-executing { background-color: rgba(0, 0, 255, 0.12); }
+.currently-executing { background-color: rgba(0, 0, 0, 0.12); }
 
 .zero-width-mark.error {
   background-color: rgba(255, 0, 0, 0.3);
