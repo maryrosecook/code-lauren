@@ -40,6 +40,24 @@ var program = {
     drawOperationsSinceLastRepaint = [];
   },
 
+  play: function() {
+    // the thing where you see a drawing part reappear after stepping
+    // back past it then pressing play is because the current
+    // instruction is inside code where the draw is already a foregone
+    // conclusion eg if current instruction is one of the args to
+    // draw-oval in code below
+    // if mouse-button-is-down { draw-oval(1 1 1 1 "filled" "red") }
+
+    drawOperationsSinceLastRepaint = []
+    for (var i = allDrawOperations.length - 1; i >= 0; i--) {
+      if (allDrawOperations[i].step < step) {
+        break;
+      }
+    }
+
+    allDrawOperations.splice(i + 1);
+  },
+
   stepForwards: function() {
     step++;
   },
@@ -66,12 +84,12 @@ var program = {
     var ops = [];
     var foundClearScreen = false;
     for (var i = allDrawOperations.length - 1; i >= 0; i--) {
-      if (allDrawOperations[i].step < step && allDrawOperations[i].isClearScreen === true) {
+      if (allDrawOperations[i].step <= step) {
         ops.push(allDrawOperations[i]);
-        foundClearScreen = true;
-        break;
-      } else if (allDrawOperations[i].step < step) {
-        ops.push(allDrawOperations[i]);
+        if(allDrawOperations[i].isClearScreen === true) {
+          foundClearScreen = true;
+          break;
+        }
       }
     }
 

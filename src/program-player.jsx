@@ -82,45 +82,44 @@ function parse(code, annotator) {
 
 var ProgramPlayer = React.createClass({
   getInitialState: function() {
-    var self = this;
-
-    (function tick(lastEventLoopYield) {
-      while(true) {
-        if (self.state !== null && self.state.ps !== undefined && !self.state.paused) {
-          if (!vm.isComplete(self.state.ps)) {
-            self.stepForwards();
-
-            if (self.state.ps.get("canvasLib").hitClearScreen() === true) {
-              self.state.ps.get("canvasLib").clearScreen();
-              self.state.ps.get("canvasLib").flush();
-              requestAnimationFrame(() => tick(new Date().getTime()))
-              break;
-            } else if (self.state.ps.get("currentInstruction").isForever) {
-              // By recurring, we rate limit non-clear-screening programs
-              // to roughly the same rate as a clear-screening program
-              // which makes stepping a non-clear-screening program better
-              // because fewer iterations happen in a given period of running time
-              requestAnimationFrame(() => tick(lastEventLoopYield))
-              break;
-            }
-          }
-        }
-
-        if (Date.now() - lastEventLoopYield > 33) {
-          if (self.state !== null && self.state.ps !== undefined && !self.state.paused) {
-            self.state.ps.get("canvasLib").runDrawOperationsSinceLastRepaint();
-          }
-
-          requestAnimationFrame(() => tick(new Date().getTime()))
-          break;
-        }
-      }
-    })(new Date().getTime());
-
     this.stepBackwardsClickHandler = onClickOrHoldDown(this.stepBackwardsByHand);
     this.stepForwardsClickHandler = onClickOrHoldDown(this.stepForwardsByHand);
 
     this.setupProgramReevaluation();
+
+    var self = this;
+
+    (function tick(lastEventLoopYield) {
+      while(true) {
+        if (self.state === null ||
+            self.state.paused ||
+            self.state.ps === undefined ||
+            vm.isComplete(self.state.ps)) {
+          setTimeout(() => requestAnimationFrame(() => tick(Date.now())), 200);
+          break;
+        } else {
+          self.stepForwards();
+
+          if (self.state.ps.get("canvasLib").hitClearScreen() === true) {
+            self.state.ps.get("canvasLib").clearScreen();
+            self.state.ps.get("canvasLib").flush();
+            requestAnimationFrame(() => tick(Date.now()))
+            break;
+          } else if (Date.now() - lastEventLoopYield > 33) {
+            self.state.ps.get("canvasLib").runDrawOperationsSinceLastRepaint();
+            requestAnimationFrame(() => tick(Date.now()))
+            break;
+          } else if (self.state.ps.get("currentInstruction").isForever) {
+            // By recurring, we rate limit non-clear-screening programs
+            // to roughly the same rate as a clear-screening program
+            // which makes stepping a non-clear-screening program better
+            // because fewer iterations happen in a given period of running time
+            requestAnimationFrame(() => tick(lastEventLoopYield))
+            break;
+          }
+        }
+      }
+    })(new Date().getTime());
 
     return { ps: undefined, paused: false, pses: [] };
   },
@@ -174,6 +173,7 @@ var ProgramPlayer = React.createClass({
   unpause: function() {
     this.state.paused = false;
     this.props.annotator.clear();
+    this.state.ps.get("canvasLib").play();
     this.setState(this.state);
   },
 
