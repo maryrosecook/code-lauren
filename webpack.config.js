@@ -29,5 +29,5 @@ module.exports = {
     fs: "empty"
   },
 
-  devtool: 'source-map'
+  devtool: 'cheap-eval-source-map'
 };
