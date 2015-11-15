@@ -1,4 +1,4 @@
-## Learn to code. No experience necessary.
+## Make video games and learn to code. No experience necessary.
 
 Try changing `"blue"` to `"red"` in the code on the left.
 
