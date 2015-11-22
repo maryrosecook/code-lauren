@@ -27,6 +27,17 @@ function annotateCurrentInstruction(ps, annotator) {
   }
 };
 
+function hasAnnotatablePs(pses) {
+  for (var i = 0; i < pses.length; i++) {
+    var currentInstruction = pses[i].get("currentInstruction");
+    if (currentInstruction !== undefined && currentInstruction.annotate === true) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 function onClickOrHoldDown(onClick) {
   var firstClickTime;
   var timerId;
@@ -284,7 +295,7 @@ var ProgramPlayer = React.createClass({
   },
 
   canStepBackwards: function() {
-    return this.state.pses !== undefined && this.state.pses.length > 1;
+    return this.state.pses !== undefined && hasAnnotatablePs(this.state.pses);
   },
 
   render: function() {
