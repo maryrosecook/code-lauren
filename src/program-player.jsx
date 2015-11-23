@@ -102,10 +102,17 @@ var ProgramPlayer = React.createClass({
 
     (function tick(lastEventLoopYield) {
       while(true) {
-        if (self.state === null ||
-            self.state.paused ||
-            self.state.ps === undefined ||
-            vm.isComplete(self.state.ps)) {
+        if (!self.state ||
+            !self.state.ps) {
+          setTimeout(() => requestAnimationFrame(() => tick(Date.now())), 200);
+          break;
+        } else if (vm.isComplete(self.state.ps) ||
+                   vm.isCrashed(self.state.ps)) {
+          self.state.ps.get("canvasLib").flush();
+          self.pause();
+          setTimeout(() => requestAnimationFrame(() => tick(Date.now())), 200);
+          break;
+        } else if (self.state.paused) {
           setTimeout(() => requestAnimationFrame(() => tick(Date.now())), 200);
           break;
         } else {
@@ -199,7 +206,6 @@ var ProgramPlayer = React.createClass({
     // instruction would leave side effects done.
 
     if (vm.isCrashed(this.state.ps) || vm.isComplete(this.state.ps)) {
-      this.setState(this.state); // update buttons
       return;
     }
 
@@ -237,7 +243,9 @@ var ProgramPlayer = React.createClass({
 
         this.state.ps = ps;
         return;
-      } else if (vm.isComplete(ps)) {
+      } else if (vm.isComplete(ps) || vm.isCrashed(ps)) {
+        this.state.ps = ps;
+        this.pause();
         return;
       } else if (loopCount > 100) {
         throw new Error("Trapped in infinite loop trying to step");
