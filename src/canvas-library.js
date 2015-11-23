@@ -84,7 +84,7 @@ var program = {
     var ops = [];
     var foundClearScreen = false;
     for (var i = allDrawOperations.length - 1; i >= 0; i--) {
-      if (allDrawOperations[i].step <= step) {
+      if (allDrawOperations[i].step < step) {
         ops.push(allDrawOperations[i]);
         if(allDrawOperations[i].isClearScreen === true) {
           foundClearScreen = true;
