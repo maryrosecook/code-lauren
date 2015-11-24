@@ -19,7 +19,7 @@
     "codemirror": "^5.4.0",
     "immutable": "^3.7.4",
     "jquery": "^1.11.2",
-    "live-server": "^0.7.1",
+    "live-server": "^0.8.2",
     "lz-string": "^1.4.4",
     "marked": "^0.3.3",
     "pegjs": "pegjs/pegjs#da57118a43a904f753d44d407994cf0b36358adc",
