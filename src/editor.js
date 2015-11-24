@@ -27,7 +27,7 @@ var createEditor = module.exports = function() {
     }, 400);
   });
 
-    // restore focus to editor if user ever starts typing
+  // restore focus to editor if user ever starts typing
   $(window).keydown(function(e) {
     if (e.ctrlKey === false && e.metaKey === false && $("#searchbox").is(":focus") === false) {
       editor.focus();
