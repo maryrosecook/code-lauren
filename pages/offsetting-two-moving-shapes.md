@@ -26,7 +26,7 @@ forever {
 }
 ```
 
-Does your code use one name for the distance of both rectangles from the left (as the code above does with `left-dist`)? Or does your code use a different name for each rectangle (eg `left-dist-one` and `left-dist-two`)?
+Does your code use one name for the distance of the centers of both rectangles from the left (as the code above does with `left-dist`)? Or does your code use a different name for each rectangle (eg `left-dist-one` and `left-dist-two`)?
 
 If your code uses two different names, change it so it only uses one.  This makes your code shorter and, therefore, easier to understand.
 
@@ -44,17 +44,17 @@ Change the width and height of the rectangles so the red one is smaller than the
 
 #### Rectangles nearly in the right places
 
-Get the red rectangle perched on top of the blue rectangle.  To do this, change the numbers that describe the distance that each rectangle is from the top of the screen.
+Get the red rectangle perched on top of the blue rectangle.  To do this, change the numbers that describe the distance that the center of each rectangle is from the top of the screen.
 
 #### Rectangles really in the right places
 
 The rectangles are in the right place vertically.  Now they need to be in the right place horizontally.
 
-This is a little trickier.  You were able to get the top rectangle on top of the bottom rectangle because you could directly change the numbers that describe the distance of each rectangle from the top of the screen.  To get the red rectangle centered over the blue rectangle, you need to put the two rectangles at different distances from the left.  But both rectangles use the same name to describe their distance from the left, so they always have the same distance from the left!
+This is a little trickier.  You were able to get the top rectangle on top of the bottom rectangle because you could directly change the numbers that describe the distance of each rectangle from the top of the screen.  To get the red rectangle centered over the blue rectangle, you need to put the centers of two rectangles at different distances from the left.  But both rectangles use the same name to describe the distance of their centers from the left, so they always have the same distance from the left!
 
-Try using `add` to modify the distance of one of the rectangles from the left.  For example, look at the code below.  It draws a green oval on the left and a yellow oval on the right.
+Try using `add` to modify the distance of the center of one of the rectangles from the left.  For example, look at the code below.  It draws a green oval on the left and a yellow oval on the right.
 
-`start` describes the green oval's distance from the left of the screen.  But `add(start 200)` is used to describe the yellow oval's distance from the left.  This means that `200` is added to `start` to get the yellow oval's distance from the left.  Which means that the yellow oval is drawn on the right of the green oval.
+`start` describes how far the green oval's center is from the left of the screen.  But `add(start 200)` is used to describe how far the yellow oval's center is from the left.  This means that `200` is added to `start` to get how far the yellow oval's center is from the left.  Which means that the yellow oval is drawn on the right of the green oval.
 
 ```
 start: 100

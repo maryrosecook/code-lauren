@@ -10,17 +10,17 @@ draw-oval(200 200 30 40 "filled" "blue")
 draw-oval(250 200 30 40 "filled" "red")
 ```
 
-Notice how `200`, the description of how far down to draw an oval, appears twice.  `30`, the width of the ovals, appears twice. The height appears twice, too.
+Notice how `200`, the description of how far the center of the oval is from the top of the screen, appears twice.  `30`, the width of the ovals, appears twice. The height appears twice, too.
 
 ### Name the distance from the top
 
-You could name the distance of the ovals from the top like this:
+Using the code below, you could name the distance of the center of the ovals from the top:
 
 ```
 top-dist: 200
 ```
 
-Then you could use the name in place of the distance.
+Then you could use the name in place of the distances.
 
 Let's do that. Delete all the code on the left. Type in this code:
 

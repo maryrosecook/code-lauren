@@ -24,7 +24,7 @@ If your rectangle is not blue, set the color of your rectangle to `"blue"`.
 
 ### The red rectangle
 
-Add another line of code that draws a rectangle that is `100` from the left of the screen, `200` from the top, `10` wide, `300` tall and colored `"red"`.
+Add another line of code that draws a rectangle that has its center `100` from the left of the screen and `200` from the top.  Make it `10` wide, `300` tall and colored `"red"`.
 
 ### Move the two rectangles
 

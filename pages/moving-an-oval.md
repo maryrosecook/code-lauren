@@ -13,7 +13,7 @@ forever {
 }
 ```
 
-This code is extremely similar to the code on the previous page.  The main difference is that the number that gets changed is used to describe the distance of an oval from the left of the screen.
+This code is extremely similar to the code on the previous page.  The main difference is that the number that gets changed is used to describe the distance of the center of an oval from the left of the screen.
 
 Again, if you're not sure how this code works, use the play controls at the top of the screen. Walk through the code step by step to see the sequence of events.
 

@@ -18,14 +18,14 @@ Try changing `"filled"` to `"unfilled"`.
 
 Try changing the numbers. They describe:
 
-1. How far to the right the oval is.
-2. How far down the oval is.
+1. How far from the top the oval is.
+2. How far from the left the oval is.
 3. How wide wide the oval is.
 4. How tall the oval is.
 
 Which one is which?
 
-Do the numbers that describe the position of the oval indicate the middle of the oval or the top left of the oval? To put the question another way, will this oval be half off the screen or fully visible?
+Do the numbers that describe the position of the oval indicate the middle of the oval or the top left of the oval? To put the question another way, will the oval described by the code below be half off the screen or fully visible?
 
 ```
 draw-oval(0 0 100 100 "filled" "pink")

@@ -140,28 +140,30 @@ var user = im.Map({
 
   "draw-oval": langUtil.setSideEffecting(function(meta, x, y, w, h, filledStr, color) {
     chk(arguments,
-        chk.num("the distance from the left of the screen"),
-        chk.num("the distance from the top of the screen"),
+        chk.num("the distance of the center of the oval from the left of the screen"),
+        chk.num("the distance of the center of the oval from the top of the screen"),
         chk.num("the width"),
         chk.num("the height"),
         chk.set(["filled", "unfilled"], 'either "filled" or "unfilled"'),
         chk.set(COLORS, "the color of the oval"));
 
     addOperation(makeOperation(function () {
+      var left = x - w / 2;
+      var top = y - h / 2;
       var kappa = 0.5522848;
       var ox = (w / 2) * kappa; // control point offset horizontal
       var oy = (h / 2) * kappa; // control point offset vertical
-      var xe = x + w;           // x-end
-      var ye = y + h;           // y-end
-      var xm = x + w / 2;       // x-middle
-      var ym = y + h / 2;       // y-middle
+      var xe = left + w;           // x-end
+      var ye = top + h;           // y-end
+      var xm = left + w / 2;       // x-middle
+      var ym = top + h / 2;       // y-middle
 
       screen.beginPath();
-      screen.moveTo(x, ym);
-      screen.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-      screen.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+      screen.moveTo(left, ym);
+      screen.bezierCurveTo(left, ym - oy, xm - ox, top, xm, top);
+      screen.bezierCurveTo(xm + ox, top, xe, ym - oy, xe, ym);
       screen.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-      screen.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+      screen.bezierCurveTo(xm - ox, ye, left, ym + oy, left, ym);
 
       if (filledStr === "unfilled") {
         screen.strokeStyle = color;
@@ -177,21 +179,23 @@ var user = im.Map({
 
   "draw-rectangle": langUtil.setSideEffecting(function(meta, x, y, width, height, filledStr, color) {
     chk(arguments,
-        chk.num("the distance from the left of the screen"),
-        chk.num("the distance from the top of the screen"),
+        chk.num("the distance of the center of the rectangle from the left of the screen"),
+        chk.num("the distance of the center of the rectangle from the top of the screen"),
         chk.num("the width"),
         chk.num("the height"),
         chk.set(["filled", "unfilled"], 'either "filled" or "unfilled"'),
         chk.set(COLORS, "the color of the rectangle"));
 
     addOperation(makeOperation(function () {
+      var left = x - width / 2;
+      var top = y - height / 2;
       if (filledStr === "unfilled") {
         screen.strokeStyle = color;
-        screen.strokeRect(x, y, width, height);
+        screen.strokeRect(left, top, width, height);
         screen.strokeStyle = "black";
       } else if (filledStr === "filled") {
         screen.fillStyle = color;
-        screen.fillRect(x, y, width, height);
+        screen.fillRect(left, top, width, height);
         screen.fillStyle = "black";
       }
     }, "draw-rectangle"));
