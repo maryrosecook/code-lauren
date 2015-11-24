@@ -33,10 +33,10 @@ describe("canvas library", function() {
   describe("draw-oval", function() {
     it("should report missing args", function() {
       expect(vm.complete(setupProgram('draw-oval()')).get("exception").message)
-        .toEqual("Needs the distance from the left of the screen");
+        .toEqual("Needs the distance of the center of the oval from the left of the screen");
 
       expect(vm.complete(setupProgram('draw-oval(10)')).get("exception").message)
-        .toEqual("Needs the distance from the top of the screen");
+        .toEqual("Needs the distance of the center of the oval from the top of the screen");
 
       expect(vm.complete(setupProgram('draw-oval(10 10)')).get("exception").message)
         .toEqual("Needs the width");
@@ -55,10 +55,10 @@ describe("canvas library", function() {
   describe("draw-rectangle", function() {
     it("should report missing args", function() {
       expect(vm.complete(setupProgram('draw-rectangle()')).get("exception").message)
-        .toEqual("Needs the distance from the left of the screen");
+        .toEqual("Needs the distance of the center of the rectangle from the left of the screen");
 
       expect(vm.complete(setupProgram('draw-rectangle(10)')).get("exception").message)
-        .toEqual("Needs the distance from the top of the screen");
+        .toEqual("Needs the distance of the center of the rectangle from the top of the screen");
 
       expect(vm.complete(setupProgram('draw-rectangle(10 10)')).get("exception").message)
         .toEqual("Needs the width");
