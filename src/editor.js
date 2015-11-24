@@ -15,7 +15,9 @@ var createEditor = module.exports = function() {
     autofocus: true,
     scrollbarStyle: "simple",
     extraKeys: {
-      Tab: function(cm) { cm.execCommand("insertSoftTab"); }
+      Tab: function(cm) { cm.execCommand("insertSoftTab"); },
+      "Ctrl-/": function(cm) { cm.undo(); },
+      "Shift-Ctrl-/": function(cm) { cm.redo(); }
     }
   });
 
