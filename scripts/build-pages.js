@@ -146,7 +146,7 @@ buildPages();
 
 // rebuild pages when something in on change
 fs.watch(__dirname + "/../pages", function (event, filename) {
-  if (filename.match(/\.md$/)) {
+  if (event == "change" && filename.match(/\.md$/)) {
     buildPages();
   }
 });
