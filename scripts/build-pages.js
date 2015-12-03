@@ -7,25 +7,84 @@ var PAGES_PATH = __dirname + "/../pages";
 
 function buildPages() {
   try {
-    var pages = fs.readdirSync(PAGES_PATH)
-        .filter(function(n) { return n.match(/\.md$/); })
-        .map(function(n) { return path.join(PAGES_PATH, n); })
-        .map(function(filePath) {
-          return {
-            slug: filePath.match(/^.+\/([A-Za-z0-9-]+)\.md$/)[1],
-            html: marked(makeLinksOnClick(fs.readFileSync(filePath, "utf8"))),
-            string: fs.readFileSync(filePath, "utf8")
-          };
-        }).reduce(function(a, o) {
-          a[o.slug] = { string: o.string, html: o.html, slug: o.slug };
-          return a
-        }, {});
+    checkPageLinks(readPagesWithPaths());
+
+    var pages = readPagesWithPaths()
+      .map(function(pageWithPath) {
+        return {
+          slug: pathToSlug(pageWithPath.path),
+          html: marked(makeLinksOnClick(pageWithPath.page)),
+          string: pageWithPath.page
+        };
+      }).reduce(function(a, o) {
+        a[o.slug] = { string: o.string, html: o.html, slug: o.slug };
+        return a
+      }, {});
 
     fs.writeFileSync(path.join(PAGES_PATH, "/all-pages.js"),
                      "module.exports = " + JSON.stringify(pages));
     console.log("Rebuilt");
   } catch (e) {
     console.log("Rebuild failed:", e.message);
+  }
+};
+
+function pathToSlug(path) {
+  return path.match(/^.+\/([A-Za-z0-9-]+)\.md$/)[1];
+};
+
+function readPagesWithPaths() {
+  return fs
+    .readdirSync(PAGES_PATH)
+    .filter(function(n) { return n.match(/\.md$/); })
+    .map(function(n) { return path.join(PAGES_PATH, n); })
+    .map(function(filePath) {
+      return { path: filePath, page: fs.readFileSync(filePath, "utf8") };
+    });
+};
+
+// puts k/v pair into shallow copied o
+function assoc(o, k, v) {
+  var c = {};
+  for (var i in o) {
+    c[i] = o[i];
+  }
+
+  c[k] = v;
+  return c;
+};
+
+function checkPageLinks(pagesWithPaths) {
+  var existantSlugHash = _
+      .chain(pagesWithPaths)
+      .pluck("path")
+      .map(pathToSlug)
+      .reduce(function(a, x) {
+        a[x] = true;
+        return a;
+      }, {})
+      .value();
+
+  var brokenLinks = _
+      .chain(pagesWithPaths)
+      .map(function(pageWithPath) {
+        return assoc(pageWithPath, "pageSlug", pathToSlug(pageWithPath.path));
+      })
+      .map(function(pageWithPageSlug) {
+        return links(pageWithPageSlug.page)
+          .map(function(link) { return { pageSlug: pageWithPageSlug.pageSlug, link: link }; });
+      })
+      .flatten()
+      .filter(function(l) { return matchPageLink(l.link); })
+      .map(function(l) { return assoc(l, "linkSlug", matchPageLink(l.link)[1]); })
+      .filter(function(l) { return !(l.linkSlug in existantSlugHash); })
+      .value();
+
+  if (brokenLinks.length > 0) {
+    throw new Error("Broken link(s) to: \n" +
+                    brokenLinks
+                      .map(function(l) { return "  " + l.linkSlug + " in " + l.pageSlug })
+                      .join("\n"));
   }
 };
 
@@ -41,8 +100,21 @@ function matchIndices(regex, str) {
   return indices;
 };
 
+function linkIndices(page) {
+  return matchIndices("\\[[^\\]]+\\]\\(#[^)]+\\)", page);
+};
+
+function matchPageLink(link) {
+  return link.match(/\(#([^\)]+)\)$/);
+};
+
+function links(page) {
+  return linkIndices(page)
+    .map(function(range) { return page.slice(range[0], range[1]); });
+};
+
 function maybeMarkdownLinkToOnClick(link) {
-  var pageMatch = link.match(/\(#([^\)]+)\)$/);
+  var pageMatch = matchPageLink(link);
   if (pageMatch) {
     var page = pageMatch[1];
     var text = link.match(/^\[([^\]]+)\]/)[1];
@@ -55,19 +127,19 @@ function maybeMarkdownLinkToOnClick(link) {
 };
 
 function makeLinksOnClick(md) {
-  var linkIndices = matchIndices("\\[[^\\]]+\\]\\(#[^)]+\\)", md);
-  var links = linkIndices
-      .map(function(range) { return md.slice(range[0], range[1]); })
+  var linkTexts = links(md)
       .map(maybeMarkdownLinkToOnClick);
 
-  var allIndices = [[undefined, 0]].concat(linkIndices).concat([[md.length]]);
+  var allIndices = [[undefined, 0]]
+      .concat(linkIndices(md))
+      .concat([[md.length]]);
 
-  var nonLinks = [];
+  var nonLinkTexts = [];
   for (var i = 1; i < allIndices.length; i++) {
-    nonLinks.push(md.slice(allIndices[i - 1][1], allIndices[i][0]));
+    nonLinkTexts.push(md.slice(allIndices[i - 1][1], allIndices[i][0]));
   }
 
-  return _.compact(_.flatten(_.zip(nonLinks, links))).join("");
+  return _.compact(_.flatten(_.zip(nonLinkTexts, linkTexts))).join("");
 };
 
 buildPages();
