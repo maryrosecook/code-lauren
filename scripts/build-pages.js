@@ -33,6 +33,9 @@ function pathToSlug(path) {
   return path.match(/^.+\/([A-Za-z0-9-]+)\.md$/)[1];
 };
 
+function isFile(path) {
+  return fs.statSync(path).isFile();
+};
 function readPagesWithPaths() {
   return fs
     .readdirSync(PAGES_PATH)
