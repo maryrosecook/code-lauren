@@ -153,10 +153,6 @@ function isFile(path) {
   return fs.statSync(path).isFile();
 };
 
-function isDirectory(path) {
-  return fs.statSync(path).isDirectory();
-};
-
 function createPathPage(path, page) {
   return { path: path, page: page };
 };
@@ -241,20 +237,6 @@ function maybeMarkdownLinkToOnClick(link) {
   } else {
     return link;
   }
-};
-
-function readdirRecursiveSync(dir) {
-  var dirAbsolutePaths = fs
-      .readdirSync(dir)
-      .map(function(n) { return path.join(dir, n); });
-
-  var dirs = dirAbsolutePaths
-      .filter(function(p) { return fs.statSync(p).isDirectory(); });
-
-  var files = dirAbsolutePaths
-      .filter(function(p) { return fs.statSync(p).isFile(); });
-
-  return files.concat(_.flatten(dirs.map(readdirRecursiveSync)));
 };
 
 function makeLinksOnClick(md) {
