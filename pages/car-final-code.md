@@ -49,5 +49,3 @@ If you didn't get the car working - no worries.  Try using the player controls a
 [Learn more about how to use the player controls](#fixing-code-using-the-player-controls).
 
 If you stay stuck, please email [mary@maryrosecook.com](mailto:mary@maryrosecook.com) and I can help.
-
-### [← Previous](#offsetting-many-moving-shapes) <div class="next">[Home](#home)</div>

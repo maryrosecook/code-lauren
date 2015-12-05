@@ -5,45 +5,164 @@ var marked = require("marked");
 
 var PAGES_PATH = __dirname + "/../pages";
 
+var pageLinkRegex = /\(#([^\)]+)\)$/;
+
 function buildPages() {
   try {
-    checkPageLinks(readPagesWithPaths());
+    var allPaths = markdownPaths(PAGES_PATH);
 
-    var pages = readPagesWithPaths()
-      .map(function(pageWithPath) {
-        return {
-          slug: pathToSlug(pageWithPath.path),
-          html: marked(makeLinksOnClick(pageWithPath.page)),
-          string: pageWithPath.page
-        };
-      }).reduce(function(a, o) {
-        a[o.slug] = { string: o.string, html: o.html, slug: o.slug };
-        return a
+    var tutorialPagesWithPaths = _
+        .chain(tutorialIndices(allPaths))
+        .map(_.partial(tutorialPathPages, allPaths))
+        .flatten()
+        .value();
+
+    var rootPagesWithPaths = _
+        .difference(allPaths, _.pluck(tutorialPagesWithPaths, "path"))
+        .map(pathToPathPage);
+
+    var allPagesWithPaths = rootPagesWithPaths
+        .concat(tutorialPagesWithPaths);
+
+    checkPageLinks(allPagesWithPaths);
+
+    var pages = allPagesWithPaths
+        .map(function(pageWithPath) {
+          return helpPage(pageWithPath.path,
+                          marked(makeLinksOnClick(pageWithPath.page)),
+                          pageWithPath.page);
+        })
+        .reduce(function(a, o) {
+          if (o.slug in a) {
+            throw new Error("Duplicated slug: " + o.slug);
+          }
+
+          a[o.slug] = { string: o.string, html: o.html, slug: o.slug };
+          return a
       }, {});
 
     fs.writeFileSync(path.join(PAGES_PATH, "/all-pages.js"),
                      "module.exports = " + JSON.stringify(pages));
     console.log("Rebuilt");
   } catch (e) {
+    console.log(e.stack)
     console.log("Rebuild failed:", e.message);
   }
 };
 
-function pathToSlug(path) {
-  return path.match(/^.+\/([A-Za-z0-9-]+)\.md$/)[1];
+function tutorialPathPages(allPages, indexPath) {
+  function slugToPath(slug) {
+    return contentPaths.filter(match(slug + "\.md$"))[0];
+  };
+
+  var toc = indexSlugs(indexPath);
+  var prefix = tutorialPrefix(indexPath);
+  var contentPaths = _.difference(allPages.filter(match("\/" + prefix + "[^\/]+\.md$")),
+                                  [indexPath]);
+
+  var navLinkPairs = [[pathToSlug(indexPath), toc[1]]];
+  for (var i = 1; i < toc.length - 1; i++) {
+    navLinkPairs.push([toc[i - 1], toc[i + 1]]);
+  }
+
+  navLinkPairs.push([toc[toc.length - 2], undefined]);
+  if (navLinkPairs.length !== contentPaths.length) {
+    throw new Error("Index doesn't match pages in " + tutorialDir + " tutorial.");
+  }
+
+  return toc
+    .map(slugToPath)
+    .map(function(p, i) {
+      var previous = navLinkPairs[i][0];
+      var next = navLinkPairs[i][1];
+      var nextPageTitle = next ?
+          pageTitle(fs.readFileSync(slugToPath(next), "utf8")) :
+          undefined;
+      var markdownWithNav = addTutorialNavigation(fs.readFileSync(p, "utf8"),
+                                                  previous,
+                                                  next,
+                                                  nextPageTitle);
+      return createPathPage(p, markdownWithNav);
+    })
+    .concat(createPathPage(indexPath, fs.readFileSync(indexPath, "utf8")));
+};
+
+function addTutorialNavigation(markdown, previousSlug, nextSlug, nextTitle) {
+  markdown += "\n ### ";
+
+  if (previousSlug) {
+    markdown += '[← Previous](#' + previousSlug + ') ';
+  }
+
+  if (nextSlug) {
+    markdown += '<div class="next">[' + nextTitle + ' →](#' + nextSlug + ')</div>';
+  }
+
+  return markdown;
+};
+
+function pageTitle(markdown) {
+  return markdown.match(/## (.+)/)[1];
+};
+
+function match(regex) {
+  return function(str) {
+    return str.match(regex);
+  };
+};
+
+function indexSlugs(indexPath) {
+  return fs
+    .readFileSync(indexPath, "utf8")
+    .match(/\n\n(1[\s\S]+)\n$/m)[1] // [\s\S] (class and opposite) mimics . that includes \n
+    .split("\n")
+    .map(function(line) { return line.replace("1. ", ""); })
+    .map(function(line) { return line.match(pageLinkRegex)[1]; });
+};
+
+function tutorialPrefix(indexPath) {
+  return indexPath.match(/\/([^\/]+-)index\.md$/)[1];
+};
+
+function tutorialIndices(allPaths) {
+  return allPaths
+    .filter(match(/index\.md$/));
+};
+
+function helpPage(path, html, page) {
+  return { slug: pathToSlug(path), html: html, string: page };
+};
+
+function markdownPaths(p) {
+  return fs
+    .readdirSync(p)
+    .map(function(n) { return path.join(p, n); })
+    .filter(isFile)
+    .filter(isMarkdown)
+};
+
+function pathToSlug(p) {
+  return p.match(/^.+\/([A-Za-z0-9-]+)\.md$/)[1];
+};
+
+function isMarkdown(path) {
+  return path.match(/\.md$/);
 };
 
 function isFile(path) {
   return fs.statSync(path).isFile();
 };
-function readPagesWithPaths() {
-  return fs
-    .readdirSync(PAGES_PATH)
-    .filter(function(n) { return n.match(/\.md$/); })
-    .map(function(n) { return path.join(PAGES_PATH, n); })
-    .map(function(filePath) {
-      return { path: filePath, page: fs.readFileSync(filePath, "utf8") };
-    });
+
+function isDirectory(path) {
+  return fs.statSync(path).isDirectory();
+};
+
+function createPathPage(path, page) {
+  return { path: path, page: page };
+};
+
+function pathToPathPage(filePath) {
+  return createPathPage(filePath, fs.readFileSync(filePath, "utf8"));
 };
 
 // puts k/v pair into shallow copied o
@@ -78,8 +197,8 @@ function checkPageLinks(pagesWithPaths) {
           .map(function(link) { return { pageSlug: pageWithPageSlug.pageSlug, link: link }; });
       })
       .flatten()
-      .filter(function(l) { return matchPageLink(l.link); })
-      .map(function(l) { return assoc(l, "linkSlug", matchPageLink(l.link)[1]); })
+      .filter(function(l) { return l.link.match(pageLinkRegex); })
+      .map(function(l) { return assoc(l, "linkSlug", l.link.match(pageLinkRegex)[1]); })
       .filter(function(l) { return !(l.linkSlug in existantSlugHash); })
       .value();
 
@@ -107,19 +226,14 @@ function linkIndices(page) {
   return matchIndices("\\[[^\\]]+\\]\\(#[^)]+\\)", page);
 };
 
-function matchPageLink(link) {
-  return link.match(/\(#([^\)]+)\)$/);
-};
-
 function links(page) {
   return linkIndices(page)
     .map(function(range) { return page.slice(range[0], range[1]); });
 };
 
 function maybeMarkdownLinkToOnClick(link) {
-  var pageMatch = matchPageLink(link);
-  if (pageMatch) {
-    var page = pageMatch[1];
+  if (link.match(pageLinkRegex)) {
+    var page = link.match(pageLinkRegex)[1];
     var text = link.match(/^\[([^\]]+)\]/)[1];
     return ['<a href="#" onclick="pub.loadHelpPage(event, \'', page, '\');">',
             text,
@@ -127,6 +241,20 @@ function maybeMarkdownLinkToOnClick(link) {
   } else {
     return link;
   }
+};
+
+function readdirRecursiveSync(dir) {
+  var dirAbsolutePaths = fs
+      .readdirSync(dir)
+      .map(function(n) { return path.join(dir, n); });
+
+  var dirs = dirAbsolutePaths
+      .filter(function(p) { return fs.statSync(p).isDirectory(); });
+
+  var files = dirAbsolutePaths
+      .filter(function(p) { return fs.statSync(p).isFile(); });
+
+  return files.concat(_.flatten(dirs.map(readdirRecursiveSync)));
 };
 
 function makeLinksOnClick(md) {
