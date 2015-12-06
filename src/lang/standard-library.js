@@ -37,6 +37,12 @@ var createStandardLibrary = module.exports = function () {
       return parseFloat(a) / parseFloat(b);
     },
 
+    positive: function(meta, a) {
+      chk(arguments,
+          chk.num("a number make positive"));
+
+      return Math.abs(parseFloat(a));
+    },
     modulus: function(meta, a, b) {
       chk(arguments,
           chk.num("a number to divide"),
