@@ -43,6 +43,24 @@ var createStandardLibrary = module.exports = function () {
 
       return Math.abs(parseFloat(a));
     },
+
+    distance: function(meta, x1, y1, x2, y2) {
+      chk(arguments,
+          chk.num("a distance from the left for the first point"),
+          chk.num("a distance from the top for the first point"),
+          chk.num("a distance from the left for the second point"),
+          chk.num("a distance from the top for the second point"));
+
+      x1 = parseFloat(x1);
+      y1 = parseFloat(y1);
+      x2 = parseFloat(x2);
+      y2 = parseFloat(y2);
+
+      var x = Math.abs(x1 - x2);
+      var y = Math.abs(y1 - y2);
+      return Math.sqrt((x * x) + (y * y));
+    },
+
     modulus: function(meta, a, b) {
       chk(arguments,
           chk.num("a number to divide"),
