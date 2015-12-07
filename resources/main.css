@@ -45,7 +45,7 @@ video {
 .program-player {
   position: absolute;
   top: 0;
-  left: 206px;
+  left: 188px;
   z-index: 2;
 }
 
@@ -193,7 +193,7 @@ video {
 .topbar .left-navigation {
   position: absolute;
   top: 0;
-  left: 350px;
+  left: 336px;
   padding-top: 7px;
 }
 
