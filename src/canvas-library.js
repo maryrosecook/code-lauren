@@ -199,7 +199,11 @@ var user = im.Map({
         screen.fillStyle = "black";
       }
     }, "draw-rectangle"));
-  })
+  }),
+
+  "random-color": function() {
+    return COLORS[Math.floor(Math.random() * (COLORS.length - 1))];
+  },
 });
 
 var api = {
