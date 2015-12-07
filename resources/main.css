@@ -28,7 +28,7 @@ video {
 .CodeMirror {
   margin-top: 33px;
   font-family: "courier";
-  font-size: 15px;
+  font-size: 13px;
   width: calc(100% - 450px);
   height: calc(100vh - 33px);
   z-index: 1;
@@ -79,7 +79,7 @@ video {
   height: 22px;
   border: 1px solid black;
   font-family: "Gill Sans W02 Light";
-  font-size: 17px;
+  font-size: 16px;
   padding-left: 5px;
   vertical-align: top;
   width: 292px;
@@ -133,7 +133,7 @@ video {
 }
 
 #sidebar {
-  font-size: 17px;
+  font-size: 16px;
   position: fixed;
   right: 0;
   width: 450px;
@@ -177,6 +177,8 @@ video {
 }
 
 .topbar {
+  font-family: "Gill Sans W02 Light";
+  font-size: 16px;
   position: fixed;
   top: 0;
   left: 0;
@@ -188,23 +190,18 @@ video {
   background-color: white;
 }
 
-.topbar {
-  font-family: "Gill Sans W02 Light";
-  font-size: 17px;
-}
-
 .topbar .left-navigation {
   position: absolute;
   top: 0;
   left: 350px;
-  padding-top: 6px;
+  padding-top: 7px;
 }
 
 .topbar .right-navigation {
   position: absolute;
   top: 0;
   right: 9px;
-  padding-top: 6px;
+  padding-top: 7px;
 }
 
 #program-link {
@@ -213,8 +210,8 @@ video {
 
 h1 {
   font-family: "Gill Sans W02 Light";
-  font-size: 30px;
-  margin: -4px 0 0 0;
+  font-size: 27px;
+  margin: -2px 0 0 0;
   color: white;
   width: 210px;
   font-weight: normal;
@@ -222,7 +219,7 @@ h1 {
 
 #sidebar h2 {
   font-family: "Gill Sans W02 Book";
-  font-size: 24px;
+  font-size: 21px;
 
   /* to give nice space at top of content. When content loaded,
      padding on .sidebar and margin on this h2 is auto-scrolled past for
@@ -234,7 +231,7 @@ h1 {
 }
 
 #sidebar h3 {
-  font-size: 20px;
+  font-size: 18px;
   margin-top: 0;
   margin-bottom: 0.55em;
   font-weight: normal;
@@ -242,7 +239,7 @@ h1 {
 }
 
 #sidebar h4 {
-  font-size: 18px;
+  font-size: 16px;
   margin-top: 0;
   margin-bottom: 0.55em;
   font-weight: normal;
@@ -426,7 +423,7 @@ button:focus {
 
 #line-messages {
   font-family: "courier";
-  font-size: 15px;
+  font-size: 13px;
   position: absolute;
   top: 33px;
   right: 461px; /* leave a bit of extra room for editor scrollbar if showing */
@@ -485,7 +482,7 @@ pre code {
 code {
   background-color: #e7e7e7;
   font-family: "courier";
-  font-size: 14px;
+  font-size: 13px;
   color: #333;
 }
 
