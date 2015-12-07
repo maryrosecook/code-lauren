@@ -204,6 +204,23 @@ var user = im.Map({
   "random-color": function() {
     return COLORS[Math.floor(Math.random() * (COLORS.length - 1))];
   },
+
+  "rectangles-overlapping": function(meta, x1, y1, w1, h1, x2, y2, w2, h2) {
+    chk(arguments,
+        chk.num("the distance of the center of the first rectangle from left of the screen"),
+        chk.num("the distance of the center of the first rectangle from top of the screen"),
+        chk.num("the width of the first rectangle"),
+        chk.num("the height of the first rectangle"),
+        chk.num("the distance of the center of the second rectangle from left of the screen"),
+        chk.num("the distance of the center of the second rectangle from top of the screen"),
+        chk.num("the width of the second rectangle"),
+        chk.num("the height of the second rectangle"));
+
+    return !(x1 + w1 / 2 < x2 - w2 / 2 ||
+             y1 + h1 / 2 < y2 - h2 / 2 ||
+             x1 - w1 / 2 > x2 + w2 / 2 ||
+             y1 - h1 / 2 > y2 + h2 / 2);
+  },
 });
 
 var api = {
