@@ -1,3 +1,5 @@
+var _ = require("underscore");
+
 var parse = require("../src/lang/parser");
 var compile = require("../src/lang/compiler");
 var vm = require("../src/lang/vm");
@@ -74,4 +76,61 @@ describe("canvas library", function() {
         .toEqual("Needs the color of the rectangle");
     });
   });
+
+  describe("rectangle-overlapping-rectangle", function() {
+    it("should report missing args", function() {
+      expect(vm.complete(setupProgram('rectangle-overlapping-rectangle()'))
+             .get("exception").message)
+        .toEqual("Needs the distance of the center of the first rectangle from left of the screen");
+
+      expect(vm.complete(setupProgram('rectangle-overlapping-rectangle(1)'))
+             .get("exception").message)
+        .toEqual("Needs the distance of the center of the first rectangle from top of the screen");
+
+      expect(vm.complete(setupProgram('rectangle-overlapping-rectangle(1 1)'))
+             .get("exception").message)
+        .toEqual("Needs the width of the first rectangle");
+
+      expect(vm.complete(setupProgram('rectangle-overlapping-rectangle(1 1 1)'))
+             .get("exception").message)
+        .toEqual("Needs the height of the first rectangle");
+
+      expect(vm.complete(setupProgram('rectangle-overlapping-rectangle(1 1 1 1)'))
+             .get("exception").message)
+        .toEqual("Needs the distance of the center of the second rectangle from left of the screen");
+
+      expect(vm.complete(setupProgram('rectangle-overlapping-rectangle(1 1 1 1 1)'))
+             .get("exception").message)
+        .toEqual("Needs the distance of the center of the second rectangle from top of the screen");
+
+      expect(vm.complete(setupProgram('rectangle-overlapping-rectangle(1 1 1 1 1 1)'))
+             .get("exception").message)
+        .toEqual("Needs the width of the second rectangle");
+
+      expect(vm.complete(setupProgram('rectangle-overlapping-rectangle(1 1 1 1 1 1 1)'))
+             .get("exception").message)
+        .toEqual("Needs the height of the second rectangle");
+    });
+
+    it("should return true when two rectangles overlapping", function() {
+      expect(vm.complete(setupProgram('rectangle-overlapping-rectangle(11 12 2 4 14 15 4 2)'))
+             .get("stack").get(-1).v)
+        .toEqual(true);
+    });
+
+    it("should return true when two rectangles not overlapping", function() {
+      expect(vm.complete(setupProgram('rectangle-overlapping-rectangle(11 12 2 4 15 15 4 2)'))
+             .get("stack").get(-1).v)
+        .toEqual(false);
+    });
+  });
+
+  describe("random-color", function() {
+    it("should return a random color", function() {
+      var color = vm.complete(setupProgram('random-color()')).get("stack").get(-1).v;
+      expect(_.isString(color)).toEqual(true);
+      expect(color.length > 3).toEqual(true);
+    });
+  });
+
 });
