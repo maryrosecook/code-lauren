@@ -6,7 +6,7 @@ In this tutorial, you'll write some code that rolls a ball across the screen.  S
 1. [Draw lots of ovals](#first-draw-lots-of-ovals)
 1. [Draw a rectangle](#first-draw-a-rectangle)
 1. [Naming things](#first-naming-things)
-1. [Write text](#first-write-text)
+1. [Writing text](#first-writing-text)
 1. [Adding numbers](#first-adding-numbers)
 1. [Naming the result of an action](#first-naming-the-result-of-an-action)
 1. [Reusing a name](#first-reusing-a-name)

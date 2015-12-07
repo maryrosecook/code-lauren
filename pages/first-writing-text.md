@@ -1,4 +1,4 @@
-## Write text
+## Writing text
 
 You can write text on the screen with the `write` action.  Delete all the code on the left. Type in this code:
 
