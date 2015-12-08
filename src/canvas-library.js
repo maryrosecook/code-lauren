@@ -205,7 +205,7 @@ var user = im.Map({
     return COLORS[Math.floor(Math.random() * (COLORS.length - 1))];
   },
 
-  "rectangles-overlapping": function(meta, x1, y1, w1, h1, x2, y2, w2, h2) {
+  "rectangle-overlapping-rectangle": function(meta, x1, y1, w1, h1, x2, y2, w2, h2) {
     chk(arguments,
         chk.num("the distance of the center of the first rectangle from left of the screen"),
         chk.num("the distance of the center of the first rectangle from top of the screen"),
