@@ -61,6 +61,13 @@ var createStandardLibrary = module.exports = function () {
       return Math.sqrt((x * x) + (y * y));
     },
 
+    "square-root": function(meta, n) {
+      chk(arguments,
+          chk.num("a number to get the square root of"));
+
+      return Math.sqrt(n);
+    },
+
     modulus: function(meta, a, b) {
       chk(arguments,
           chk.num("a number to divide"),

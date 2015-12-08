@@ -339,4 +339,17 @@ describe("library", function() {
       expect(randomNumber < 0.9999999).toEqual(true);
     });
   });
+
+  describe("square-root", function() {
+    it("should be able to get square root of number", function() {
+      var code = "square-root(4)"
+      expect(v(code, c(p(code))).getIn(["stack", -1]).v).toEqual(2);
+    });
+
+    it("should throw if missing arg", function() {
+      var code = "square-root()";
+      expect(v(code, c(p(code))).get("exception").message)
+        .toEqual("Needs a number to get the square root of");
+    });
+  });
 });
