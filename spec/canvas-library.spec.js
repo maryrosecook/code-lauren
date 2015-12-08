@@ -132,5 +132,4 @@ describe("canvas library", function() {
       expect(color.length > 3).toEqual(true);
     });
   });
-
 });
