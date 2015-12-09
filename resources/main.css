@@ -546,7 +546,7 @@ td code {
     display: block !important;
     position: absolute;
     top: 33px;
-    padding: 5px;
+    padding: 5px 6px;
   }
 
   /* hide the editor stuff */
