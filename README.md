@@ -2,7 +2,7 @@
 
 Game programming for beginners.
 
-See it live [here](http://codelauren.com).
+See it live at [codelauren.com](http://codelauren.com)
 
 ## Contact
 
