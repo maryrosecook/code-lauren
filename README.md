@@ -2,7 +2,7 @@
 
 A programming environment for beginners.
 
-See it live [here](http://lauren.maryrosecook.com/).
+See it live [here](http://codelauren.com).
 
 ## Contact
 
