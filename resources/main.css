@@ -529,7 +529,7 @@ td code {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
-    padding-bottom: 3px; /* fix for iOS */
+    padding: 5px 0;
   }
 
   h2 {
@@ -540,13 +540,14 @@ td code {
 
   .topbar {
     position: relative;
+    height: 35px;
   }
 
   #mobile-description {
     display: block !important;
     position: absolute;
-    top: 33px;
-    padding: 5px 6px;
+    top: 41px;
+    padding: 10px;
   }
 
   /* hide the editor stuff */
