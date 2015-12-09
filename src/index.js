@@ -3,6 +3,10 @@ var _ = require("underscore");
 var $ = require("jquery");
 var React = require('react');
 
+// require images and videos so they will get copied to build dir
+require.context("../resources/images/help", true);
+require.context("../resources/videos", true);
+
 // require css
 require("../resources/jquery.jscrollpane.css");
 require("../resources/simplescrollbars.css");

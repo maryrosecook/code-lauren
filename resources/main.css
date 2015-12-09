@@ -267,19 +267,19 @@ h1 {
 }
 
 .rewind-button {
-  background: url(/resources/images/rewind.png);
+  background: url(../resources/images/rewind.png);
   background-size: 36px 33px;
   width: 36px;
   height: 33px;
 }
 
 .rewind-button:hover {
-  background: url(/resources/images/rewind-hover.png);
+  background: url(../resources/images/rewind-hover.png);
   background-size: 35.5px 33px;
 }
 
 .rewind-button.disabled, .rewind-button.disabled:active {
-  background: url(/resources/images/rewind-disabled.png);
+  background: url(../resources/images/rewind-disabled.png);
   background-size: 35.5px 33px;
   width: 35.5px;
   height: 33px;
@@ -287,14 +287,14 @@ h1 {
 }
 
 .rewind-button:active {
-  background: url(/resources/images/rewind-active.png);
+  background: url(../resources/images/rewind-active.png);
   background-size: 35.5px 33px;
   width: 35.5px;
   height: 33px;
 }
 
 .play-button {
-  background: url(/resources/images/play.png);
+  background: url(../resources/images/play.png);
   background-size: 16.5px 33px;
   width: 16px;
   margin: 0 10px 0 6px; /* push play right and pull stepforward left to make play look correct */
@@ -302,36 +302,36 @@ h1 {
 }
 
 .play-button:hover {
-  background: url(/resources/images/play-hover.png);
+  background: url(../resources/images/play-hover.png);
   background-size: 16px 33px;
 }
 
 .pause-button {
-  background: url(/resources/images/pause.png);
+  background: url(../resources/images/pause.png);
   background-size: 16px 33px;
   width: 16px;
   height: 33px;
 }
 
 .pause-button:hover {
-  background: url(/resources/images/pause-hover.png);
+  background: url(../resources/images/pause-hover.png);
   background-size: 16px 33px;
 }
 
 .step-forwards-button {
-  background: url(/resources/images/step-forwards.png);
+  background: url(../resources/images/step-forwards.png);
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
 }
 
 .step-forwards-button:hover {
-  background: url(/resources/images/step-forwards-hover.png);
+  background: url(../resources/images/step-forwards-hover.png);
   background-size: 20px 33px;
 }
 
 .step-forwards-button.disabled, .step-forwards-button.disabled:active {
-  background: url(/resources/images/step-forwards-disabled.png);
+  background: url(../resources/images/step-forwards-disabled.png);
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
@@ -339,26 +339,26 @@ h1 {
 }
 
 .step-forwards-button:active {
-  background: url(/resources/images/step-forwards-active.png);
+  background: url(../resources/images/step-forwards-active.png);
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
 }
 
 .step-backwards-button {
-  background: url(/resources/images/step-backwards.png);
+  background: url(../resources/images/step-backwards.png);
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
 }
 
 .step-backwards-button:hover {
-  background: url(/resources/images/step-backwards-hover.png);
+  background: url(../resources/images/step-backwards-hover.png);
   background-size: 20px 33px;
 }
 
 .step-backwards-button.disabled, .step-backwards-button.disabled:active {
-  background: url(/resources/images/step-backwards-disabled.png);
+  background: url(../resources/images/step-backwards-disabled.png);
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
@@ -366,14 +366,14 @@ h1 {
 }
 
 .step-backwards-button:active {
-  background: url(/resources/images/step-backwards-active.png);
+  background: url(../resources/images/step-backwards-active.png);
   background-size: 20px 33px;
   width: 20px;
   height: 33px;
 }
 
 .example-play-button {
-  background: url(/resources/images/play-bow.png);
+  background: url(../resources/images/play-bow.png);
   background-size: 9px 11px;
   width: 9px;
   height: 11px;
@@ -381,7 +381,7 @@ h1 {
 }
 
 .example-pause-button {
-  background: url(/resources/images/pause-bow.png);
+  background: url(../resources/images/pause-bow.png);
   background-size: 8px 11px;
   width: 8px;
   height: 11px;
@@ -389,7 +389,7 @@ h1 {
 }
 
 .example-step-forwards-button {
-  background: url(/resources/images/step-forwards-bow.png);
+  background: url(../resources/images/step-forwards-bow.png);
   background-size: 11px 11px;
   width: 11px;
   height: 11px;
@@ -397,7 +397,7 @@ h1 {
 }
 
 .example-step-backwards-button {
-  background: url(/resources/images/step-backwards-bow.png);
+  background: url(../resources/images/step-backwards-bow.png);
   background-size: 11px 11px;
   width: 11px;
   height: 11px;
@@ -405,7 +405,7 @@ h1 {
 }
 
 .example-rewind-button {
-  background: url(/resources/images/rewind-bow.png);
+  background: url(../resources/images/rewind-bow.png);
   background-size: 21px 11px;
   width: 21px;
   height: 11px;
