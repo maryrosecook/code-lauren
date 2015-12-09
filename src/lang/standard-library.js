@@ -152,10 +152,17 @@ var createStandardLibrary = module.exports = function () {
       }
     },
 
-    "random-number": function() {
-      // TODO: should produce the same stream of numbers for a single program
-
-      return Math.random();
+    "random-number": function(meta, a, b) {
+      chk(arguments,
+          chk.num("a lowest possible random number"),
+          [chk.num("a highest possible random number"),
+           chk.range(a,
+                     undefined,
+                     "the highest possible random number.  Should be equal to or higher than " +
+                       a +
+                       ", the lowest possible number you gave.")]);
+      console.log(Math.floor(Math.random() * (b - a)) + a)
+      return Math.round(Math.random() * (b - a)) + a;
     },
 
     set: function(meta, dict, key, value) {

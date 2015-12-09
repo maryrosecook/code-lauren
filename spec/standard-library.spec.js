@@ -331,12 +331,46 @@ describe("library", function() {
     });
   });
 
-  describe("random", function() {
-    it("should return a number between 0 and 1", function() {
-      var code = "random-number()"
+  describe("random-number", function() {
+    it("should return 0 for 0, 0", function() {
+      var code = "random-number(0 0)"
       var randomNumber = v(code, c(p(code))).getIn(["stack", -1]).v;
-      expect(randomNumber > 0).toEqual(true);
-      expect(randomNumber < 0.9999999).toEqual(true);
+      expect(randomNumber).toEqual(0);
+    });
+
+    it("should return number between 0 and 400", function() {
+      var code = "random-number(0 400)"
+      var randomNumber = v(code, c(p(code))).getIn(["stack", -1]).v;
+      expect(randomNumber >= 0).toEqual(true);
+      expect(randomNumber <= 400).toEqual(true);
+    });
+
+    it("should throw if missing lowest num", function() {
+      var code = "random-number()";
+      expect(v(code, c(p(code))).get("exception").message)
+        .toEqual("Needs a lowest possible random number");
+    });
+
+    it("should throw if missing highest num", function() {
+      var code = "random-number(0)";
+      expect(v(code, c(p(code))).get("exception").message)
+        .toEqual("Needs a highest possible random number");
+    });
+
+    it("should throw if highest num arg is lower than lowest num arg", function() {
+      var code = "random-number(10 8)";
+      expect(v(code, c(p(code))).get("exception").message)
+        .toEqual("Should be the highest possible random number.  Should be equal to or higher than 10, the lowest possible number you gave.");
+    });
+
+    it("should use 0 when passed", function() {
+      // Regression.  Old chk.range() code did low = low ||
+      // Number.MIN_SAFE_INTEGER which means 0, being falsy, got
+      // replaced with min safe integer.
+
+      var code = "random-number(0 0)"
+      var randomNumber = v(code, c(p(code))).getIn(["stack", -1]).v;
+      expect(randomNumber).toEqual(0);
     });
   });
 
