@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "node --harmony node_modules/jasmine-node/lib/jasmine-node/cli.js --color spec/",
-    "build": "webpack -p --progress --colors",
+    "build-for-deploy": "webpack -p --progress --colors",
     "watch": "webpack --progress --colors --watch",
     "start": "live-server build --port=4000 --no-browser --host=localhost",
     "build-pages": "node scripts/build-pages.js"
