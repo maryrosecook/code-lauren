@@ -1,6 +1,6 @@
 # Lauren
 
-A programming environment for beginners.
+Game programming for beginners.
 
 See it live [here](http://codelauren.com).
 
