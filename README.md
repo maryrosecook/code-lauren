@@ -25,4 +25,9 @@ In a terminal:
 In another terminal:
 
     $ cd path/to/project/root
+    $ npm run build-pages
+
+In another terminal:
+
+    $ cd path/to/project/root
     $ npm run start
