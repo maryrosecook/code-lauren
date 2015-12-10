@@ -202,7 +202,8 @@ var user = im.Map({
   }),
 
   "random-color": function() {
-    return COLORS[Math.floor(Math.random() * (COLORS.length - 1))];
+    var colorsWithoutWhite = COLORS.filter(function(c) { return c !== "white"; });
+    return colorsWithoutWhite[Math.floor(Math.random() * (colorsWithoutWhite.length - 1))];
   },
 
   "rectangle-overlapping-rectangle": function(meta, x1, y1, w1, h1, x2, y2, w2, h2) {
