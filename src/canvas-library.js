@@ -371,5 +371,6 @@ var COLORS = [
   "turquoise",
   "violet",
   "yellow",
-  "yellowgreen"
+  "yellowgreen",
+  "white"
 ];
