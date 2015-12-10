@@ -326,7 +326,6 @@ var COLORS = [
   "mediumturquoise",
   "mediumvioletred",
   "midnightblue",
-  "mintcream",
   "mistyrose",
   "moccasin",
   "navy",
