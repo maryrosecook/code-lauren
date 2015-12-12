@@ -128,7 +128,7 @@ var user = im.Map({
         chk.any("something to write to the screen"),
         chk.num("the distance from the left of the screen"),
         chk.num("the distance from the top of the screen"),
-        chk.set(COLORS, "the color of the text"));
+        chk.set(COLORS_WITH_GRAYSCALE, "the color of the text"));
 
     addOperation(makeOperation(function () {
       screen.font = "20px Georgia";
@@ -145,7 +145,7 @@ var user = im.Map({
         chk.num("the width"),
         chk.num("the height"),
         chk.set(["filled", "unfilled"], 'either "filled" or "unfilled"'),
-        chk.set(COLORS, "the color of the oval"));
+        chk.set(COLORS_WITH_GRAYSCALE, "the color of the oval"));
 
     addOperation(makeOperation(function () {
       var left = x - w / 2;
@@ -184,7 +184,7 @@ var user = im.Map({
         chk.num("the width"),
         chk.num("the height"),
         chk.set(["filled", "unfilled"], 'either "filled" or "unfilled"'),
-        chk.set(COLORS, "the color of the rectangle"));
+        chk.set(COLORS_WITH_GRAYSCALE, "the color of the rectangle"));
 
     addOperation(makeOperation(function () {
       var left = x - width / 2;
@@ -202,8 +202,9 @@ var user = im.Map({
   }),
 
   "random-color": function() {
-    var colorsWithoutWhite = COLORS.filter(function(c) { return c !== "white"; });
-    return colorsWithoutWhite[Math.floor(Math.random() * (colorsWithoutWhite.length - 1))];
+    return COLORS_WITHOUT_GRAYSCALE[
+      Math.floor(Math.random() * (COLORS_WITHOUT_GRAYSCALE.length - 1))
+    ];
   },
 
   "rectangle-overlapping-rectangle": function(meta, x1, y1, w1, h1, x2, y2, w2, h2) {
@@ -242,7 +243,7 @@ function set(legalValues) {
   });
 };
 
-var COLORS = [
+var COLORS_WITH_GRAYSCALE = [
   "aliceblue",
   "aqua",
   "aquamarine",
@@ -266,7 +267,6 @@ var COLORS = [
   "darkblue",
   "darkcyan",
   "darkgoldenrod",
-  "darkgray",
   "darkgreen",
   "darkkhaki",
   "darkmagenta",
@@ -277,12 +277,10 @@ var COLORS = [
   "darksalmon",
   "darkseagreen",
   "darkslateblue",
-  "darkslategray",
   "darkturquoise",
   "darkviolet",
   "deeppink",
   "deepskyblue",
-  "dimgray",
   "dodgerblue",
   "firebrick",
   "forestgreen",
@@ -290,7 +288,6 @@ var COLORS = [
   "gainsboro",
   "gold",
   "goldenrod",
-  "gray",
   "green",
   "greenyellow",
   "honeydew",
@@ -360,8 +357,6 @@ var COLORS = [
   "silver",
   "skyblue",
   "slateblue",
-  "slategray",
-  "snow",
   "springgreen",
   "steelblue",
   "tan",
@@ -374,3 +369,7 @@ var COLORS = [
   "yellowgreen",
   "white"
 ];
+
+var COLORS_GREYSCALE = ["white", "black", "gray"];
+
+var COLORS_WITHOUT_GRAYSCALE = _.difference(COLORS_WITH_GRAYSCALE, COLORS_GREYSCALE);
