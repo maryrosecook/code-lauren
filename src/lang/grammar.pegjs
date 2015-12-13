@@ -155,7 +155,7 @@ number
 
 
 string
-  = '"' all:[A-Za-z0-9.,# ]* '"'
+  = '"' all:[A-Za-z0-9.,# \-]* '"'
     { return node('string', all.join(""), offset(), text()); }
 
 boolean
