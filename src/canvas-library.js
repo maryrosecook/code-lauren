@@ -1,6 +1,7 @@
 var _ = require("underscore");
 var im = require("immutable");
 
+var util = require("./util");
 var langUtil = require("./lang/lang-util");
 var chk = require("./lang/check-args");
 
