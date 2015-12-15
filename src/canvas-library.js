@@ -220,7 +220,7 @@ var drawFns = {
 
   circle: function(o) {
     screen.beginPath();
-    screen.arc(o.get("x"), o.get("y"), o.get("width"), 0, 2 * Math.PI);
+    screen.arc(o.get("x"), o.get("y"), o.get("width") / 2, 0, 2 * Math.PI);
     screen.closePath()
 
     if (o.get("filled") === true) {
