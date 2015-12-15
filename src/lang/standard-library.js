@@ -44,23 +44,6 @@ var createStandardLibrary = module.exports = function () {
       return Math.abs(parseFloat(a));
     },
 
-    distance: function(meta, x1, y1, x2, y2) {
-      chk(arguments,
-          chk.num("a distance from the left for the first point"),
-          chk.num("a distance from the top for the first point"),
-          chk.num("a distance from the left for the second point"),
-          chk.num("a distance from the top for the second point"));
-
-      x1 = parseFloat(x1);
-      y1 = parseFloat(y1);
-      x2 = parseFloat(x2);
-      y2 = parseFloat(y2);
-
-      var x = Math.abs(x1 - x2);
-      var y = Math.abs(y1 - y2);
-      return Math.sqrt((x * x) + (y * y));
-    },
-
     "square-root": function(meta, n) {
       chk(arguments,
           chk.num("a number to get the square root of"));
@@ -111,10 +94,8 @@ var createStandardLibrary = module.exports = function () {
       return parseFloat(x) / 0.01745;
     },
 
-    "new-dictionary": function(meta) {
-      var args = _.rest(arguments);
-      return _.object(_.filter(args, function(_, i) { return i % 2 === 0; }),
-                      _.filter(args, function(_, i) { return i % 2 === 1; }));
+    "make-thing": function(meta) {
+      return im.Map();
     },
 
     "less-than": function(meta, a, b) {
@@ -161,23 +142,22 @@ var createStandardLibrary = module.exports = function () {
                      "the highest possible random number.  Should be equal to or higher than " +
                        a +
                        ", the lowest possible number you gave.")]);
-      console.log(Math.floor(Math.random() * (b - a)) + a)
+
       return Math.round(Math.random() * (b - a)) + a;
     },
 
-    set: function(meta, dict, key, value) {
-      dict[key] = value;
-      return dict;
+    set: function(meta, obj, key, value) {
+      return obj.set(key, value);
     },
 
-    get: function(meta, dict, key) {
-      return dict[key];
+    get: function(meta, obj, key) {
+      return obj.get(key);
     },
 
     print: langUtil.setSideEffecting(
       function(meta, itemToPrint) {
         chk(arguments,
-            chk.any("something to print"));
+            chk.defined("something to print"));
 
         console.log(itemToPrint);
         return itemToPrint + "\n";

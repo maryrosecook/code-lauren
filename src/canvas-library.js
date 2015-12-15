@@ -46,8 +46,8 @@ var program = {
     // back past it then pressing play is because the current
     // instruction is inside code where the draw is already a foregone
     // conclusion eg if current instruction is one of the args to
-    // draw-oval in code below
-    // if mouse-button-is-down { draw-oval(1 1 1 1 "filled" "red") }
+    // draw-circle in code below
+    // if mouse-button-is-down { draw-circle(1 1 1 1 "filled" "red") }
 
     drawOperationsSinceLastRepaint = []
     for (var i = allDrawOperations.length - 1; i >= 0; i--) {
@@ -124,82 +124,13 @@ var user = im.Map({
     }, "clear-screen", true));
   }),
 
-  write: langUtil.setSideEffecting(function(meta, str, x, y, color) {
+  draw: langUtil.setSideEffecting(function(meta, drawable) {
     chk(arguments,
-        chk.any("something to write to the screen"),
-        chk.num("the distance from the left of the screen"),
-        chk.num("the distance from the top of the screen"),
-        chk.set(COLORS_WITH_GRAYSCALE, "the color of the text"));
+        chk.anyType(["rectangle", "circle", "text"], "a shape or a piece of text to draw"));
 
     addOperation(makeOperation(function () {
-      screen.font = "20px Georgia";
-      screen.fillStyle = color;
-      screen.fillText(str, x, y);
-      screen.fillStyle = "black";
-    }, "write"));
-  }),
-
-  "draw-oval": langUtil.setSideEffecting(function(meta, x, y, w, h, filledStr, color) {
-    chk(arguments,
-        chk.num("the distance of the center of the oval from the left of the screen"),
-        chk.num("the distance of the center of the oval from the top of the screen"),
-        chk.num("the width"),
-        chk.num("the height"),
-        chk.set(["filled", "unfilled"], 'either "filled" or "unfilled"'),
-        chk.set(COLORS_WITH_GRAYSCALE, "the color of the oval"));
-
-    addOperation(makeOperation(function () {
-      var left = x - w / 2;
-      var top = y - h / 2;
-      var kappa = 0.5522848;
-      var ox = (w / 2) * kappa; // control point offset horizontal
-      var oy = (h / 2) * kappa; // control point offset vertical
-      var xe = left + w;           // x-end
-      var ye = top + h;           // y-end
-      var xm = left + w / 2;       // x-middle
-      var ym = top + h / 2;       // y-middle
-
-      screen.beginPath();
-      screen.moveTo(left, ym);
-      screen.bezierCurveTo(left, ym - oy, xm - ox, top, xm, top);
-      screen.bezierCurveTo(xm + ox, top, xe, ym - oy, xe, ym);
-      screen.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-      screen.bezierCurveTo(xm - ox, ye, left, ym + oy, left, ym);
-
-      if (filledStr === "unfilled") {
-        screen.strokeStyle = color;
-        screen.stroke();
-        screen.strokeStyle = "black";
-      } else if (filledStr === "filled") {
-        screen.fillStyle = color;
-        screen.fill();
-        screen.fillStyle = "black";
-      }
-    }, "draw-oval"));
-  }),
-
-  "draw-rectangle": langUtil.setSideEffecting(function(meta, x, y, width, height, filledStr, color) {
-    chk(arguments,
-        chk.num("the distance of the center of the rectangle from the left of the screen"),
-        chk.num("the distance of the center of the rectangle from the top of the screen"),
-        chk.num("the width"),
-        chk.num("the height"),
-        chk.set(["filled", "unfilled"], 'either "filled" or "unfilled"'),
-        chk.set(COLORS_WITH_GRAYSCALE, "the color of the rectangle"));
-
-    addOperation(makeOperation(function () {
-      var left = x - width / 2;
-      var top = y - height / 2;
-      if (filledStr === "unfilled") {
-        screen.strokeStyle = color;
-        screen.strokeRect(left, top, width, height);
-        screen.strokeStyle = "black";
-      } else if (filledStr === "filled") {
-        screen.fillStyle = color;
-        screen.fillRect(left, top, width, height);
-        screen.fillStyle = "black";
-      }
-    }, "draw-rectangle"));
+      drawFns[drawable.get("type")](drawable);
+    }, "draw"));
   }),
 
   "random-color": function() {
@@ -208,22 +139,56 @@ var user = im.Map({
     ];
   },
 
-  "rectangle-overlapping-rectangle": function(meta, x1, y1, w1, h1, x2, y2, w2, h2) {
+  "are-overlapping": function(meta, s1, s2) {
     chk(arguments,
-        chk.num("the distance of the center of the first rectangle from left of the screen"),
-        chk.num("the distance of the center of the first rectangle from top of the screen"),
-        chk.num("the width of the first rectangle"),
-        chk.num("the height of the first rectangle"),
-        chk.num("the distance of the center of the second rectangle from left of the screen"),
-        chk.num("the distance of the center of the second rectangle from top of the screen"),
-        chk.num("the width of the second rectangle"),
-        chk.num("the height of the second rectangle"));
+        chk.anyType(["rectangle", "circle"], "a shape"),
+        chk.anyType(["rectangle", "circle"], "another shape"));
 
-    return !(x1 + w1 / 2 < x2 - w2 / 2 ||
-             y1 + h1 / 2 < y2 - h2 / 2 ||
-             x1 - w1 / 2 > x2 + w2 / 2 ||
-             y1 - h1 / 2 > y2 + h2 / 2);
+    var collisionTestFn = overlappingFns[s1.get("type") + " " + s2.get("type")];
+    if (collisionTestFn !== undefined) {
+      return collisionTestFn(s1, s2);
+    } else {
+      throw new Error("Could not find collision test function.");
+    };
   },
+
+  "make-rectangle": function(meta, x, y, width, height) {
+    chk(arguments,
+        chk.num("the x coordinate of the center of the rectangle"),
+        chk.num("the y coordinate of the center of the rectangle"),
+        chk.num("the width"),
+        chk.num("the height"));
+
+    return im.Map({x: x, y: y, width: width, height: height,
+                   filled: true, color: "black", type: "rectangle"});
+  },
+
+  "make-circle": function(meta, x, y, width) {
+    chk(arguments,
+        chk.num("the x coordinate of the center of the circle"),
+        chk.num("the y coordinate of the center of the circle"),
+        chk.num("the width"));
+
+    return im.Map({x: x, y: y, width: width,
+                   filled: true, color: "black", type: "circle"});
+  },
+
+  "make-text": function(meta, x, y, text) {
+    chk(arguments,
+        chk.num("the x coordinate of the center of the text"),
+        chk.num("the y coordinate of the center of the text"),
+        chk.string("some words in quotes"));
+
+    return im.Map({x: x, y: y, text: text, color: "black", type: "text" });
+  },
+
+  distance: function(meta, s1, s2) {
+    chk(arguments,
+        chk.anyType(["rectangle", "circle"], "a shape"),
+        chk.anyType(["rectangle", "circle"], "another shape"));
+
+    return shapeDistance(s1, s2);
+  }
 });
 
 var api = {
@@ -238,10 +203,121 @@ var setScreen = module.exports = function(inScreen) {
   return api;
 };
 
-function set(legalValues) {
-  return createSpec(message, function(arg) {
-    return legalValues.indexOf();
-  });
+var drawFns = {
+  rectangle: function(r) {
+    var left = r.get("x") - r.get("width") / 2;
+    var top = r.get("y") - r.get("height") / 2;
+    if (r.get("filled") === true) {
+      screen.fillStyle = r.get("color");
+      screen.fillRect(left, top, r.get("width"), r.get("height"));
+      screen.fillStyle = "black";
+    } else if (r.get("filled") === false) {
+      screen.strokeStyle = r.get("color");
+      screen.strokeRect(left, top, r.get("width"), r.get("height"));
+      screen.strokeStyle = "black";
+    }
+  },
+
+  circle: function(o) {
+    screen.beginPath();
+    screen.arc(o.get("x"), o.get("y"), o.get("width"), 0, 2 * Math.PI);
+    screen.closePath()
+
+    if (o.get("filled") === true) {
+      screen.fillStyle = o.get("color");
+      screen.fill();
+      screen.fillStyle = "black";
+    } else if (o.get("filled") === false) {
+      screen.strokeStyle = o.get("color");
+      screen.stroke();
+      screen.strokeStyle = "black";
+    }
+  },
+
+  text: function(t) {
+    screen.font = "20px Georgia";
+    screen.textAlign = "center";
+    screen.textBaseline = "middle";
+    screen.fillStyle = t.get("color");
+    screen.fillText(t.get("text"), t.get("x"), t.get("y"));
+    screen.fillStyle = "black";
+  }
+};
+
+var overlappingFns = {
+  // only works for unrotated rectangles
+  // when introduce rotation will need to change this
+  "rectangle rectangle": function(s1, s2) {
+    var x1 = s1.get("x");
+    var y1 = s1.get("y");
+    var w1 = s1.get("width");
+    var h1 = s1.get("height");
+    var x2 = s2.get("x");
+    var y2 = s2.get("y");
+    var w2 = s2.get("width");
+    var h2 = s2.get("height");
+    return !(x1 + w1 / 2 < x2 - w2 / 2 ||
+             y1 + h1 / 2 < y2 - h2 / 2 ||
+             x1 - w1 / 2 > x2 + w2 / 2 ||
+             y1 - h1 / 2 > y2 + h2 / 2);
+  },
+
+  "circle circle": function(s1, s2) {
+    return shapeDistance(s1, s2) <= s1.get("width") / 2 + s2.get("width") / 2;
+  },
+
+  // only works for unrotated rectangles
+  // when introduce rotation will need to change this
+  "rectangle circle": function(r, c) {
+    var rX = parseFloat(r.get("x"));
+    var rY = parseFloat(r.get("y"));
+    var rWidth = parseFloat(r.get("width"));
+    var rHeight = parseFloat(r.get("height"));
+
+    var cX = parseFloat(c.get("x"));
+    var cY = parseFloat(c.get("y"));
+    var cWidth = parseFloat(c.get("width"));
+
+    var closestX = 0;
+    var closestY = 0;
+
+    if (cX < rX - rWidth / 2) {
+      closestX = rX - rWidth / 2;
+    } else if (cX > rX + rWidth / 2) {
+      closestX = rX + rWidth / 2;
+    } else {
+      closestX = cX;
+    }
+
+    if (cY < rY - rHeight / 2) {
+      closestY = rY - rHeight / 2;
+    } else if (cY > rY + rHeight / 2) {
+      closestY = rY + rHeight / 2;
+    } else {
+      closestY = cY;
+    }
+
+    return distance(cX, cY, closestX, closestY) < cWidth / 2;
+  },
+
+  "circle rectangle": function(c, r) {
+    return overlappingFns["rectangle circle"](r, c);
+  }
+};
+
+function distance(x1, y1, x2, y2) {
+  var x = Math.abs(x1 - x2);
+  var y = Math.abs(y1 - y2);
+
+  return Math.sqrt((x * x) + (y * y));
+};
+
+function shapeDistance(s1, s2) {
+  var x1 = parseFloat(s1.get("x"));
+  var y1 = parseFloat(s1.get("y"));
+  var x2 = parseFloat(s2.get("x"));
+  var y2 = parseFloat(s2.get("y"));
+  return distance(x1, y1, x2, y2);
 };
 
 var COLORS_WITH_GRAYSCALE = [

@@ -66,7 +66,7 @@ function createSpec(message, testFn) {
   return { message: message, testFn: testFn };
 };
 
-function any(message) {
+function defined(message) {
   return createSpec(message, function(arg) {
     return arg === undefined;
   });
@@ -75,6 +75,12 @@ function any(message) {
 function num(message) {
   return createSpec(message, function(arg) {
     return !_.isNumber(arg);
+  });
+};
+
+function string(message) {
+  return createSpec(message, function(arg) {
+    return !_.isString(arg);
   });
 };
 
@@ -104,11 +110,27 @@ function set(legalValues, message) {
   });
 };
 
-checkBuiltinArgs.any = any;
+function anyType(types, message) {
+  return createSpec(message, function(arg) {
+    for (var i = 0; i < types.length; i++) {
+      if (arg.get("type") === types[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+};
+
+// refactor to export the tests as well as the created specs
+
+checkBuiltinArgs.defined = defined;
 checkBuiltinArgs.num = num;
+checkBuiltinArgs.string = string;
 checkBuiltinArgs.set = set;
 checkBuiltinArgs.range = range;
 checkBuiltinArgs.numOrBoolean = numOrBoolean;
+checkBuiltinArgs.anyType = anyType;
 checkBuiltinArgs.checkLambdaArgs = checkLambdaArgs;
 checkBuiltinArgs.checkBuiltinArgs = checkBuiltinArgs;
 module.exports = checkBuiltinArgs;

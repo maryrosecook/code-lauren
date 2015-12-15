@@ -1,3 +1,5 @@
+var im = require("immutable");
+
 var standardLibrary = require("../src/lang/standard-library.js");
 
 var p = require("../src/lang/parser");
@@ -10,23 +12,17 @@ function metaMock() {
 };
 
 describe("library", function() {
-  describe("new-dictionary", function() {
+  describe("make-thing", function() {
     it("should be able to make new empty dict", function() {
       var lib = standardLibrary();
-      expect(lib.get("new-dictionary")()).toEqual({});
-    });
-
-    it("should be able to make new dict with initial keys and values", function() {
-      var lib = standardLibrary();
-      expect(lib.get("new-dictionary")({}, "name", "mary", "height", 160))
-        .toEqual({ name: "mary", height: 160 });
+      expect(lib.get("make-thing")().toObject()).toEqual({});
     });
   });
 
   describe("set", function() {
     it("should be able to set a value on a dict", function() {
       var lib = standardLibrary();
-      expect(lib.get("set")({}, lib.get("new-dictionary")(), "name", "mary").name).toEqual("mary");
+      expect(lib.get("set")({}, lib.get("make-thing")(), "name", "mary").get("name")).toEqual("mary");
     });
   });
 
@@ -35,7 +31,7 @@ describe("library", function() {
       var lib = standardLibrary();
       expect(lib.get("get")({},
                             lib.get("set")({},
-                                           lib.get("new-dictionary")(),
+                                           lib.get("make-thing")(),
                                            "name",
                                            "mary"),
                             "name")).toEqual("mary");
