@@ -154,7 +154,7 @@ var createStandardLibrary = module.exports = function () {
       return obj.get(key);
     },
 
-    print: langUtil.setSideEffecting(
+    print: langUtil.setIsOutputting(
       function(meta, itemToPrint) {
         chk(arguments,
             chk.defined("something to print"));

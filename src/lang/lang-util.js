@@ -26,14 +26,14 @@ var langUtil = module.exports = {
     return o instanceof Function || langUtil.isInternalStateFn(o);
   },
 
-  setSideEffecting: function(fn) {
-    fn.hasSideEffects = true;
+  setIsOutputting: function(fn) {
+    fn.isOutputting = true;
     return fn;
   },
 
-  isSideEffecting: function(o) {
+  isOutputting: function(o) {
     var fn = langUtil.isInternalStateFn(o) ? o.get("fn") : o;
-    return fn.hasSideEffects === true;
+    return fn.isOutputting === true;
   },
 
   createInternalStateFn: function(state, fn) {
@@ -50,7 +50,7 @@ var langUtil = module.exports = {
       o.get("fn") !== undefined;
   },
 
-  NO_SIDE_EFFECTS: "no_side_effects",
+  NO_OUTPUTTING: "no_outputting",
 
   RuntimeError: RuntimeError,
   Meta: Meta

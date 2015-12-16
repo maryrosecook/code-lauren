@@ -67,7 +67,7 @@ function stepSetEnv(ins, p) {
          addScope.setGlobalBinding(p.get("scopes"), currentScopeId, ins[1], v));
 };
 
-function stepInvoke(ins, p, noSideEffects) {
+function stepInvoke(ins, p, noOutputting) {
   var fnStackItem = p.get("stack").peek();
   p = p.set("stack", p.get("stack").shift());
   var fnObj = fnStackItem.v;
@@ -92,8 +92,8 @@ function stepInvoke(ins, p, noSideEffects) {
         return pushCallFrame(p, fnObj.bc, 0, addScope.lastScopeId(p), ins[2]);
       }
     } else if (langUtil.isBuiltin(fnObj)) {
-      if (noSideEffects !== langUtil.NO_SIDE_EFFECTS ||
-          !langUtil.isSideEffecting(fnObj)) {
+      if (noOutputting !== langUtil.NO_OUTPUTTING ||
+          !langUtil.isOutputting(fnObj)) {
 
         if (langUtil.isInternalStateFn(fnObj)) {
           var fn = fnObj.get("fn");
@@ -153,7 +153,7 @@ function stepJump(ins, p) {
                     function(bcPointer) { return bcPointer + ins[1] });
 };
 
-function step(p, noSideEffects) {
+function step(p, noOutputting) {
   var currentFrame = currentCallFrame(p);
   if (currentFrame === undefined) {
     return p;
@@ -176,7 +176,7 @@ function step(p, noSideEffects) {
       } else if (ins[0] === "set_env") {
         return stepSetEnv(ins, p);
       } else if (ins[0] === "invoke") {
-        return stepInvoke(ins, p, noSideEffects);
+        return stepInvoke(ins, p, noOutputting);
       } else if (ins[0] === "if_not_true_jump") {
         return stepIfNotTrueJump(ins, p);
       } else if (ins[0] === "jump") {

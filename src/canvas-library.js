@@ -118,13 +118,13 @@ var program = {
 };
 
 var user = im.Map({
-  "clear-screen": langUtil.setSideEffecting(function(meta) {
+  "clear-screen": langUtil.setIsOutputting(function(meta) {
     addOperation(makeOperation(function () {
       program.clearScreen();
     }, "clear-screen", true));
   }),
 
-  draw: langUtil.setSideEffecting(function(meta, drawable) {
+  draw: langUtil.setIsOutputting(function(meta, drawable) {
     chk(arguments,
         chk.anyType(["rectangle", "circle", "text"], "a shape or a piece of text to draw"));
 
