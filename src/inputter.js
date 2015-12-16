@@ -28,8 +28,8 @@ var setup = module.exports = function(window, inScreen) {
   return {
     getMouseBindings: function() {
       return {
-        "mouse-distance-from-left": mousePosition.x,
-        "mouse-distance-from-top": mousePosition.y,
+        "mouse-x": mousePosition.x,
+        "mouse-y": mousePosition.y,
         "mouse-button-is-down": mouseDown,
         "mouse-button-is-up": !mouseDown
       };
