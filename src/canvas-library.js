@@ -118,13 +118,13 @@ var program = {
 };
 
 var user = im.Map({
-  "clear-screen": langUtil.setIsOutputting(function(meta) {
+  "clear-screen": langUtil.createBuiltinOutputting(function(meta) {
     addOperation(makeOperation(function () {
       program.clearScreen();
     }, "clear-screen", true));
   }),
 
-  draw: langUtil.setIsOutputting(function(meta, drawable) {
+  draw: langUtil.createBuiltinOutputting(function(meta, drawable) {
     chk(arguments,
         chk.anyType(["rectangle", "circle", "text"], "a shape or a piece of text to draw"));
 
@@ -133,13 +133,13 @@ var user = im.Map({
     }, "draw"));
   }),
 
-  "random-color": function() {
+  "random-color": langUtil.createBuiltinNormal(function() {
     return COLORS_WITHOUT_GRAYSCALE[
       Math.floor(Math.random() * (COLORS_WITHOUT_GRAYSCALE.length - 1))
     ];
-  },
+  }),
 
-  "are-overlapping": function(meta, s1, s2) {
+  "are-overlapping": langUtil.createBuiltinNormal(function(meta, s1, s2) {
     chk(arguments,
         chk.anyType(["rectangle", "circle"], "a shape"),
         chk.anyType(["rectangle", "circle"], "another shape"));
@@ -150,9 +150,9 @@ var user = im.Map({
     } else {
       throw new Error("Could not find collision test function.");
     };
-  },
+  }),
 
-  "make-rectangle": function(meta, x, y, width, height) {
+  "make-rectangle": langUtil.createBuiltinNormal(function(meta, x, y, width, height) {
     chk(arguments,
         chk.num("the x coordinate of the center of the rectangle"),
         chk.num("the y coordinate of the center of the rectangle"),
@@ -161,9 +161,9 @@ var user = im.Map({
 
     return im.Map({x: x, y: y, width: width, height: height,
                    filled: true, color: "black", type: "rectangle"});
-  },
+  }),
 
-  "make-circle": function(meta, x, y, width) {
+  "make-circle": langUtil.createBuiltinNormal(function(meta, x, y, width) {
     chk(arguments,
         chk.num("the x coordinate of the center of the circle"),
         chk.num("the y coordinate of the center of the circle"),
@@ -171,24 +171,24 @@ var user = im.Map({
 
     return im.Map({x: x, y: y, width: width,
                    filled: true, color: "black", type: "circle"});
-  },
+  }),
 
-  "make-text": function(meta, x, y, text) {
+  "make-text": langUtil.createBuiltinNormal(function(meta, x, y, text) {
     chk(arguments,
         chk.num("the x coordinate of the center of the text"),
         chk.num("the y coordinate of the center of the text"),
         chk.string("some words in quotes"));
 
     return im.Map({x: x, y: y, text: text, color: "black", type: "text" });
-  },
+  }),
 
-  distance: function(meta, s1, s2) {
+  distance: langUtil.createBuiltinNormal(function(meta, s1, s2) {
     chk(arguments,
         chk.anyType(["rectangle", "circle"], "a shape"),
         chk.anyType(["rectangle", "circle"], "another shape"));
 
     return shapeDistance(s1, s2);
-  }
+  })
 });
 
 var api = {

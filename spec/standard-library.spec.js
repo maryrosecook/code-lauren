@@ -5,6 +5,7 @@ var standardLibrary = require("../src/lang/standard-library.js");
 var p = require("../src/lang/parser");
 var c = require("../src/lang/compiler");
 var v = require("../src/lang/vm");
+var langUtil = require("../src/lang/lang-util");
 var envModule = require("../src/env");
 
 function metaMock() {
@@ -15,26 +16,36 @@ describe("library", function() {
   describe("make-thing", function() {
     it("should be able to make new empty dict", function() {
       var lib = standardLibrary();
-      expect(lib.get("make-thing")().toObject()).toEqual({});
+      expect(lib.getIn(["make-thing", "fn"])().toObject()).toEqual({});
     });
   });
 
   describe("set", function() {
     it("should be able to set a value on a dict", function() {
       var lib = standardLibrary();
-      expect(lib.get("set")({}, lib.get("make-thing")(), "name", "mary").get("name")).toEqual("mary");
+      expect(lib.getIn(["set", "fn"])({}, lib.getIn(["make-thing", "fn"])(), "name", "mary")
+             .get("name")).toEqual("mary");
+    });
+
+    it("should be able to set a value on a dict", function() {
+      var lib = standardLibrary();
+      expect(lib.getIn(["set", "fn"])({}, lib.getIn(["make-thing", "fn"])(), "name", "mary")
+             .get("name")).toEqual("mary");
     });
   });
 
   describe("get", function() {
     it("should be able to get a value from a dict", function() {
       var lib = standardLibrary();
-      expect(lib.get("get")({},
-                            lib.get("set")({},
-                                           lib.get("make-thing")(),
-                                           "name",
-                                           "mary"),
-                            "name")).toEqual("mary");
+      var get = lib.getIn(["get", "fn"]);
+      var set = lib.getIn(["set", "fn"]);
+      var makeThing = lib.getIn(["make-thing", "fn"]);
+      expect(get({},
+                 set({},
+                     makeThing(),
+                     "name",
+                     "mary"),
+                 "name")).toEqual("mary");
     });
   });
 
@@ -272,7 +283,10 @@ describe("library", function() {
       var code = "x: 0 \n forever { collect(counted(2)) \n if equal(3 x) { blowup } else { x: add(x 1) } }";
 
       var counts = [];
-      var env = standardLibrary().set("collect", function(__, count) { counts.push(count); });
+      var env = standardLibrary().set("collect",
+                                      langUtil.createBuiltinNormal(function(__, count) {
+                                        counts.push(count);
+                                      }));
 
       expect(v(code, c(p(code)), env).get("exception").message)
         .toEqual("Never heard of blowup"); // catch blowup
@@ -283,7 +297,10 @@ describe("library", function() {
       var code = "x: 0 \n forever { collect(counted(3)) \n if equal(5 x) { blowup } else { x: add(x 1) } }";
 
       var counts = [];
-      var env = standardLibrary().set("collect", function(__, count) { counts.push(count); });
+      var env = standardLibrary().set("collect",
+                                      langUtil.createBuiltinNormal(function(__, count) {
+                                        counts.push(count);
+                                      }));
 
       expect(v(code, c(p(code)), env).get("exception").message)
         .toEqual("Never heard of blowup"); // catch blowup

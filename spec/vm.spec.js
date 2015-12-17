@@ -133,9 +133,9 @@ describe("vm", function() {
       ps = v.step(ps);
 
       var binding = ps.getIn(["scopes", ps.getIn(["callStack", 0, "scope"]), "bindings", "a"]);
-      expect(util.stripBc(binding.bc)).toEqual([["push", 1],
-                                                ["return"]]);
-      expect(binding.parameters).toBeDefined();
+      expect(util.stripBc(binding.get("bc"))).toEqual([["push", 1],
+                                                       ["return"]]);
+      expect(binding.get("parameters")).toBeDefined();
     });
   });
 

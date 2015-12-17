@@ -1,6 +1,7 @@
 var _ = require("underscore");
 
 var util = require("../util");
+var langUtil = require("./lang-util");
 
 var ANNOTATE = true;
 var DO_NOT_ANNOTATE = false;
@@ -128,7 +129,7 @@ function ins(instruction, ast, annotate) {
 };
 
 function createLambda(bc, parameters) {
-  return { bc: bc, parameters: parameters };
+  return langUtil.createLambda(bc, parameters);
 };
 
 function compile(a) {

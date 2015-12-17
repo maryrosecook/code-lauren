@@ -20,9 +20,10 @@ function stepPush(ins, p) {
 function stepPushLambda(ins, p) {
   var lambda = ins[1];
 
-  // once created, will have this id for rest of program, so done need
+  // once created, will have this id for rest of program, so don't need
   // immutable data
-  lambda.closureScope = currentCallFrame(p).get("scope"); // an id into the p.scopes object
+  lambda = lambda.set("closureScope",
+                      currentCallFrame(p).get("scope")); // an id into the p.scopes object
 
   return p.set("stack", p.get("stack").unshift({ v: lambda, ast: ins.ast }));
 };
@@ -72,7 +73,7 @@ function stepInvoke(ins, p, noOutputting) {
   p = p.set("stack", p.get("stack").shift());
   var fnObj = fnStackItem.v;
 
-  if (langUtil.isFunction(fnObj)) {
+  if (langUtil.isInvokable(fnObj)) {
     var pAndArgContainers = popTopArgsOnStack(p);
     var p = pAndArgContainers[0];
     var argContainers = pAndArgContainers[1];
@@ -80,7 +81,9 @@ function stepInvoke(ins, p, noOutputting) {
 
     if (langUtil.isLambda(fnObj)) {
       checkArgs.checkLambdaArgs(fnStackItem, argContainers, ins.ast);
-      p = addScope(p, im.Map(_.object(fnObj.parameters, argValues)), fnObj.closureScope);
+      p = addScope(p,
+                   im.Map(_.object(fnObj.get("parameters"), argValues)),
+                   fnObj.get("closureScope"));
 
       var tailIndex = tailCallIndex(p.get("callStack"), fnObj);
       if (tailIndex !== undefined) { // if tail position exprs all way to recursive call then tco
@@ -89,13 +92,13 @@ function stepInvoke(ins, p, noOutputting) {
           .setIn(["callStack", -1, "scope"], addScope.lastScopeId(p))
           .setIn(["callStack", -1, "bcPointer"], 0);
       } else {
-        return pushCallFrame(p, fnObj.bc, 0, addScope.lastScopeId(p), ins[2]);
+        return pushCallFrame(p, fnObj.get("bc"), 0, addScope.lastScopeId(p), ins[2]);
       }
     } else if (langUtil.isBuiltin(fnObj)) {
       if (noOutputting !== langUtil.NO_OUTPUTTING ||
-          !langUtil.isOutputting(fnObj)) {
+          !langUtil.isBuiltinOutputting(fnObj)) {
 
-        if (langUtil.isInternalStateFn(fnObj)) {
+        if (langUtil.isBuiltinInternalState(fnObj)) {
           var fn = fnObj.get("fn");
           var meta = new langUtil.Meta(ins.ast, fnObj.get("state"));
           var result = fn.apply(null, [meta].concat(argValues));
@@ -104,7 +107,7 @@ function stepInvoke(ins, p, noOutputting) {
           return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }))
             .setIn(["scopes", 0, "bindings", fnName, "state"], result.state);
         } else {
-          var fn = fnObj;
+          var fn = fnObj.get("fn");
           var meta = new langUtil.Meta(ins.ast);
           var result = fn.apply(null, [meta].concat(argValues));
           return p.set("stack", p.get("stack").unshift({ v: result, ast: ins.ast }));
@@ -112,6 +115,8 @@ function stepInvoke(ins, p, noOutputting) {
       } else {
         return p;
       }
+    } else {
+      throw new langUtil.RuntimeError("Got invokable of unknown type", fnStackItem.ast);
     }
   } else {
     throw new langUtil.RuntimeError("This is not an action", fnStackItem.ast);
@@ -130,7 +135,7 @@ function tailCallIndex(callStack, fn) {
 
 function previousRecursionCallFrameIndex(callStack, fn) {
   for (var i = callStack.size - 1; i >= 0; i--) {
-    if (callStack.getIn([i, "bc"]) === fn.bc) {
+    if (callStack.getIn([i, "bc"]) === fn.get("bc")) {
       return i;
     }
   }
@@ -274,7 +279,7 @@ function initProgramStateAndComplete(code, bc, env) {
 };
 
 function throwIfUninvokedStackFunctions(p) {
-  var unrunFn = p.get("stack").find(o => langUtil.isFunction(o.v));
+  var unrunFn = p.get("stack").find(o => langUtil.isInvokable(o.v));
   if (unrunFn !== undefined) {
     throw new langUtil.RuntimeError("This is an action. Type " +
                                     p.get("code").slice(unrunFn.ast.s, unrunFn.ast.e) +

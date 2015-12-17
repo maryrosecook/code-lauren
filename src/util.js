@@ -23,6 +23,8 @@ var util = module.exports = {
       delete instruction.ast;
       delete instruction.annotate;
       if (instruction[0] === "push_lambda") {
+        instruction[1] = instruction[1].toObject();
+        delete instruction[1].type;
         delete instruction[1].parameters;
         delete instruction[1].annotate;
         util.stripBc(instruction[1].bc);

@@ -1,3 +1,5 @@
+var im = require("immutable");
+
 var p = require("../src/lang/parser");
 var c = require("../src/lang/compiler");
 var util = require("../src/util");
@@ -186,19 +188,22 @@ describe("bytecode compiler", function() {
 
   describe("lambdas", function() {
     it("should compile an empty lambda", function() {
-      expect(util.stripBc(c(util.getNodeAt(p("{}"), ["top", "do", 0, "return"]))[0][1].bc))
+      expect(util.stripBc(c(util.getNodeAt(p("{}"), ["top", "do", 0, "return"]))[0][1]
+                          .get("bc")))
         .toEqual([["push", undefined],
                   ["return"]]);
     });
 
     it("should compile a lambda that returns 1", function() {
-      expect(util.stripBc(c(util.getNodeAt(p("{ 1 }"), ["top", "do", 0, "return"]))[0][1].bc))
+      expect(util.stripBc(c(util.getNodeAt(p("{ 1 }"), ["top", "do", 0, "return"]))[0][1]
+                          .get("bc")))
         .toEqual([["push", 1],
                   ["return"]]);
     });
 
     it("should compile lambda that has 2 expressions and returns the second", function() {
-      expect(util.stripBc(c(util.getNodeAt(p("{ 1 \n 2 }"), ["top", "do", 0, "return"]))[0][1].bc))
+      expect(util.stripBc(c(util.getNodeAt(p("{ 1 \n 2 }"), ["top", "do", 0, "return"]))[0][1]
+                          .get("bc")))
         .toEqual([["push", 1],
                   ["pop"],
                   ["push", 2],
@@ -206,7 +211,8 @@ describe("bytecode compiler", function() {
     });
 
     it("should compile lambda that contains an invocation on no arguments", function() {
-      expect(util.stripBc(c(util.getNodeAt(p("{ a() }"), ["top", "do", 0, "return"]))[0][1].bc))
+      expect(util.stripBc(c(util.getNodeAt(p("{ a() }"), ["top", "do", 0, "return"]))[0][1]
+                          .get("bc")))
         .toEqual([["arg_start"],
                   ["get_env", "a"],
                   ["invoke", 0, true],
@@ -214,7 +220,8 @@ describe("bytecode compiler", function() {
     });
 
     it("should compile lambda that contains an invocation with some arguments", function() {
-      expect(util.stripBc(c(util.getNodeAt(p("{ a(1 2) }"), ["top", "do", 0, "return"]))[0][1].bc))
+      expect(util.stripBc(c(util.getNodeAt(p("{ a(1 2) }"), ["top", "do", 0, "return"]))[0][1]
+                          .get("bc")))
         .toEqual([["arg_start"],
                   ["push", 1],
                   ["push", 2],
@@ -225,7 +232,7 @@ describe("bytecode compiler", function() {
 
     it("should compile invocation of lambda literal", function() {
       var code = util.stripBc(c(util.getNodeAt(p("{ {}() }"),
-                                               ["top", "do", 0, "return"]))[0][1].bc);
+                                               ["top", "do", 0, "return"]))[0][1].get("bc"));
       expect(code).toEqual([["arg_start"],
                             ["push_lambda", { bc: [["push", undefined],
                                                    ["return"]] }],

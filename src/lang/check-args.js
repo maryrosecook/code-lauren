@@ -28,6 +28,7 @@ function checkBuiltinArgs(fnArgs) {
 
 function checkLambdaArgs(fnStackItem, argContainers, invocationAst) {
   var fn = fnStackItem.v;
+  var parameters = fn.get("parameters");
 
   argContainers.forEach(function(c, i) {
     invocationAst.c.slice(1);
@@ -36,17 +37,17 @@ function checkLambdaArgs(fnStackItem, argContainers, invocationAst) {
     }
   });
 
-  if (fn.parameters.length > argContainers.length) {
+  if (parameters.length > argContainers.length) {
     var markerIndex = invocationAst.s + invocationAst.text.trim().length - 1;
     var firstMissingParameterIndex = argContainers.length;
-    var firstMissingParameterName = fn.parameters[firstMissingParameterIndex];
+    var firstMissingParameterName = parameters[firstMissingParameterIndex];
     throw new langUtil.RuntimeError('Missing a "' + firstMissingParameterName  + '"',
                                     { s: markerIndex, e: markerIndex });
   } else {
     checkNoExtraArgs(fnStackItem.ast.c,
                      argContainers.map(function(c) { return c.v; }),
                      argContainers.map(function(c) { return c.ast; }),
-                     fn.parameters.length);
+                     parameters.length);
   }
 };
 
