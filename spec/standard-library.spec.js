@@ -21,31 +21,43 @@ describe("library", function() {
   });
 
   describe("set", function() {
-    it("should be able to set a value on a dict", function() {
-      var lib = standardLibrary();
-      expect(lib.getIn(["set", "fn"])({}, lib.getIn(["make-thing", "fn"])(), "name", "mary")
-             .get("name")).toEqual("mary");
+    it("should throw if missing args", function() {
+      var code = 'set()';
+      expect(v(code, c(p(code))).get("exception").message)
+        .toEqual("Needs a thing to set some information on");
+
+      var code = 'a: make-thing() \n set(a)';
+      expect(v(code, c(p(code))).get("exception").message)
+        .toEqual("Needs the name of the information to set");
+
+      var code = 'a: make-thing() \n set(a "key")';
+      expect(v(code, c(p(code))).get("exception").message)
+        .toEqual("Needs the information to set");
     });
 
-    it("should be able to set a value on a dict", function() {
-      var lib = standardLibrary();
-      expect(lib.getIn(["set", "fn"])({}, lib.getIn(["make-thing", "fn"])(), "name", "mary")
-             .get("name")).toEqual("mary");
+    it("should be able to add a value to a thing by mutating the thing", function() {
+      var code = 'thing: make-thing() \n set(thing "key" "value") \n thing';
+      var ps = v(code, c(p(code)));
+      expect(ps.getIn(["stack", -1]).v.toObject()).toEqual({ key: "value" });
+    });
+
+    it("should be able to change a value on a thing by mutating the thing", function() {
+      var code = 'thing: make-thing() \n set(thing "key" "a") \n set(thing "key" "b") \n thing';
+      var ps = v(code, c(p(code)));
+      expect(ps.getIn(["stack", -1]).v.toObject()).toEqual({ key: "b" });
+    });
+
+    it("should return undefined", function() {
+      var code = 'a: make-thing() \n set(a "key" "value")';
+      expect(v(code, c(p(code))).getIn(["stack", -1])).toBeUndefined();
     });
   });
 
   describe("get", function() {
     it("should be able to get a value from a dict", function() {
-      var lib = standardLibrary();
-      var get = lib.getIn(["get", "fn"]);
-      var set = lib.getIn(["set", "fn"]);
-      var makeThing = lib.getIn(["make-thing", "fn"]);
-      expect(get({},
-                 set({},
-                     makeThing(),
-                     "name",
-                     "mary"),
-                 "name")).toEqual("mary");
+      var code = 'thing: make-thing() \n set(thing "key" "value") \n get(thing "key")';
+      var ps = v(code, c(p(code)));
+      expect(ps.getIn(["stack", -1]).v).toEqual("value");
     });
   });
 

@@ -146,7 +146,12 @@ var createStandardLibrary = module.exports = function () {
       return Math.round(Math.random() * (b - a)) + a;
     }),
 
-    set: langUtil.createBuiltinNormal(function(meta, obj, key, value) {
+    set: langUtil.createBuiltinMutating(function(meta, obj, key, value) {
+      chk(arguments,
+          chk.thing("a thing to set some information on"),
+          chk.string("the name of the information to set"),
+          chk.numOrBooleanOrString("the information to set"));
+
       return obj.set(key, value);
     }),
 

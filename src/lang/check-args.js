@@ -73,6 +73,12 @@ function defined(message) {
   });
 };
 
+function thing(message) {
+  return createSpec(message, function(arg) {
+    return !_.isObject(arg) || _.isArray(arg);
+  });
+};
+
 function num(message) {
   return createSpec(message, function(arg) {
     return !_.isNumber(arg);
@@ -93,9 +99,17 @@ function range(low, high, message) {
   });
 };
 
+// TODO refactor by implementing OR checkArgs syntax
 function numOrBoolean(message) {
   return createSpec(message, function(arg) {
     return !_.isNumber(arg) && !_.isBoolean(arg);
+  });
+};
+
+// TODO refactor by implementing OR checkArgs syntax
+function numOrBooleanOrString(message) {
+  return createSpec(message, function(arg) {
+    return !_.isNumber(arg) && !_.isBoolean(arg) && !_.isString(arg);
   });
 };
 
@@ -123,7 +137,7 @@ function anyType(types, message) {
   });
 };
 
-// refactor to export the tests as well as the created specs
+// TODO refactor to export the tests as well as the created specs
 
 checkBuiltinArgs.defined = defined;
 checkBuiltinArgs.num = num;
@@ -131,6 +145,8 @@ checkBuiltinArgs.string = string;
 checkBuiltinArgs.set = set;
 checkBuiltinArgs.range = range;
 checkBuiltinArgs.numOrBoolean = numOrBoolean;
+checkBuiltinArgs.numOrBooleanOrString = numOrBooleanOrString;
+checkBuiltinArgs.thing = thing;
 checkBuiltinArgs.anyType = anyType;
 checkBuiltinArgs.checkLambdaArgs = checkLambdaArgs;
 checkBuiltinArgs.checkBuiltinArgs = checkBuiltinArgs;

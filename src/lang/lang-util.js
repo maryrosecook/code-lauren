@@ -17,9 +17,10 @@ var LAMBDA = "lambda";
 var BUILTIN_NORMAL = "builtin_normal";
 var BUILTIN_INTERNAL_STATE = "builtin_internal_state";
 var BUILTIN_OUTPUTTING = "builtin_outputting";
+var BUILTIN_MUTATING = "builtin_mutating";
 
 var INVOKABLE_BUILTIN_TYPES = [BUILTIN_NORMAL, BUILTIN_INTERNAL_STATE,
-                               BUILTIN_OUTPUTTING];
+                               BUILTIN_OUTPUTTING, BUILTIN_MUTATING];
 var INVOKABLE_TYPES = [LAMBDA].concat(INVOKABLE_BUILTIN_TYPES);
 
 var langUtil = module.exports = {
@@ -55,6 +56,14 @@ var langUtil = module.exports = {
     }
   },
 
+  createBuiltinMutating: function(fn) {
+    if (fn instanceof Function) {
+      return im.Map({ type: BUILTIN_MUTATING, fn: fn });
+    } else {
+      throw new Error("Function for builtin is not a JS function.");
+    }
+  },
+
   isInvokable: function(o) {
     return o != null && o instanceof im.Map && INVOKABLE_TYPES.indexOf(o.get("type")) !== -1;
   },
@@ -77,6 +86,10 @@ var langUtil = module.exports = {
 
   isBuiltinInternalState: function(o) {
     return langUtil.isInvokable(o) && o.get("type") === BUILTIN_INTERNAL_STATE;
+  },
+
+  isBuiltinMutating: function(o) {
+    return langUtil.isInvokable(o) && o.get("type") === BUILTIN_MUTATING;
   },
 
   NO_OUTPUTTING: "no_outputting",

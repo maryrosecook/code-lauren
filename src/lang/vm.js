@@ -98,19 +98,28 @@ function stepInvoke(ins, p, noOutputting) {
       if (noOutputting !== langUtil.NO_OUTPUTTING ||
           !langUtil.isBuiltinOutputting(fnObj)) {
 
+        var fn = fnObj.get("fn");
         if (langUtil.isBuiltinInternalState(fnObj)) {
-          var fn = fnObj.get("fn");
           var meta = new langUtil.Meta(ins.ast, fnObj.get("state"));
           var result = fn.apply(null, [meta].concat(argValues));
           var fnName = fnStackItem.ast.c;
 
           return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }))
             .setIn(["scopes", 0, "bindings", fnName, "state"], result.state);
-        } else if (langUtil.isBuiltinNormal(fnObj) || langUtil.isBuiltinOutputting(fnObj)) {
-          var fn = fnObj.get("fn");
+        } else if (langUtil.isBuiltinNormal(fnObj) ||
+                   langUtil.isBuiltinOutputting(fnObj)) {
           var meta = new langUtil.Meta(ins.ast);
           var result = fn.apply(null, [meta].concat(argValues));
           return p.set("stack", p.get("stack").unshift({ v: result, ast: ins.ast }));
+        } else if (langUtil.isBuiltinMutating(fnObj)) {
+          var meta = new langUtil.Meta(ins.ast);
+          var newThing = fn.apply(null, [meta].concat(argValues));
+          var currentScopeId = currentCallFrame(p).get("scope");
+          var varName = ins.ast.c[1].c;
+          return p.set("scopes", addScope.setGlobalBinding(p.get("scopes"),
+                                                           currentScopeId,
+                                                           varName,
+                                                           newThing));
         }
       } else {
         return p;

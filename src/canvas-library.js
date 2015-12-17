@@ -113,7 +113,7 @@ var program = {
     // stepping backwards through programs without an explicit
     // clear-screen()
     screen.clearRect(0, 0, screen.canvas.width, screen.canvas.height);
-    user.get("clear-screen")();
+    user.getIn(["clear-screen", "fn"])();
   }
 };
 
