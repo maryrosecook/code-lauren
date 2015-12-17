@@ -106,7 +106,7 @@ function stepInvoke(ins, p, noOutputting) {
 
           return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }))
             .setIn(["scopes", 0, "bindings", fnName, "state"], result.state);
-        } else {
+        } else if (langUtil.isBuiltinNormal(fnObj) || langUtil.isBuiltinOutputting(fnObj)) {
           var fn = fnObj.get("fn");
           var meta = new langUtil.Meta(ins.ast);
           var result = fn.apply(null, [meta].concat(argValues));
