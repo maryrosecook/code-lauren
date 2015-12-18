@@ -1,7 +1,7 @@
-## Make video games and learn to code. No experience necessary.
+## Game programming for beginners
 
-Try changing `"blue"` to `"red"` in the code on the left.
+Get started with programming by changing some of the numbers in the code on the left.
 
-Try some other colors.
+Do you see how the circle moves and changes size? You've just written your first code!
 
-### <div class="next">[Start the first tutorial →](#first-index)</div>
+### <div class="next">[Now, start the first tutorial →](#first-index)</div>
