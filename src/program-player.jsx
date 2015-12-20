@@ -109,7 +109,14 @@ var ProgramPlayer = React.createClass({
         } else if (vm.isComplete(self.state.ps) ||
                    vm.isCrashed(self.state.ps)) {
           self.state.ps.get("canvasLib").flush();
-          self.pause();
+
+          // Check not paused to avoid rerendering error messages
+          // every 200ms when crashed. Temp hack until I rewrite the
+          // annotator in React.
+          if (!self.state.paused) {
+            self.pause();
+          }
+
           setTimeout(() => requestAnimationFrame(() => tick(Date.now())), 200);
           break;
         } else if (self.state.paused) {
