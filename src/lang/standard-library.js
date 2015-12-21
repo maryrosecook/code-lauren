@@ -116,8 +116,8 @@ var createStandardLibrary = module.exports = function () {
 
     equal: langUtil.createBuiltinNormal(function(meta, a, b) {
       chk(arguments,
-          chk.num("a number"),
-          chk.num("a number to compare"));
+          chk.numOrBooleanOrString("a number or a piece of text"),
+          chk.numOrBooleanOrString("a number or a piece of text to compare"));
 
       return a == b;
     }),

@@ -276,11 +276,11 @@ describe("library", function() {
     it("should throw if missing args", function() {
       var code = "equal()";
       expect(v(code, c(p(code))).get("exception").message)
-        .toEqual("Needs a number");
+        .toEqual("Needs a number or a piece of text");
 
       var code = "equal(1)";
       expect(v(code, c(p(code))).get("exception").message)
-        .toEqual("Needs a number to compare");
+        .toEqual("Needs a number or a piece of text to compare");
     });
   });
 
