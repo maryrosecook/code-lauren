@@ -178,7 +178,7 @@ var user = im.Map({
     chk(arguments,
         chk.num("the x coordinate of the center of the text"),
         chk.num("the y coordinate of the center of the text"),
-        chk.string("some words in quotes"));
+        chk.numOrBooleanOrString("some words or a number"));
 
     return im.Map({x: x, y: y, text: text, color: "black", type: "text" });
   }),

@@ -102,7 +102,7 @@ describe("canvas library", function() {
         .toEqual("Needs the y coordinate of the center of the text");
 
       expect(vm.complete(setupProgram('make-text(10 10)')).get("exception").message)
-        .toEqual("Needs some words in quotes");
+        .toEqual("Needs some words or a number");
     });
 
     it("should make a text", function() {
