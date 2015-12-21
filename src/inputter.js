@@ -6,12 +6,14 @@ var setup = module.exports = function(window, inScreen) {
 
   screen = inScreen;
 
+  var env = require("./env");
+
   window.addEventListener('mousemove', function(e) {
     var absoluteMousePosition = getAbsoluteMousePosition(e);
     var elementPosition = getElementPosition(screen.canvas);
     mousePosition = {
       x: absoluteMousePosition.x - elementPosition.x,
-      y: absoluteMousePosition.y - elementPosition.y
+      y: env.yInvert(absoluteMousePosition.y - elementPosition.y)
     };
   }, false);
 

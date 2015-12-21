@@ -44,6 +44,8 @@ video {
   top: 33px;
   z-index: -1;
   opacity: 1;
+  width: calc(100% - 450px);
+  height: calc(100vh - 33px);
 }
 
 .program-player {

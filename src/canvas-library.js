@@ -4,6 +4,7 @@ var im = require("immutable");
 var util = require("./util");
 var langUtil = require("./lang/lang-util");
 var chk = require("./lang/check-args");
+var env = require("./env");
 
 var screen;
 var step = 0;
@@ -206,7 +207,7 @@ var setScreen = module.exports = function(inScreen) {
 var drawFns = {
   rectangle: function(r) {
     var left = r.get("x") - r.get("width") / 2;
-    var top = r.get("y") - r.get("height") / 2;
+    var top = env.yInvert(r.get("y")) - r.get("height") / 2;
     if (r.get("filled") === true) {
       screen.fillStyle = r.get("color");
       screen.fillRect(left, top, r.get("width"), r.get("height"));
@@ -220,7 +221,7 @@ var drawFns = {
 
   circle: function(o) {
     screen.beginPath();
-    screen.arc(o.get("x"), o.get("y"), o.get("width") / 2, 0, 2 * Math.PI);
+    screen.arc(o.get("x"), env.yInvert(o.get("y")), o.get("width") / 2, 0, 2 * Math.PI);
     screen.closePath()
 
     if (o.get("filled") === true) {
@@ -239,7 +240,7 @@ var drawFns = {
     screen.textAlign = "center";
     screen.textBaseline = "middle";
     screen.fillStyle = t.get("color");
-    screen.fillText(t.get("text"), t.get("x"), t.get("y"));
+    screen.fillText(t.get("text"), t.get("x"), env.yInvert(t.get("y")));
     screen.fillStyle = "black";
   }
 };
@@ -249,11 +250,11 @@ var overlappingFns = {
   // when introduce rotation will need to change this
   "rectangle rectangle": function(s1, s2) {
     var x1 = s1.get("x");
-    var y1 = s1.get("y");
+    var y1 = env.yInvert(s1.get("y"));
     var w1 = s1.get("width");
     var h1 = s1.get("height");
     var x2 = s2.get("x");
-    var y2 = s2.get("y");
+    var y2 = env.yInvert(s2.get("y"));
     var w2 = s2.get("width");
     var h2 = s2.get("height");
     return !(x1 + w1 / 2 < x2 - w2 / 2 ||
@@ -270,12 +271,12 @@ var overlappingFns = {
   // when introduce rotation will need to change this
   "rectangle circle": function(r, c) {
     var rX = parseFloat(r.get("x"));
-    var rY = parseFloat(r.get("y"));
+    var rY = parseFloat(env.yInvert(r.get("y")));
     var rWidth = parseFloat(r.get("width"));
     var rHeight = parseFloat(r.get("height"));
 
     var cX = parseFloat(c.get("x"));
-    var cY = parseFloat(c.get("y"));
+    var cY = parseFloat(env.yInvert(c.get("y")));
     var cWidth = parseFloat(c.get("width"));
 
     var closestX = 0;
@@ -314,9 +315,9 @@ function distance(x1, y1, x2, y2) {
 
 function shapeDistance(s1, s2) {
   var x1 = parseFloat(s1.get("x"));
-  var y1 = parseFloat(s1.get("y"));
+  var y1 = parseFloat(env.yInvert(s1.get("y")));
   var x2 = parseFloat(s2.get("x"));
-  var y2 = parseFloat(s2.get("y"));
+  var y2 = parseFloat(env.yInvert(s2.get("y")));
   return distance(x1, y1, x2, y2);
 };
 
