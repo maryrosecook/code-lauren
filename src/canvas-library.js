@@ -174,6 +174,13 @@ var user = im.Map({
                    filled: true, color: "black", type: "circle"});
   }),
 
+  "set-composite-operation": langUtil.createBuiltinNormal(function(meta, operation) {
+    chk(arguments,
+        chk.set(COMPOSITE_OPERATIONS, "a composite operation"));
+
+    screen.globalCompositeOperation = operation;
+  }),
+
   "make-text": langUtil.createBuiltinNormal(function(meta, x, y, text) {
     chk(arguments,
         chk.num("the x coordinate of the center of the text"),
@@ -320,6 +327,35 @@ function shapeDistance(s1, s2) {
   var y2 = parseFloat(env.yInvert(s2.get("y")));
   return distance(x1, y1, x2, y2);
 };
+
+var COMPOSITE_OPERATIONS = [
+  "source-over",
+  "source-in",
+  "source-out",
+  "source-atop",
+  "destination-over",
+  "destination-in",
+  "destination-out",
+  "destination-atop",
+  "lighter",
+  "copy",
+  "xor",
+  "multiply",
+  "screen",
+  "overlay",
+  "darken",
+  "lighten",
+  "color-dodge",
+  "color-burn",
+  "hard-light",
+  "soft-light",
+  "difference",
+  "exclusion",
+  "hue",
+  "saturation",
+  "color",
+  "luminosity"
+];
 
 var COLORS_WITH_GRAYSCALE = [
   "aliceblue",
