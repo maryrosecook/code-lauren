@@ -67,7 +67,7 @@ function tutorialPathPages(allPages, indexPath) {
 
   navLinkPairs.push([toc[toc.length - 2], undefined]);
   if (navLinkPairs.length !== contentPaths.length) {
-    throw new Error("Index doesn't match pages in " + tutorialDir + " tutorial.");
+    throw new Error("Index doesn't match pages in " + prefix + " tutorial.");
   }
 
   return toc
