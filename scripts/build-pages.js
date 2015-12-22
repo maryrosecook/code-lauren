@@ -60,12 +60,12 @@ function tutorialPathPages(allPages, indexPath) {
   var contentPaths = _.difference(allPages.filter(match("\/" + prefix + "[^\/]+\.md$")),
                                   [indexPath]);
 
-  var navLinkPairs = [[pathToSlug(indexPath), toc[1]]];
-  for (var i = 1; i < toc.length - 1; i++) {
-    navLinkPairs.push([toc[i - 1], toc[i + 1]]);
+  var tocWithIndex = [pathToSlug(indexPath)].concat(toc);
+  var navLinkPairs = [];
+  for (var i = 1; i < tocWithIndex.length; i++) {
+    navLinkPairs.push([tocWithIndex[i - 1], tocWithIndex[i + 1]]);
   }
 
-  navLinkPairs.push([toc[toc.length - 2], undefined]);
   if (navLinkPairs.length !== contentPaths.length) {
     throw new Error("Index doesn't match pages in " + prefix + " tutorial.");
   }
@@ -75,6 +75,7 @@ function tutorialPathPages(allPages, indexPath) {
     .map(function(p, i) {
       var previous = navLinkPairs[i][0];
       var next = navLinkPairs[i][1];
+
       var nextPageTitle = next ?
           pageTitle(fs.readFileSync(slugToPath(next), "utf8")) :
           undefined;
