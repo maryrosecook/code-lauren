@@ -1,7 +1,7 @@
 ## Game programming for beginners
 
-Get started with programming by changing some of the numbers in the code on the left.
+Get started by changing one of the numbers in the code on the left.  Did the circle move? Or did it change size?
 
-Do you see how the circle moves and changes size? You've just written your first code!
+Try changing the other numbers.  What does each number do?
 
-### <div class="next">[Now, start the first tutorial →](#first-index)</div>
+### <div class="next">[Start making your first game →](#first-index)</div>
