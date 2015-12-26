@@ -38,7 +38,7 @@ function hasAnnotatablePs(pses) {
   return false;
 };
 
-function onClickOrHoldDown(onClick) {
+function handleClickHoldDownEnd(onClick, onHoldDown, onHoldDownEnd) {
   var firstClickTime;
   var timerId;
 
@@ -49,13 +49,14 @@ function onClickOrHoldDown(onClick) {
 
       timerId = setTimeout(function() {
         timerId = setInterval(function() {
-          onClick();
+          onHoldDown();
         }, 0);
       }, 300);
     } else if (e.type === "mouseup") {
       clearInterval(timerId);
       timerId = undefined;
       firstClickTime = undefined;
+      onHoldDownEnd();
     }
   };
 };
@@ -93,8 +94,17 @@ function parse(code, annotator) {
 
 var ProgramPlayer = React.createClass({
   getInitialState: function() {
-    this.stepBackwardsClickHandler = onClickOrHoldDown(this.stepBackwardsByHand);
-    this.stepForwardsClickHandler = onClickOrHoldDown(this.stepForwardsByHand);
+    this.stepBackwardsClickHandler = handleClickHoldDownEnd(
+      () => this.stepBackwardsByHand(true),
+      () => this.stepBackwardsByHand(false),
+      () => annotateCurrentInstruction(this.state.ps, this.props.annotator)
+    );
+
+    this.stepForwardsClickHandler = handleClickHoldDownEnd(
+      () => this.stepForwardsByHand(true),
+      () => this.stepForwardsByHand(false),
+      () => annotateCurrentInstruction(this.state.ps, this.props.annotator)
+    );
 
     this.setupProgramReevaluation();
 
@@ -202,9 +212,18 @@ var ProgramPlayer = React.createClass({
     this.setState(this.state);
   },
 
-  stepForwardsByHand: function() {
-    this.stepForwards();
-    this.pause();
+  stepForwardsByHand: function(annotate) {
+    if (this.state.paused === false) {
+      this.pause();
+    } else {
+      this.stepForwards();
+      this.state.ps.get("canvasLib").redraw();
+      if (annotate === true) {
+        annotateCurrentInstruction(this.state.ps, this.props.annotator);
+      }
+    }
+
+    this.setState(this.state);
   },
 
   stepForwards: function() {
@@ -283,15 +302,17 @@ var ProgramPlayer = React.createClass({
     }
   },
 
-  stepBackwardsByHand: function() {
+  stepBackwardsByHand: function(annotate) {
     if (this.state.paused === false) {
       this.pause();
     } else {
       this.stepBackwards();
+      if (annotate === true) {
+        annotateCurrentInstruction(this.state.ps, this.props.annotator);
+      }
     }
 
     this.setState(this.state);
-    annotateCurrentInstruction(this.state.ps, this.props.annotator);
   },
 
   canStepForwards: function() {
