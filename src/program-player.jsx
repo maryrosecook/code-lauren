@@ -38,7 +38,7 @@ function hasAnnotatablePs(pses) {
   return false;
 };
 
-function handleClickHoldDownEnd(onClick, onHoldDown, onHoldDownEnd) {
+function onClickOrHoldDown(onClick) {
   var firstClickTime;
   var timerId;
 
@@ -49,14 +49,13 @@ function handleClickHoldDownEnd(onClick, onHoldDown, onHoldDownEnd) {
 
       timerId = setTimeout(function() {
         timerId = setInterval(function() {
-          onHoldDown();
+          onClick();
         }, 0);
       }, 300);
     } else if (e.type === "mouseup") {
       clearInterval(timerId);
       timerId = undefined;
       firstClickTime = undefined;
-      onHoldDownEnd();
     }
   };
 };
@@ -94,17 +93,8 @@ function parse(code, annotator) {
 
 var ProgramPlayer = React.createClass({
   getInitialState: function() {
-    this.stepBackwardsClickHandler = handleClickHoldDownEnd(
-      () => this.stepBackwardsByHand(true),
-      () => this.stepBackwardsByHand(false),
-      () => annotateCurrentInstruction(this.state.ps, this.props.annotator)
-    );
-
-    this.stepForwardsClickHandler = handleClickHoldDownEnd(
-      () => this.stepForwardsByHand(true),
-      () => this.stepForwardsByHand(false),
-      () => annotateCurrentInstruction(this.state.ps, this.props.annotator)
-    );
+    this.stepBackwardsClickHandler = onClickOrHoldDown(this.stepBackwardsByHand);
+    this.stepForwardsClickHandler = onClickOrHoldDown(this.stepForwardsByHand);
 
     this.setupProgramReevaluation();
 
@@ -212,18 +202,9 @@ var ProgramPlayer = React.createClass({
     this.setState(this.state);
   },
 
-  stepForwardsByHand: function(annotate) {
-    if (this.state.paused === false) {
-      this.pause();
-    } else {
-      this.stepForwards();
-      this.state.ps.get("canvasLib").redraw();
-      if (annotate === true) {
-        annotateCurrentInstruction(this.state.ps, this.props.annotator);
-      }
-    }
-
-    this.setState(this.state);
+  stepForwardsByHand: function() {
+    this.stepForwards();
+    this.pause();
   },
 
   stepForwards: function() {
@@ -302,17 +283,15 @@ var ProgramPlayer = React.createClass({
     }
   },
 
-  stepBackwardsByHand: function(annotate) {
+  stepBackwardsByHand: function() {
     if (this.state.paused === false) {
       this.pause();
     } else {
       this.stepBackwards();
-      if (annotate === true) {
-        annotateCurrentInstruction(this.state.ps, this.props.annotator);
-      }
     }
 
     this.setState(this.state);
+    annotateCurrentInstruction(this.state.ps, this.props.annotator);
   },
 
   canStepForwards: function() {
