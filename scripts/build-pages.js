@@ -142,7 +142,7 @@ function indexSlugs(indexPath) {
 };
 
 function tutorialPrefix(indexPath) {
-  return indexPath.match(/\/([^\/]+-)index\.md$/)[1];
+  return indexPath.match(/\/([^\/]+---)index\.md$/)[1];
 };
 
 function tutorialIndices(allPaths) {
