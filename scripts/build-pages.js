@@ -7,6 +7,12 @@ var PAGES_PATH = __dirname + "/../pages";
 
 var pageLinkRegex = /\(#([^\)]+)\)$/;
 
+function SpecificError(message) {
+  this.message = message;
+};
+
+SpecificError.prototype = Object.create(Error.prototype);
+
 function buildPages() {
   try {
     var allPaths = markdownPaths(PAGES_PATH);
@@ -34,7 +40,7 @@ function buildPages() {
         })
         .reduce(function(a, o) {
           if (o.slug in a) {
-            throw new Error("Duplicated slug: " + o.slug);
+            throw new SpecificError("Duplicated slug: " + o.slug);
           }
 
           a[o.slug] = { string: o.string, html: o.html, slug: o.slug };
@@ -45,8 +51,11 @@ function buildPages() {
                      "module.exports = " + JSON.stringify(pages));
     console.log("Rebuilt");
   } catch (e) {
-    console.log(e.stack)
-    console.log("Rebuild failed:", e.message);
+    if (e instanceof SpecificError) {
+      console.log("Rebuild failed:", e.message);
+    } else {
+      console.log(e.stack)
+    }
   }
 };
 
@@ -67,7 +76,18 @@ function tutorialPathPages(allPages, indexPath) {
   }
 
   if (navLinkPairs.length !== contentPaths.length) {
-    throw new Error("Index doesn't match pages in " + prefix + " tutorial.");
+    var tocError = "TOC: \n" + toc
+        .sort()
+        .map(function(s) { return "  " + s; })
+        .join("\n");
+    var contentPathsError = "Pages in dir: \n" + contentPaths
+        .sort()
+        .map(function(s) { return "  " + s; })
+        .join("\n");
+
+    throw new SpecificError("Index doesn't match pages in " + prefix + " tutorial:\n" +
+                            tocError + "\n" +
+                            contentPathsError);
   }
 
   return toc
@@ -200,10 +220,10 @@ function checkPageLinks(pagesWithPaths) {
       .value();
 
   if (brokenLinks.length > 0) {
-    throw new Error("Broken link(s) to: \n" +
-                    brokenLinks
-                      .map(function(l) { return "  " + l.linkSlug + " in " + l.pageSlug })
-                      .join("\n"));
+    throw new SpecificError("Broken link(s) to: \n" +
+                            brokenLinks
+                            .map(function(l) { return "  " + l.linkSlug + " in " + l.pageSlug })
+                            .join("\n"));
   }
 };
 
