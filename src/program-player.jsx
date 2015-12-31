@@ -23,7 +23,7 @@ function annotateCurrentInstruction(ps, annotator) {
     annotator.codeHighlight(ps.get("code"),
                             ps.get("currentInstruction").ast.s,
                             ps.get("currentInstruction").ast.e,
-                            "currently-executing");
+                            "exec");
   }
 };
 
