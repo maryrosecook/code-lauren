@@ -1,4 +1,4 @@
-# Lauren
+# Code Lauren
 
 Game programming for beginners.
 
