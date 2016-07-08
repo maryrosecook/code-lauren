@@ -4,6 +4,10 @@ var util = require("../util");
 var chk = require("./check-args");
 var im = require("immutable");
 
+function maybeUnwrapImmutableValue(item) {
+  return item !== undefined && item.toJS ? item.toJS() : item;
+};
+
 var createStandardLibrary = module.exports = function () {
   var lib = im.Map({
     add: langUtil.createBuiltinNormal(function(meta, a, b) {
@@ -164,7 +168,7 @@ var createStandardLibrary = module.exports = function () {
         chk(arguments,
             chk.defined("something to print"));
 
-        console.log(itemToPrint);
+        console.log(maybeUnwrapImmutableValue(itemToPrint));
         return itemToPrint + "\n";
       }),
 
