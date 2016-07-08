@@ -151,10 +151,11 @@ function ParenthesisError(s, message, stack) {
 };
 ParenthesisError.prototype = Object.create(Error.prototype);
 
-parse.indexToLineAndColumn = indexToLineAndColumn;
-parse.balanceParentheses = balanceParentheses;
-parse.verifyAllAstNodesHaveStartIndex = verifyAllAstNodesHaveStartIndex;
-parse.parse = parse;
-parse.ParseError = ParseError;
-parse.ParenthesisError = ParenthesisError;
-module.exports = parse;
+module.exports = _.extend(parse, {
+  indexToLineAndColumn: indexToLineAndColumn,
+  balanceParentheses: balanceParentheses,
+  verifyAllAstNodesHaveStartIndex: verifyAllAstNodesHaveStartIndex,
+  parse: parse,
+  ParseError: ParseError,
+  ParenthesisError: ParenthesisError
+});
