@@ -61,11 +61,13 @@ function stepGetEnv(ins, p) {
 };
 
 function stepSetEnv(ins, p) {
-  var v = p.get("stack").peek().v;
   var currentScopeId = currentCallFrame(p).get("scope");
-  return p.set("stack", p.get("stack").shift())
+  var variableName = ins[1];
+  var variableValue = p.get("stack").peek().v;
+  return p
+    .set("stack", p.get("stack").shift())
     .set("scopes",
-         addScope.setGlobalBinding(p.get("scopes"), currentScopeId, ins[1], v));
+         addScope.setGlobalBinding(p.get("scopes"), currentScopeId, variableName, variableValue));
 };
 
 function stepInvoke(ins, p, noOutputting) {
