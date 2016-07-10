@@ -119,7 +119,8 @@ function stepInvoke(ins, p, noOutputting) {
           return p.set("scopes", addScope.setGlobalBinding(p.get("scopes"),
                                                            currentScopeId,
                                                            varName,
-                                                           newThing));
+                                                           newThing))
+            .set("stack", p.get("stack").unshift({ v: newThing, ast: ins.ast }));
         }
       } else {
         return p;
