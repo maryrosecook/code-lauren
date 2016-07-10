@@ -1,7 +1,7 @@
 {
   "name": "lauren",
   "description": "A programming environment for beginners.",
-  "author": "Mary Rose Cook <maryrosecook@maryrosecook.com> (http://maryrosecook.com/)",
+  "author": "Mary Rose Cook <mary@maryrosecook.com> (http://maryrosecook.com/)",
   "version": "0.1.0",
   "repository": {
     "type": "git",
