@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/maryrosecook/lauren.git"
+    "url": "https://github.com/maryrosecook/code-lauren.git"
   },
   "scripts": {
     "test": "node --harmony node_modules/jasmine-node/lib/jasmine-node/cli.js --color spec/",
