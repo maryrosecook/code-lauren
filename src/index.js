@@ -26,6 +26,7 @@ require("./top");
 
 var Topbar = require("./topbar.jsx");
 var Sidebar = require("./sidebar.jsx");
+var ExplanationShower = require("./explanation-shower.jsx");
 
 var createEditor = require("./editor");
 var sourceSaver = require("./source-saver");
@@ -40,6 +41,9 @@ window.addEventListener("load", function() {
 
   // export globally
   top.pub.sidebar = React.render(React.createElement(Sidebar), $("#sidebar")[0]);
+  top.pub.explanationShower = React.render(React.createElement(ExplanationShower,
+                                                               { editor: editor } ),
+                                           $("#explanation-shower")[0]);
   top.pub.editor = editor;
   top.pub.codeToFailedParseStack = require("./lang/parser-state-error").codeToFailedParseStack;
 

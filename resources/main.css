@@ -138,13 +138,31 @@ video {
   font-weight: bold;
 }
 
+#explanation-shower {
+  font-size: 16px;
+  position: fixed;
+  top: 70%;
+  right: 0;
+  width: 450px;
+  max-width: 450px;
+  height: 30%;
+  border-top: 1px black solid;
+  background-color: white;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.explanation-shower {
+  padding: 0 8px 0 8px; /* put padding on this so don't throw off 70/30 split w line messages */
+}
+
 #sidebar {
   font-size: 16px;
   position: fixed;
   right: 0;
   width: 450px;
   max-width: 450px;
-  height: calc(100% - 32px);
+  height: calc(70% - 32px);
   background-color: white;
   z-index: 2;
   overflow: hidden;
