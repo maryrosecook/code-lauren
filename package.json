@@ -8,7 +8,7 @@
     "url": "https://github.com/maryrosecook/code-lauren.git"
   },
   "scripts": {
-    "test": "node --harmony node_modules/jasmine-node/lib/jasmine-node/cli.js --color spec/",
+    "test": "node --harmony node_modules/jasmine-node/lib/jasmine-node/cli.js --color --autotest src/ spec/",
     "build-for-deploy": "rm -r build; webpack -p --progress --colors",
     "watch": "rm -r build; webpack --progress --colors --watch",
     "start": "live-server build --port=4000 --no-browser --host=localhost",
