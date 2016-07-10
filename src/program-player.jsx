@@ -8,7 +8,7 @@ var compile = require("./lang/compiler");
 var langUtil = require("../src/lang/lang-util");
 var url = require("./url");
 
-var STEP_TO_SAVE = 2000;
+var STEP_TO_SAVE = 40000;
 
 function annotateCurrentInstruction(ps, annotator) {
   if (ps.get("currentInstruction") === undefined) { return; }
