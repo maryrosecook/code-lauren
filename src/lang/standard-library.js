@@ -98,7 +98,7 @@ var createStandardLibrary = module.exports = function () {
       return parseFloat(x) / 0.01745;
     }),
 
-    "make-thing": langUtil.createBuiltinNormal(function(meta) {
+    "thing": langUtil.createBuiltinNormal(function(meta) {
       return im.Map();
     }),
 

@@ -13,10 +13,10 @@ function metaMock() {
 };
 
 describe("library", function() {
-  describe("make-thing", function() {
+  describe("thing", function() {
     it("should be able to make new empty dict", function() {
       var lib = standardLibrary();
-      expect(lib.getIn(["make-thing", "fn"])().toObject()).toEqual({});
+      expect(lib.getIn(["thing", "fn"])().toObject()).toEqual({});
     });
   });
 
@@ -26,23 +26,23 @@ describe("library", function() {
       expect(v(code, c(p(code))).get("exception").message)
         .toEqual("Needs a thing to set some information on");
 
-      var code = 'a: make-thing() \n set(a)';
+      var code = 'a: thing() \n set(a)';
       expect(v(code, c(p(code))).get("exception").message)
         .toEqual("Needs the name of the information to set");
 
-      var code = 'a: make-thing() \n set(a "key")';
+      var code = 'a: thing() \n set(a "key")';
       expect(v(code, c(p(code))).get("exception").message)
         .toEqual("Needs the information to set");
     });
 
     it("should be able to add a value to a thing by mutating the thing", function() {
-      var code = 'thing: make-thing() \n set(thing "key" "value") \n thing';
+      var code = 'thing: thing() \n set(thing "key" "value") \n thing';
       var ps = v(code, c(p(code)));
       expect(ps.getIn(["stack", -1]).v.toObject()).toEqual({ key: "value" });
     });
 
     it("should be able to change a value on a thing by mutating the thing", function() {
-      var code = 'thing: make-thing() \n set(thing "key" "a") \n set(thing "key" "b") \n thing';
+      var code = 'thing: thing() \n set(thing "key" "a") \n set(thing "key" "b") \n thing';
       var ps = v(code, c(p(code)));
       expect(ps.getIn(["stack", -1]).v.toObject()).toEqual({ key: "b" });
     });
@@ -56,7 +56,7 @@ describe("library", function() {
 
   describe("get", function() {
     it("should be able to get a value from a dict", function() {
-      var code = 'thing: make-thing() \n set(thing "key" "value") \n get(thing "key")';
+      var code = 'a: thing() \n set(a "key" "value") \n get(a "key")';
       var ps = v(code, c(p(code)));
       expect(ps.getIn(["stack", -1]).v).toEqual("value");
     });

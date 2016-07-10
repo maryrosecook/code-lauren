@@ -6,6 +6,8 @@ var langUtil = require("./lang/lang-util");
 var chk = require("./lang/check-args");
 var env = require("./env");
 
+var OPERATIONS_TO_SAVE = 40000;
+
 var screen;
 var step = 0;
 var allDrawOperations = [];
@@ -24,7 +26,7 @@ function addOperation(op) {
   allDrawOperations.push(op);
   drawOperationsSinceLastRepaint.push(op);
 
-  if (allDrawOperations.length > 5000) {
+  if (allDrawOperations.length > OPERATIONS_TO_SAVE) {
     allDrawOperations.shift();
   }
 };
@@ -127,7 +129,7 @@ var user = im.Map({
 
   draw: langUtil.createBuiltinOutputting(function(meta, drawable) {
     chk(arguments,
-        chk.anyType(["rectangle", "circle", "text"], "a shape or a piece of text to draw"));
+        chk.anyType(["rectangle", "circle", "words"], "a shape or some words to draw"));
 
     addOperation(makeOperation(function () {
       drawFns[drawable.get("type")](drawable);
@@ -153,7 +155,7 @@ var user = im.Map({
     };
   }),
 
-  "make-rectangle": langUtil.createBuiltinNormal(function(meta, x, y, width, height) {
+  "rectangle": langUtil.createBuiltinNormal(function(meta, x, y, width, height) {
     chk(arguments,
         chk.num("the x coordinate of the center of the rectangle"),
         chk.num("the y coordinate of the center of the rectangle"),
@@ -164,7 +166,7 @@ var user = im.Map({
                    filled: true, color: "black", type: "rectangle"});
   }),
 
-  "make-circle": langUtil.createBuiltinNormal(function(meta, x, y, width) {
+  "circle": langUtil.createBuiltinNormal(function(meta, x, y, width) {
     chk(arguments,
         chk.num("the x coordinate of the center of the circle"),
         chk.num("the y coordinate of the center of the circle"),
@@ -181,13 +183,13 @@ var user = im.Map({
     screen.globalCompositeOperation = operation;
   }),
 
-  "make-text": langUtil.createBuiltinNormal(function(meta, x, y, text) {
+  "words": langUtil.createBuiltinNormal(function(meta, x, y, words) {
     chk(arguments,
-        chk.num("the x coordinate of the center of the text"),
-        chk.num("the y coordinate of the center of the text"),
+        chk.num("the x coordinate of the center of the words"),
+        chk.num("the y coordinate of the center of the words"),
         chk.numOrBooleanOrString("some words or a number"));
 
-    return im.Map({x: x, y: y, text: text, color: "black", type: "text" });
+    return im.Map({x: x, y: y, words: words, color: "black", type: "words" });
   }),
 
   distance: langUtil.createBuiltinNormal(function(meta, s1, s2) {
@@ -242,12 +244,12 @@ var drawFns = {
     }
   },
 
-  text: function(t) {
+  words: function(t) {
     screen.font = "20px Georgia";
     screen.textAlign = "center";
     screen.textBaseline = "middle";
     screen.fillStyle = t.get("color");
-    screen.fillText(t.get("text"), t.get("x"), env.yInvert(t.get("y")));
+    screen.fillText(t.get("words"), t.get("x"), env.yInvert(t.get("y")));
     screen.fillStyle = "black";
   }
 };
