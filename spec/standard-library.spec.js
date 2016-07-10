@@ -47,9 +47,10 @@ describe("library", function() {
       expect(ps.getIn(["stack", -1]).v.toObject()).toEqual({ key: "b" });
     });
 
-    it("should return undefined", function() {
-      var code = 'a: make-thing() \n set(a "key" "value")';
-      expect(v(code, c(p(code))).getIn(["stack", -1])).toBeUndefined();
+    it("should return newly set value", function() {
+      var code = 'a: thing() \n set(a "key" "value")';
+      expect(v(code, c(p(code))).getIn(["stack", -1]).v.toObject()).toEqual({ key: "value" });
+    });
     });
   });
 
