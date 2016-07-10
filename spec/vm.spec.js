@@ -1,6 +1,7 @@
 var p = require("../src/lang/parser");
 var c = require("../src/lang/compiler");
 var v = require("../src/lang/vm");
+var programState = require("../src/lang/program-state");
 
 var util = require("../src/util");
 
@@ -128,7 +129,7 @@ describe("vm", function() {
 
     it("should assign lambda to env at top level", function() {
       var code = "a: { 1 }";
-      var ps = v.initProgramState(code, c(p(code)));
+      var ps = programState.init(code, c(p(code)));
       ps = v.step(ps);
       ps = v.step(ps);
 
@@ -160,7 +161,7 @@ describe("vm", function() {
 
       var code = 'x: 0 \n forever { \n print("hi") \n x: 1 \n print(x) }';
 
-      var ps = v.initProgramState(code, c(p(code)));
+      var ps = programState.init(code, c(p(code)));
 
       for (var i = 0; i < 21; i++) {
         ps = v.step(ps);
@@ -192,7 +193,7 @@ describe("vm", function() {
 
       var code = 'x: 0 \n forever { \n print("hi") \n x: add(x 1) \n print(x) }';
 
-      var ps = v.initProgramState(code, c(p(code)));
+      var ps = programState.init(code, c(p(code)));
 
       for (var i = 0; i < 25; i++) {
         ps = v.step(ps);
@@ -230,7 +231,7 @@ describe("vm", function() {
 
     it("should put undefined on stack if false and no second branch", function() {
       var code = "if false { 1 }";
-      var ps = v.initProgramState(code, c(p(code)));
+      var ps = programState.init(code, c(p(code)));
 
       ps = v.step(ps);
       expect(ps.get("currentInstruction")[0]).toEqual("push");

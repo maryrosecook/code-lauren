@@ -3,6 +3,7 @@ var _ = require("underscore");
 var p = require("../src/lang/parser");
 var c = require("../src/lang/compiler");
 var v = require("../src/lang/vm");
+var programState = require("../src/lang/program-state");
 var langUtil = require("../src/lang/lang-util");
 
 var env = require("../src/env.js");
@@ -21,7 +22,7 @@ describe("copy-state", function() {
   describe("copyProgramState", function() {
     it("should be able to step through assignment and leave original env unchanged", function() {
       var code = "x: 5";
-      var originalPs = v.initProgramState(code, c(p(code)));
+      var originalPs = programState.init(code, c(p(code)));
 
       expect(originalPs.getIn(["callStack", 0, "env", "bindings", "x"])).toBeUndefined();
 
@@ -48,25 +49,25 @@ describe("copy-state", function() {
     it("should not share counters between ps and its copy", function() {
       var code = 'counted(2)';
 
-      var ps = v.initProgramState(code, c(p(code)));
+      var ps = programState.init(code, c(p(code)));
       var ps2 = ps;
 
-      expect(v.isComplete(ps)).toEqual(false);
+      expect(programState.isComplete(ps)).toEqual(false);
       ps = v.step(ps);
       ps = v.step(ps);
       ps = v.step(ps);
       ps = v.step(ps);
       ps = v.step(ps);
-      expect(v.isComplete(ps)).toEqual(true);
+      expect(programState.isComplete(ps)).toEqual(true);
       expect(ps.get("stack").peek().v).toEqual(false);
 
-      expect(v.isComplete(ps2)).toEqual(false);
+      expect(programState.isComplete(ps2)).toEqual(false);
       ps2 = v.step(ps2);
       ps2 = v.step(ps2);
       ps2 = v.step(ps2);
       ps2 = v.step(ps2);
       ps2 = v.step(ps2);
-      expect(v.isComplete(ps2)).toEqual(true);
+      expect(programState.isComplete(ps2)).toEqual(true);
       expect(ps2.get("stack").peek().v).toEqual(false);
     });
   });

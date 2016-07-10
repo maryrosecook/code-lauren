@@ -6,13 +6,14 @@ var vm = require("../src/lang/vm");
 var standardLibrary = require("../src/lang/standard-library");
 var canvasLibrary = require("../src/canvas-library");
 var env = require("../src/env");
+var programState = require("../src/lang/program-state");
 
 var canvasLib = canvasLibrary({});
 
 function setupProgram(code) {
-  return vm.initProgramState(code,
-                             compile(parse(code)),
-                             standardLibrary().merge(canvasLib.user));
+  return programState.init(code,
+                           compile(parse(code)),
+                           standardLibrary().merge(canvasLib.user));
 };
 
 describe("canvas library", function() {

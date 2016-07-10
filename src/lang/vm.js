@@ -2,14 +2,11 @@ var _ = require("underscore");
 var im = require("immutable");
 
 var util = require("../util");
-var standardLibrary = require("./standard-library");
 var setupEnv = require("../env");
 var addScope = require("./scope");
 var langUtil = require("./lang-util");
 var checkArgs = require("./check-args");
-
-var BUILTIN_SCOPE_ID = 0;
-var GLOBAL_SCOPE_ID = 1;
+var programState = require("./program-state");
 
 function stepPush(ins, p) {
   // TODO: when have lists and objects in lang, will need to detect them and use immutablejs
@@ -23,7 +20,8 @@ function stepPushLambda(ins, p) {
   // once created, will have this id for rest of program, so don't need
   // immutable data
   lambda = lambda.set("closureScope",
-                      currentCallFrame(p).get("scope")); // an id into the p.scopes object
+                      programState.currentCallFrame(p)
+                        .get("scope")); // an id into the p.scopes object
 
   return p.set("stack", p.get("stack").unshift({ v: lambda, ast: ins.ast }));
 };
@@ -49,7 +47,7 @@ function stepArgStart(ins, p) {
 
 function stepGetEnv(ins, p) {
   var scopes = p.get("scopes");
-  var currentScope = currentCallFrame(p).get("scope");
+  var currentScope = programState.currentCallFrame(p).get("scope");
   var key = ins[1];
 
   if (!addScope.hasScopedBinding(scopes, currentScope, key)) {
@@ -61,7 +59,7 @@ function stepGetEnv(ins, p) {
 };
 
 function stepSetEnv(ins, p) {
-  var currentScopeId = currentCallFrame(p).get("scope");
+  var currentScopeId = programState.currentCallFrame(p).get("scope");
   var variableName = ins[1];
   var variableValue = p.get("stack").peek().v;
   return p
@@ -94,7 +92,7 @@ function stepInvoke(ins, p, noOutputting) {
           .setIn(["callStack", -1, "scope"], addScope.lastScopeId(p))
           .setIn(["callStack", -1, "bcPointer"], 0);
       } else {
-        return pushCallFrame(p, fnObj.get("bc"), 0, addScope.lastScopeId(p), ins[2]);
+        return programState.pushCallFrame(p, fnObj.get("bc"), 0, addScope.lastScopeId(p), ins[2]);
       }
     } else if (langUtil.isBuiltin(fnObj)) {
       if (noOutputting !== langUtil.NO_OUTPUTTING ||
@@ -116,7 +114,7 @@ function stepInvoke(ins, p, noOutputting) {
         } else if (langUtil.isBuiltinMutating(fnObj)) {
           var meta = new langUtil.Meta(ins.ast);
           var newThing = fn.apply(null, [meta].concat(argValues));
-          var currentScopeId = currentCallFrame(p).get("scope");
+          var currentScopeId = programState.currentCallFrame(p).get("scope");
           var varName = ins.ast.c[1].c;
           return p.set("scopes", addScope.setGlobalBinding(p.get("scopes"),
                                                            currentScopeId,
@@ -171,7 +169,7 @@ function stepJump(ins, p) {
 };
 
 function step(p, noOutputting) {
-  var currentFrame = currentCallFrame(p);
+  var currentFrame = programState.currentCallFrame(p);
   if (currentFrame === undefined) {
     return p;
   } else {
@@ -218,85 +216,21 @@ function step(p, noOutputting) {
   }
 };
 
-function maybePrintError(e) {
-  if (typeof(window) === "undefined" || window.location.href.indexOf("localhost:") !== -1) {
-    console.log(e.stack);
-  }
-};
-
 function complete(p) {
-  while (!isComplete(p) && !isCrashed(p)) {
+  while (!programState.isComplete(p) && !programState.isCrashed(p)) {
     p = step(p);
   }
 
   return p;
 };
 
-function currentCallFrame(p) {
-  return p.get("callStack").last();
-};
-
-function isComplete(p) {
-  var callStack = p.get("callStack");
-  var callFrame = callStack.get(0);
-  return callFrame === undefined ||
-    (callStack.size === 1 &&
-     callFrame.get("bcPointer") === callFrame.get("bc").length);
-};
-
-function isCrashed(p) {
-  return p.get("exception") !== undefined;
-};
-
-function initProgramState(code, bc, builtinBindings) {
-  builtinBindings = builtinBindings || standardLibrary();
-
-  var bcPointer = 0;
-
-  var p = im.Map({
-    exception: undefined,
-    code: code,
-    currentInstruction: undefined,
-    stack: im.Stack(),
-    callStack: im.List(), // can't be a stack because too much editing of head
-    scopes: im.List()
-  });
-
-  p = addScope(p, builtinBindings); // builtin scope
-  p = addScope(p, im.Map(), BUILTIN_SCOPE_ID); // global scope - mouse, keyboard etc
-  p = pushCallFrame(p, bc, bcPointer, GLOBAL_SCOPE_ID); // user top level scope
-  return p;
-};
-
-function mergeTopLevelBindings(p, bindings) {
-  for (var name in bindings) {
-    p = p.set("scopes", addScope.setBindingAtId(p.get("scopes"),
-                                                GLOBAL_SCOPE_ID,
-                                                name,
-                                                bindings[name]));
-  }
-
-  return p;
-};
-
-function pushCallFrame(p, bc, bcPointer, scopeId, tail) {
-  return p.set("callStack",
-               p.get("callStack").push(im.Map({
-                 bc: bc, bcPointer: bcPointer, scope: scopeId, tail: tail
-               })));
-};
-
 function initProgramStateAndComplete(code, bc, env) {
-  return complete(initProgramState(code, bc, env));
+  return complete(programState.init(code, bc, env));
 };
 
-function throwIfUninvokedStackFunctions(p) {
-  var unrunFn = p.get("stack").find(o => langUtil.isInvokable(o.v));
-  if (unrunFn !== undefined) {
-    throw new langUtil.RuntimeError("This is an action. Type " +
-                                    p.get("code").slice(unrunFn.ast.s, unrunFn.ast.e) +
-                                    "() to run it.",
-                                    unrunFn.ast);
+function maybePrintError(e) {
+  if (typeof(window) === "undefined" || window.location.href.indexOf("localhost:") !== -1) {
+    console.log(e.stack);
   }
 };
 
@@ -319,12 +253,17 @@ function popTopArgsOnStack(p) {
   ];
 };
 
+function throwIfUninvokedStackFunctions(p) {
+  var unrunFn = p.get("stack").find(o => langUtil.isInvokable(o.v));
+  if (unrunFn !== undefined) {
+    throw new langUtil.RuntimeError("This is an action. Type " +
+                                    p.get("code").slice(unrunFn.ast.s, unrunFn.ast.e) +
+                                    "() to run it.",
+                                    unrunFn.ast);
+  }
+};
+
 initProgramStateAndComplete.initProgramStateAndComplete = initProgramStateAndComplete;
-initProgramStateAndComplete.initProgramState = initProgramState;
 initProgramStateAndComplete.step = step;
 initProgramStateAndComplete.complete = complete;
-initProgramStateAndComplete.isComplete = isComplete;
-initProgramStateAndComplete.isCrashed = isCrashed;
-initProgramStateAndComplete.mergeTopLevelBindings = mergeTopLevelBindings;
-
 module.exports = initProgramStateAndComplete;

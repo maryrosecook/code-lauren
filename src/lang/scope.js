@@ -57,4 +57,5 @@ addScope.hasScopedBinding = hasScopedBinding;
 addScope.setGlobalBinding = setGlobalBinding;
 addScope.lastScopeId = lastScopeId;
 addScope.setBindingAtId = setBindingAtId;
+addScope.addScope = addScope;
 module.exports = addScope;
