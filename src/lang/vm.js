@@ -263,7 +263,8 @@ function throwIfUninvokedStackFunctions(p) {
   }
 };
 
-initProgramStateAndComplete.initProgramStateAndComplete = initProgramStateAndComplete;
-initProgramStateAndComplete.step = step;
-initProgramStateAndComplete.complete = complete;
-module.exports = initProgramStateAndComplete;
+module.exports = _.extend(initProgramStateAndComplete, {
+  initProgramStateAndComplete: initProgramStateAndComplete,
+  step: step,
+  complete: complete
+});
