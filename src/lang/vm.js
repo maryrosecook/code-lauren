@@ -3,7 +3,7 @@ var im = require("immutable");
 
 var util = require("../util");
 var setupEnv = require("../env");
-var addScope = require("./scope");
+var scope = require("./scope");
 var langUtil = require("./lang-util");
 var checkArgs = require("./check-args");
 var programState = require("./program-state");
@@ -50,10 +50,10 @@ function stepGetEnv(ins, p) {
   var currentScope = programState.currentCallFrame(p).get("scope");
   var key = ins[1];
 
-  if (!addScope.hasScopedBinding(scopes, currentScope, key)) {
+  if (!scope.hasScopedBinding(scopes, currentScope, key)) {
     throw new langUtil.RuntimeError("Never heard of " + ins[1], ins.ast);
   } else {
-    var value = addScope.getScopedBinding(scopes, currentScope, key);
+    var value = scope.getScopedBinding(scopes, currentScope, key);
     return p.set("stack", p.get("stack").push({ v: value, ast: ins.ast }));
   }
 };
@@ -65,7 +65,7 @@ function stepSetEnv(ins, p) {
   return p
     .set("stack", p.get("stack").shift())
     .set("scopes",
-         addScope.setGlobalBinding(p.get("scopes"), currentScopeId, variableName, variableValue));
+         scope.setGlobalBinding(p.get("scopes"), currentScopeId, variableName, variableValue));
 };
 
 function stepInvoke(ins, p, noOutputting) {
@@ -81,18 +81,18 @@ function stepInvoke(ins, p, noOutputting) {
 
     if (langUtil.isLambda(fnObj)) {
       checkArgs.checkLambdaArgs(fnStackItem, argContainers, ins.ast);
-      p = addScope(p,
-                   im.Map(_.object(fnObj.get("parameters"), argValues)),
-                   fnObj.get("closureScope"));
+      p = scope.addScope(p,
+                         im.Map(_.object(fnObj.get("parameters"), argValues)),
+                         fnObj.get("closureScope"));
 
       var tailIndex = tailCallIndex(p.get("callStack"), fnObj);
       if (tailIndex !== undefined) { // if tail position exprs all way to recursive call then tco
         return p
           .set("callStack", p.get("callStack").slice(0, tailIndex + 1))
-          .setIn(["callStack", -1, "scope"], addScope.lastScopeId(p))
+          .setIn(["callStack", -1, "scope"], scope.lastScopeId(p))
           .setIn(["callStack", -1, "bcPointer"], 0);
       } else {
-        return programState.pushCallFrame(p, fnObj.get("bc"), 0, addScope.lastScopeId(p), ins[2]);
+        return programState.pushCallFrame(p, fnObj.get("bc"), 0, scope.lastScopeId(p), ins[2]);
       }
     } else if (langUtil.isBuiltin(fnObj)) {
       if (noOutputting !== langUtil.NO_OUTPUTTING ||
@@ -116,7 +116,7 @@ function stepInvoke(ins, p, noOutputting) {
           var newThing = fn.apply(null, [meta].concat(argValues));
           var currentScopeId = programState.currentCallFrame(p).get("scope");
           var varName = ins.ast.c[1].c;
-          return p.set("scopes", addScope.setGlobalBinding(p.get("scopes"),
+          return p.set("scopes", scope.setGlobalBinding(p.get("scopes"),
                                                            currentScopeId,
                                                            varName,
                                                            newThing))

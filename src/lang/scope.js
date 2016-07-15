@@ -52,10 +52,11 @@ function lastScopeId(p) {
   return p.get("scopes").size - 1;
 };
 
-addScope.getScopedBinding = getScopedBinding;
-addScope.hasScopedBinding = hasScopedBinding;
-addScope.setGlobalBinding = setGlobalBinding;
-addScope.lastScopeId = lastScopeId;
-addScope.setBindingAtId = setBindingAtId;
-addScope.addScope = addScope;
-module.exports = addScope;
+module.exports = {
+  getScopedBinding: getScopedBinding,
+  hasScopedBinding: hasScopedBinding,
+  setGlobalBinding: setGlobalBinding,
+  lastScopeId: lastScopeId,
+  setBindingAtId: setBindingAtId,
+  addScope: addScope
+};
