@@ -77,7 +77,7 @@ function stepInvoke(ins, p, noOutputting) {
     var pAndArgContainers = popTopArgsOnStack(p);
     var p = pAndArgContainers[0];
     var argContainers = pAndArgContainers[1];
-    var argValues = argContainers.map(function(c) { return c.v; });
+    var argValues = _.pluck(argContainers, "v");
 
     if (langUtil.isLambda(fnObj)) {
       checkArgs.checkLambdaArgs(fnStackItem, argContainers, ins.ast);
