@@ -51,7 +51,6 @@ describe("library", function() {
       var code = 'a: thing() \n set(a "key" "value")';
       expect(v(code, c(p(code))).getIn(["stack", -1]).v.toObject()).toEqual({ key: "value" });
     });
-    });
   });
 
   describe("get", function() {
