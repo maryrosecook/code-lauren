@@ -300,7 +300,7 @@ var ProgramPlayer = React.createClass({
 
     var testPs = this.state.ps;
     while(true) {
-      testPs = vm.step(testPs, langUtil.NO_SIDE_EFFECTS);
+      testPs = vm.step(testPs, langUtil.NO_OUTPUTTING);
       if (testPs.get("currentInstruction") !== undefined &&
           testPs.get("currentInstruction").annotate === compile.ANNOTATE) {
         return true;
