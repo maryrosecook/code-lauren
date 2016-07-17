@@ -2,6 +2,7 @@ var $ = require('jquery');
 var React = require('react');
 var _ = require("underscore");
 
+var programState = require("./lang/program-state");
 var vm = require("./lang/vm");
 var parser = require("./lang/parser");
 var compile = require("./lang/compiler");
@@ -16,10 +17,10 @@ function annotateCurrentInstruction(ps, annotator) {
   annotator.clear();
 
   var e = ps.get("exception");
-  if (vm.isCrashed(ps) && e instanceof langUtil.RuntimeError) {
+  if (programState.isCrashed(ps) && e instanceof langUtil.RuntimeError) {
     annotator.codeHighlight(ps.get("code"), e.s, e.e, "error");
     annotator.lineMessage(ps.get("code"), e.s, "error", e.message);
-  } else if (!vm.isCrashed(ps)) {
+  } else if (!programState.isCrashed(ps)) {
     annotator.codeHighlight(ps.get("code"),
                             ps.get("currentInstruction").ast.s,
                             ps.get("currentInstruction").ast.e,
@@ -66,10 +67,10 @@ function initProgramState(code, annotator, canvasLib, inputter) {
   if (ast !== undefined) {
     var programBindings = require("./lang/standard-library")()
         .merge(canvasLib.user);
-    var ps = vm
-        .initProgramState(code, compile(ast), programBindings)
+    var ps = programState
+        .init(code, compile(ast), programBindings)
         .set("canvasLib", canvasLib.program);
-    ps = vm.mergeTopLevelBindings(ps, inputter.getMouseBindings());
+    ps = programState.mergeTopLevelBindings(ps, inputter.getMouseBindings());
     return ps;
   }
 };
@@ -106,8 +107,8 @@ var ProgramPlayer = React.createClass({
             !self.state.ps) {
           setTimeout(() => requestAnimationFrame(() => tick(Date.now())), 200);
           break;
-        } else if (vm.isComplete(self.state.ps) ||
-                   vm.isCrashed(self.state.ps)) {
+        } else if (programState.isComplete(self.state.ps) ||
+                   programState.isCrashed(self.state.ps)) {
           self.state.ps.get("canvasLib").flush();
 
           // Check not paused to avoid rerendering error messages
@@ -212,13 +213,13 @@ var ProgramPlayer = React.createClass({
     // Without this assumption, the case where we don't make it to an annotatable
     // instruction would leave side effects done.
 
-    if (vm.isCrashed(this.state.ps) || vm.isComplete(this.state.ps)) {
+    if (programState.isCrashed(this.state.ps) || programState.isComplete(this.state.ps)) {
       return;
     }
 
     if (!this.state.paused) {
-      this.state.ps = vm.mergeTopLevelBindings(this.state.ps,
-                                               this.props.inputter.getMouseBindings());
+      this.state.ps = programState.mergeTopLevelBindings(this.state.ps,
+                                                         this.props.inputter.getMouseBindings());
     }
 
     var loopCount = 0;
@@ -229,10 +230,10 @@ var ProgramPlayer = React.createClass({
       ps = vm.step(ps);
 
       var currentInstruction = ps.get("currentInstruction");
-      if (vm.isCrashed(ps) || // assume want to annotate crashed instruction
+      if (programState.isCrashed(ps) || // assume want to annotate crashed instruction
           (currentInstruction !== undefined &&
            currentInstruction.annotate === compile.ANNOTATE)) {
-        if (vm.isCrashed(ps) && ps.get("exception") instanceof langUtil.RuntimeError) {
+        if (programState.isCrashed(ps) && ps.get("exception") instanceof langUtil.RuntimeError) {
           var e = ps.get("exception");
           this.props.annotator.codeHighlight(ps.get("code"), e.s, e.e, "error");
           this.props.annotator.lineMessage(ps.get("code"), e.s, "error", e.message);
@@ -250,7 +251,7 @@ var ProgramPlayer = React.createClass({
 
         this.state.ps = ps;
         return;
-      } else if (vm.isComplete(ps) || vm.isCrashed(ps)) {
+      } else if (programState.isComplete(ps) || programState.isCrashed(ps)) {
         this.state.ps = ps;
         this.pause();
         return;
@@ -303,7 +304,7 @@ var ProgramPlayer = React.createClass({
       if (testPs.get("currentInstruction") !== undefined &&
           testPs.get("currentInstruction").annotate === compile.ANNOTATE) {
         return true;
-      } else if (vm.isCrashed(testPs) || vm.isComplete(testPs)) {
+      } else if (programState.isCrashed(testPs) || programState.isComplete(testPs)) {
         return false;
       }
     }
