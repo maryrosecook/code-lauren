@@ -1,8 +1,9 @@
 var langUtil = require("./lang-util");
 var _ = require("underscore");
 
+
 function checkBuiltinArgs(fnArgs) {
-  var meta = fnArgs[0];
+  var ast = fnArgs[0].get("currentInstruction").ast;
   var testArgs = _.toArray(fnArgs).slice(1);
   var specs = _.toArray(arguments).slice(1);
   specs.forEach(function(specOrSpecs, i) {
@@ -10,20 +11,20 @@ function checkBuiltinArgs(fnArgs) {
 
     specOrSpecs.forEach(function(spec) {
       if (i >= testArgs.length) {
-        var markerIndex = meta.ast.s + meta.ast.text.trim().length - 1;
+        var markerIndex = ast.s + ast.text.trim().length - 1;
         throw new langUtil.RuntimeError("Needs " + spec.message,
                                         { s: markerIndex, e: markerIndex });
       } else if (testArgs[i] === undefined) {
         throw new langUtil.RuntimeError('This has no value',
-                                        meta.ast.c[i + 1]);
+                                        ast.c[i + 1]);
       } else if (spec.testFn(testArgs[i])) {
         throw new langUtil.RuntimeError("Should be " + spec.message,
-                                        meta.ast.c[i + 1]);
+                                        ast.c[i + 1]);
       }
     });
   });
 
-  checkNoExtraArgs(meta.ast.c[0].c, testArgs, meta.ast.c.slice(1), specs.length);
+  checkNoExtraArgs(ast.c[0].c, testArgs, ast.c.slice(1), specs.length);
 };
 
 function checkLambdaArgs(fnStackItem, argContainers, invocationAst) {

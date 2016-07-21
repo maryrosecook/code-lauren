@@ -5,7 +5,7 @@ var c = require("../src/lang/compiler");
 var v = require("../src/lang/vm");
 var programState = require("../src/lang/program-state");
 var langUtil = require("../src/lang/lang-util");
-
+var standardLibrary = require("../src/lang/standard-library");
 var env = require("../src/env.js");
 
 function functionsEqual(b) {
@@ -22,7 +22,7 @@ describe("copy-state", function() {
   describe("copyProgramState", function() {
     it("should be able to step through assignment and leave original env unchanged", function() {
       var code = "x: 5";
-      var originalPs = programState.init(code, c(p(code)));
+      var originalPs = programState.init(code, c(p(code)), standardLibrary());
 
       expect(originalPs.getIn(["callStack", 0, "env", "bindings", "x"])).toBeUndefined();
 
@@ -49,7 +49,7 @@ describe("copy-state", function() {
     it("should not share counters between ps and its copy", function() {
       var code = 'counted(2)';
 
-      var ps = programState.init(code, c(p(code)));
+      var ps = programState.init(code, c(p(code)), standardLibrary());
       var ps2 = ps;
 
       expect(programState.isComplete(ps)).toEqual(false);

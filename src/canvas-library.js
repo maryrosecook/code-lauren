@@ -121,83 +121,92 @@ var program = {
 };
 
 var user = im.Map({
-  "clear-screen": langUtil.createBuiltinOutputting(function(meta) {
+  "clear-screen": langUtil.createBuiltinOutputting(function(p) {
     addOperation(makeOperation(function () {
       program.clearScreen();
     }, "clear-screen", true));
   }),
 
-  draw: langUtil.createBuiltinOutputting(function(meta, drawable) {
+  draw: langUtil.createBuiltinOutputting(function(p, drawable) {
     chk(arguments,
         chk.anyType(["rectangle", "circle", "words"], "a shape or some words to draw"));
 
     addOperation(makeOperation(function () {
       drawFns[drawable.get("type")](drawable);
     }, "draw"));
+
+    return { p: p, v: undefined };
   }),
 
-  "random-color": langUtil.createBuiltinNormal(function() {
-    return COLORS_WITHOUT_GRAYSCALE[
+  "random-color": langUtil.createBuiltinNormal(function(p) {
+    var color = COLORS_WITHOUT_GRAYSCALE[
       Math.floor(Math.random() * (COLORS_WITHOUT_GRAYSCALE.length - 1))
     ];
+
+    return { p: p, v: color };
   }),
 
-  "are-overlapping": langUtil.createBuiltinNormal(function(meta, s1, s2) {
+  "are-overlapping": langUtil.createBuiltinNormal(function(p, s1, s2) {
     chk(arguments,
         chk.anyType(["rectangle", "circle"], "a shape"),
         chk.anyType(["rectangle", "circle"], "another shape"));
 
     var collisionTestFn = overlappingFns[s1.get("type") + " " + s2.get("type")];
     if (collisionTestFn !== undefined) {
-      return collisionTestFn(s1, s2);
+      return { p: p, v: collisionTestFn(s1, s2) };
     } else {
       throw new Error("Could not find collision test function.");
     };
   }),
 
-  "rectangle": langUtil.createBuiltinNormal(function(meta, x, y, width, height) {
+  "rectangle": langUtil.createBuiltinNormal(function(p, x, y, width, height) {
     chk(arguments,
         chk.num("the x coordinate of the center of the rectangle"),
         chk.num("the y coordinate of the center of the rectangle"),
         chk.num("the width"),
         chk.num("the height"));
 
-    return im.Map({x: x, y: y, width: width, height: height,
-                   filled: true, color: "black", type: "rectangle"});
+    var rectangle = im.Map({x: x, y: y, width: width, height: height,
+                            filled: true, color: "black", type: "rectangle"});
+
+    return { p: p, v: rectangle };
   }),
 
-  "circle": langUtil.createBuiltinNormal(function(meta, x, y, width) {
+  "circle": langUtil.createBuiltinNormal(function(p, x, y, width) {
     chk(arguments,
         chk.num("the x coordinate of the center of the circle"),
         chk.num("the y coordinate of the center of the circle"),
         chk.num("the width"));
 
-    return im.Map({x: x, y: y, width: width,
-                   filled: true, color: "black", type: "circle"});
+    var circle = im.Map({x: x, y: y, width: width,
+                         filled: true, color: "black", type: "circle"});
+    return { p: p, v: circle };
   }),
 
-  "set-composite-operation": langUtil.createBuiltinNormal(function(meta, operation) {
+  "set-composite-operation": langUtil.createBuiltinNormal(function(p, operation) {
     chk(arguments,
         chk.set(COMPOSITE_OPERATIONS, "a composite operation"));
 
     screen.globalCompositeOperation = operation;
+    return { p: p, v: undefined };
   }),
 
-  "words": langUtil.createBuiltinNormal(function(meta, x, y, words) {
+  "words": langUtil.createBuiltinNormal(function(p, x, y, words) {
     chk(arguments,
         chk.num("the x coordinate of the center of the words"),
         chk.num("the y coordinate of the center of the words"),
         chk.numOrBooleanOrString("some words or a number"));
 
-    return im.Map({x: x, y: y, words: words, color: "black", type: "words" });
+    var words = im.Map({x: x, y: y, words: words, color: "black", type: "words" });
+    return { p: p, v: words };
   }),
 
-  distance: langUtil.createBuiltinNormal(function(meta, s1, s2) {
+  distance: langUtil.createBuiltinNormal(function(p, s1, s2) {
     chk(arguments,
         chk.anyType(["rectangle", "circle"], "a shape"),
         chk.anyType(["rectangle", "circle"], "another shape"));
 
-    return shapeDistance(s1, s2);
+    return { p: p, v: shapeDistance(s1, s2) };
   })
 });
 

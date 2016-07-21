@@ -5,6 +5,7 @@ var standardLibrary = require("../src/lang/standard-library.js");
 var p = require("../src/lang/parser");
 var c = require("../src/lang/compiler");
 var v = require("../src/lang/vm");
+var programState = require("../src/lang/program-state");
 var langUtil = require("../src/lang/lang-util");
 var envModule = require("../src/env");
 
@@ -16,7 +17,7 @@ describe("library", function() {
   describe("thing", function() {
     it("should be able to make new empty dict", function() {
       var lib = standardLibrary();
-      expect(lib.getIn(["thing", "fn"])().toObject()).toEqual({});
+      expect(lib.getIn(["thing", "fn"])().v.toObject()).toEqual({});
     });
   });
 
@@ -50,6 +51,12 @@ describe("library", function() {
     it("should return newly set value", function() {
       var code = 'a: thing() \n set(a "key" "value")';
       expect(v(code, c(p(code))).getIn(["stack", -1]).v.toObject()).toEqual({ key: "value" });
+    });
+
+    it("should mutate var passed into lambda for outer scope var passed in from", function() {
+      var code = 'a: thing() \n { ?a-prime set(a-prime "key" "value") }(a) \n a';
+      expect(v(code, c(p(code))).getIn(["stack", -1]).v.toObject())
+        .toEqual({ key: "value" });
     });
   });
 
@@ -295,12 +302,15 @@ describe("library", function() {
       var code = "x: 0 \n forever { collect(counted(2)) \n if equal(3 x) { blowup } else { x: add(x 1) } }";
 
       var counts = [];
-      var env = standardLibrary().set("collect",
-                                      langUtil.createBuiltinNormal(function(__, count) {
-                                        counts.push(count);
-                                      }));
+      var env = standardLibrary()
+          .set("collect", langUtil.createBuiltinNormal(function(p, count) {
+            counts.push(count);
+            return { p: p, v: undefined }
+          }));
 
-      expect(v(code, c(p(code)), env).get("exception").message)
+      var ps = programState.init(code, c(p(code)), env);
+
+      expect(v.complete(ps).get("exception").message)
         .toEqual("Never heard of blowup"); // catch blowup
       expect(counts).toEqual([false, true, false, true]);
     });
@@ -309,12 +319,15 @@ describe("library", function() {
       var code = "x: 0 \n forever { collect(counted(3)) \n if equal(5 x) { blowup } else { x: add(x 1) } }";
 
       var counts = [];
-      var env = standardLibrary().set("collect",
-                                      langUtil.createBuiltinNormal(function(__, count) {
-                                        counts.push(count);
-                                      }));
+      var env = standardLibrary()
+          .set("collect", langUtil.createBuiltinNormal(function(p, count) {
+            counts.push(count);
+            return { p: p, v: undefined }
+          }));
 
-      expect(v(code, c(p(code)), env).get("exception").message)
+      var ps = programState.init(code, c(p(code)), env);
+
+      expect(v.complete(ps).get("exception").message)
         .toEqual("Never heard of blowup"); // catch blowup
       expect(counts).toEqual([false, false, true, false, false, true]);
     });

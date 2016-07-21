@@ -1,8 +1,8 @@
 var _ = require("underscore");
 var im = require("immutable");
 
-var standardLibrary = require("./standard-library");
 var scope = require("./scope");
+var heapLib = require("./heap");
 
 var BUILTIN_SCOPE_ID = 0;
 var GLOBAL_SCOPE_ID = 1;
@@ -24,8 +24,6 @@ function isCrashed(p) {
 };
 
 function init(code, bc, builtinBindings) {
-  builtinBindings = builtinBindings || standardLibrary();
-
   var bcPointer = 0;
 
   var p = im.Map({
@@ -34,7 +32,8 @@ function init(code, bc, builtinBindings) {
     currentInstruction: undefined,
     stack: im.Stack(),
     callStack: im.List(), // can't be a stack because too much editing of head
-    scopes: im.List()
+    scopes: im.List(),
+    heap: heapLib.create()
   });
 
   p = scope.addScope(p, builtinBindings); // builtin scope
@@ -61,9 +60,14 @@ function pushCallFrame(p, bc, bcPointer, scopeId, tail) {
                })));
 };
 
+function currentScopeId(p) {
+  return currentCallFrame(p).get("scope");
+};
+
 module.exports = {
   init: init,
   currentCallFrame: currentCallFrame,
+  currentScopeId: currentScopeId,
   isComplete: isComplete,
   isCrashed: isCrashed,
   mergeTopLevelBindings: mergeTopLevelBindings,

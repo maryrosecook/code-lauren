@@ -6,6 +6,7 @@ var setupEnv = require("../env");
 var scope = require("./scope");
 var langUtil = require("./lang-util");
 var checkArgs = require("./check-args");
+var standardLibrary = require("./standard-library");
 var programState = require("./program-state");
 
 function stepPush(ins, p) {
@@ -70,13 +71,10 @@ function stepSetEnv(ins, p) {
 
 function stepInvoke(ins, p, noOutputting) {
   var fnStackItem = p.get("stack").peek();
-  p = p.set("stack", p.get("stack").shift());
   var fnObj = fnStackItem.v;
 
   if (langUtil.isInvokable(fnObj)) {
-    var pAndArgContainers = popTopArgsOnStack(p);
-    var p = pAndArgContainers[0];
-    var argContainers = pAndArgContainers[1];
+    var argContainers = popFnArgs(p).args;
     var argValues = _.pluck(argContainers, "v");
 
     if (langUtil.isLambda(fnObj)) {
@@ -87,43 +85,26 @@ function stepInvoke(ins, p, noOutputting) {
 
       var tailIndex = tailCallIndex(p.get("callStack"), fnObj);
       if (tailIndex !== undefined) { // if tail position exprs all way to recursive call then tco
+        p = popFnArgs(p).p;
         return p
           .set("callStack", p.get("callStack").slice(0, tailIndex + 1))
           .setIn(["callStack", -1, "scope"], scope.lastScopeId(p))
           .setIn(["callStack", -1, "bcPointer"], 0);
       } else {
-        return programState.pushCallFrame(p, fnObj.get("bc"), 0, scope.lastScopeId(p), ins[2]);
+        p = popFnArgs(p).p;
+        return programState
+          .pushCallFrame(p,
+                         fnObj.get("bc"), 0, scope.lastScopeId(p), ins[2]);
       }
     } else if (langUtil.isBuiltin(fnObj)) {
       if (noOutputting !== langUtil.NO_OUTPUTTING ||
           !langUtil.isBuiltinOutputting(fnObj)) {
-
-        var fn = fnObj.get("fn");
-        if (langUtil.isBuiltinInternalState(fnObj)) {
-          var meta = new langUtil.Meta(ins.ast, fnObj.get("state"));
-          var result = fn.apply(null, [meta].concat(argValues));
-          var fnName = fnStackItem.ast.c;
-
-          return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }))
-            .setIn(["scopes", 0, "bindings", fnName, "state"], result.state);
-        } else if (langUtil.isBuiltinNormal(fnObj) ||
-                   langUtil.isBuiltinOutputting(fnObj)) {
-          var meta = new langUtil.Meta(ins.ast);
-          var result = fn.apply(null, [meta].concat(argValues));
-          return p.set("stack", p.get("stack").unshift({ v: result, ast: ins.ast }));
-        } else if (langUtil.isBuiltinMutating(fnObj)) {
-          var meta = new langUtil.Meta(ins.ast);
-          var newThing = fn.apply(null, [meta].concat(argValues));
-          var currentScopeId = programState.currentCallFrame(p).get("scope");
-          var varName = ins.ast.c[1].c;
-          return p.set("scopes", scope.setGlobalBinding(p.get("scopes"),
-                                                           currentScopeId,
-                                                           varName,
-                                                           newThing))
-            .set("stack", p.get("stack").unshift({ v: newThing, ast: ins.ast }));
-        }
+        var result = fnObj.get("fn").apply(null, [p].concat(argValues));
+        p = result.p;
+        p = popFnArgs(p).p;
+        return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }));
       } else {
-        return p;
+        return popFnArgs(p).p;
       }
     } else {
       throw new langUtil.RuntimeError("Got invokable of unknown type", fnStackItem.ast);
@@ -176,7 +157,8 @@ function step(p, noOutputting) {
     var bcPointer = currentFrame.get("bcPointer");
     var ins = currentFrame.get("bc")[bcPointer];
 
-    p = p.setIn(["callStack", -1, "bcPointer"], bcPointer + 1)
+    p = p
+      .setIn(["callStack", -1, "bcPointer"], bcPointer + 1)
       .set("currentInstruction", ins);
 
     try {
@@ -224,8 +206,8 @@ function complete(p) {
   return p;
 };
 
-function initProgramStateAndComplete(code, bc, env) {
-  return complete(programState.init(code, bc, env));
+function initProgramStateAndComplete(code, bc) {
+  return complete(programState.init(code, bc, standardLibrary()));
 };
 
 function maybePrintError(e) {
@@ -234,8 +216,10 @@ function maybePrintError(e) {
   }
 };
 
-function popTopArgsOnStack(p) {
+function popFnArgs(p) {
   var stack = p.get("stack");
+
+  stack = stack.shift(); // chuck function
 
   var args = [];
   var element = stack.peek();
@@ -245,12 +229,12 @@ function popTopArgsOnStack(p) {
     element = stack.peek();
   }
 
-  stack = stack.shift();
+  stack = stack.shift(); // chuck ARG_START
 
-  return [
-    p.set("stack", stack),
-    args.reverse()
-  ];
+  return {
+    p: p.set("stack", stack),
+    args: args.reverse()
+  };
 };
 
 function throwIfUninvokedStackFunctions(p) {
