@@ -97,14 +97,13 @@ function stepInvoke(ins, p, noOutputting) {
                          fnObj.get("bc"), 0, scope.lastScopeId(p), ins[2]);
       }
     } else if (langUtil.isBuiltin(fnObj)) {
-      if (noOutputting !== langUtil.NO_OUTPUTTING ||
-          !langUtil.isBuiltinOutputting(fnObj)) {
+      if (functionOutputsAndOutputtingIsOff(fnObj, noOutputting)) {
+        return popFnArgs(p).p;
+      } else {
         var result = fnObj.get("fn").apply(null, [p].concat(argValues));
         p = result.p;
         p = popFnArgs(p).p;
         return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }));
-      } else {
-        return popFnArgs(p).p;
       }
     } else {
       throw new langUtil.RuntimeError("Got invokable of unknown type", fnStackItem.ast);
@@ -235,6 +234,11 @@ function popFnArgs(p) {
     p: p.set("stack", stack),
     args: args.reverse()
   };
+};
+
+function functionOutputsAndOutputtingIsOff(fnObj, noOutputting) {
+  return noOutputting === langUtil.NO_OUTPUTTING &&
+    langUtil.isBuiltinOutputting(fnObj);
 };
 
 function throwIfUninvokedStackFunctions(p) {
