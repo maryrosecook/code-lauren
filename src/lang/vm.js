@@ -105,8 +105,6 @@ function stepInvoke(ins, p, noOutputting) {
         p = popFnArgs(p).p;
         return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }));
       }
-    } else {
-      throw new langUtil.RuntimeError("Got invokable of unknown type", fnStackItem.ast);
     }
   } else {
     throw new langUtil.RuntimeError("This is not an action", fnStackItem.ast);
