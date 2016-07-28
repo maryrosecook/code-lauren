@@ -77,29 +77,12 @@ function stepInvoke(ins, p, noOutputting) {
     throw new langUtil.RuntimeError("This is not an action", fnStackItem.ast);
   }
 
-  var argContainers = popFnArgs(p).args;
-  var argValues = _.pluck(argContainers, "v");
-
   if (langUtil.isLambda(fnObj)) {
-    checkArgs.checkLambdaArgs(fnStackItem, argContainers, ins.ast);
-    p = scope.addScope(p,
-                       im.Map(_.object(fnObj.get("parameters"), argValues)),
-                       fnObj.get("closureScope"));
-
-    var tailIndex = tailCallIndex(p.get("callStack"), fnObj);
-    if (tailIndex !== undefined) { // if tail position exprs all way to recursive call then tco
-      p = popFnArgs(p).p;
-      return p
-        .set("callStack", p.get("callStack").slice(0, tailIndex + 1))
-        .setIn(["callStack", -1, "scope"], scope.lastScopeId(p))
-        .setIn(["callStack", -1, "bcPointer"], 0);
-    } else {
-      p = popFnArgs(p).p;
-      return programState
-        .pushCallFrame(p,
-                       fnObj.get("bc"), 0, scope.lastScopeId(p), ins[2]);
-    }
+    return invokeLambda(ins, p);
   } else if (langUtil.isBuiltin(fnObj)) {
+    var argContainers = popFnArgs(p).args;
+    var argValues = _.pluck(argContainers, "v");
+
     if (functionOutputsAndOutputtingIsOff(fnObj, noOutputting)) {
       return popFnArgs(p).p;
     } else {
@@ -108,6 +91,32 @@ function stepInvoke(ins, p, noOutputting) {
       p = popFnArgs(p).p;
       return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }));
     }
+  }
+};
+
+function invokeLambda(ins, p) {
+  var fnStackItem = p.get("stack").peek();
+  var fnObj = fnStackItem.v;
+  var argContainers = popFnArgs(p).args;
+  var argValues = _.pluck(argContainers, "v");
+
+  checkArgs.checkLambdaArgs(fnStackItem, argContainers, ins.ast);
+  p = scope.addScope(p,
+                     im.Map(_.object(fnObj.get("parameters"), argValues)),
+                     fnObj.get("closureScope"));
+
+  var tailIndex = tailCallIndex(p.get("callStack"), fnObj);
+  if (tailIndex !== undefined) { // if tail position exprs all way to recursive call then tco
+    p = popFnArgs(p).p;
+    return p
+      .set("callStack", p.get("callStack").slice(0, tailIndex + 1))
+      .setIn(["callStack", -1, "scope"], scope.lastScopeId(p))
+      .setIn(["callStack", -1, "bcPointer"], 0);
+  } else {
+    p = popFnArgs(p).p;
+    return programState
+      .pushCallFrame(p,
+                     fnObj.get("bc"), 0, scope.lastScopeId(p), ins[2]);
   }
 };
 
