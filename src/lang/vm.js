@@ -128,7 +128,7 @@ function runFnObj(fnObj, p, argContainers) {
   return fnObj.get("fn").apply(null, [p].concat(argValues));
 };
 
-function tailCallOptimise(p, calStack, fnObj) {
+function tailCallOptimise(p, callStack, fnObj) {
   var tailIndex = tailCallIndex(callStack, fnObj);
   p = popFnArgs(p).p;
   return p
