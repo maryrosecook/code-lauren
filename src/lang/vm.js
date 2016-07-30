@@ -112,11 +112,11 @@ function invokeLambda(ins, p) {
 
 function invokeBuiltin(ins, p, noOutputting) {
   var fnObj = p.get("stack").peek().v;
-  var argContainers = popFnArgs(p).args;
 
   if (functionOutputsAndOutputtingIsOff(fnObj, noOutputting)) {
     return popFnArgs(p).p;
   } else {
+    var argContainers = popFnArgs(p).args;
     var result = runFnObj(fnObj, p, argContainers);
     p = popFnArgs(result.p).p;
     return p.set("stack", p.get("stack").unshift(new StackValue(result.v, ins.ast)));
