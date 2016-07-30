@@ -108,15 +108,19 @@ function invokeLambda(ins, p) {
 function invokeBuiltin(ins, p, noOutputting) {
   var fnObj = p.get("stack").peek().v;
   var argContainers = popFnArgs(p).args;
-  var argValues = _.pluck(argContainers, "v");
 
   if (functionOutputsAndOutputtingIsOff(fnObj, noOutputting)) {
     return popFnArgs(p).p;
   } else {
-    var result = fnObj.get("fn").apply(null, [p].concat(argValues));
+    var result = runFnObj(fnObj, p, argContainers);
     p = popFnArgs(result.p).p;
     return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }));
   }
+};
+
+function runFnObj(fnObj, p, argContainers) {
+  var argValues = _.pluck(argContainers, "v");
+  return fnObj.get("fn").apply(null, [p].concat(argValues));
 };
 
 function tailCallOptimise(p) {
