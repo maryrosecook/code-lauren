@@ -80,17 +80,7 @@ function stepInvoke(ins, p, noOutputting) {
   if (langUtil.isLambda(fnObj)) {
     return invokeLambda(ins, p);
   } else if (langUtil.isBuiltin(fnObj)) {
-    var argContainers = popFnArgs(p).args;
-    var argValues = _.pluck(argContainers, "v");
-
-    if (functionOutputsAndOutputtingIsOff(fnObj, noOutputting)) {
-      return popFnArgs(p).p;
-    } else {
-      var result = fnObj.get("fn").apply(null, [p].concat(argValues));
-      p = result.p;
-      p = popFnArgs(p).p;
-      return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }));
-    }
+    return invokeBuiltin(ins, p, noOutputting);
   }
 };
 
@@ -105,19 +95,42 @@ function invokeLambda(ins, p) {
                      im.Map(_.object(fnObj.get("parameters"), argValues)),
                      fnObj.get("closureScope"));
 
-  var tailIndex = tailCallIndex(p.get("callStack"), fnObj);
-  if (tailIndex !== undefined) { // if tail position exprs all way to recursive call then tco
-    p = popFnArgs(p).p;
-    return p
-      .set("callStack", p.get("callStack").slice(0, tailIndex + 1))
-      .setIn(["callStack", -1, "scope"], scope.lastScopeId(p))
-      .setIn(["callStack", -1, "bcPointer"], 0);
+  if (canTailCallOptimise(p.get("callStack"), fnObj)) {
+    return tailCallOptimise(p);
   } else {
     p = popFnArgs(p).p;
     return programState
       .pushCallFrame(p,
                      fnObj.get("bc"), 0, scope.lastScopeId(p), ins[2]);
   }
+};
+
+function invokeBuiltin(ins, p, noOutputting) {
+  var fnObj = p.get("stack").peek().v;
+  var argContainers = popFnArgs(p).args;
+  var argValues = _.pluck(argContainers, "v");
+
+  if (functionOutputsAndOutputtingIsOff(fnObj, noOutputting)) {
+    return popFnArgs(p).p;
+  } else {
+    var result = fnObj.get("fn").apply(null, [p].concat(argValues));
+    p = result.p;
+    p = popFnArgs(p).p;
+    return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }));
+  }
+};
+
+function tailCallOptimise(p) {
+  p = popFnArgs(p).p;
+  return p
+    .set("callStack", p.get("callStack").slice(0, tailIndex + 1))
+    .setIn(["callStack", -1, "scope"], scope.lastScopeId(p))
+    .setIn(["callStack", -1, "bcPointer"], 0);
+};
+
+function canTailCallOptimise(callStack, fnObj) {
+  // if tail position exprs all way to recursive call then tco
+  return tailCallIndex(callStack, fnObj) !== undefined;
 };
 
 function tailCallIndex(callStack, fn) {
