@@ -97,7 +97,7 @@ function invokeLambda(ins, p) {
 
   checkArgs.checkLambdaArgs(fnStackItem, argContainers, ins.ast);
   p = scope.addScope(p,
-                     im.Map(_.object(fnObj.get("parameters"), argValues)),
+                     mapParamsToArgs(fnObj.get("parameters"), argValues),
                      fnObj.get("closureScope"));
 
   if (canTailCallOptimise(p.get("callStack"), fnObj)) { // tco not tested!
@@ -121,6 +121,10 @@ function invokeBuiltin(ins, p, noOutputting) {
     p = popFnArgs(result.p).p;
     return p.set("stack", p.get("stack").unshift(new StackValue(result.v, ins.ast)));
   }
+};
+
+function mapParamsToArgs(parameters, argValues) {
+  return im.Map(_.object(parameters, argValues));
 };
 
 function runFnObj(fnObj, p, argContainers) {
