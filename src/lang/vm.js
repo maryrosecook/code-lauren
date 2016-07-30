@@ -96,7 +96,7 @@ function invokeLambda(ins, p) {
                      fnObj.get("closureScope"));
 
   if (canTailCallOptimise(p.get("callStack"), fnObj)) {
-    return tailCallOptimise(p);
+    return tailCallOptimise(p, p.get("callStack"), fnObj);
   } else {
     p = popFnArgs(p).p;
     return programState
@@ -123,7 +123,8 @@ function runFnObj(fnObj, p, argContainers) {
   return fnObj.get("fn").apply(null, [p].concat(argValues));
 };
 
-function tailCallOptimise(p) {
+function tailCallOptimise(p, calStack, fnObj) {
+  var tailIndex = tailCallIndex(callStack, fnObj);
   p = popFnArgs(p).p;
   return p
     .set("callStack", p.get("callStack").slice(0, tailIndex + 1))
