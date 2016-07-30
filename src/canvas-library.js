@@ -125,6 +125,8 @@ var user = im.Map({
     addOperation(makeOperation(function () {
       program.clearScreen();
     }, "clear-screen", true));
+
+    return { p: p, v: undefined };
   }),
 
   draw: langUtil.createBuiltinOutputting(function(p, drawable) {
