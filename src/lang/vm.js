@@ -100,7 +100,7 @@ function invokeLambda(ins, p) {
                      im.Map(_.object(fnObj.get("parameters"), argValues)),
                      fnObj.get("closureScope"));
 
-  if (canTailCallOptimise(p.get("callStack"), fnObj)) {
+  if (canTailCallOptimise(p.get("callStack"), fnObj)) { // tco not tested!
     return tailCallOptimise(p, p.get("callStack"), fnObj);
   } else {
     p = popFnArgs(p).p;
