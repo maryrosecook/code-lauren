@@ -114,8 +114,7 @@ function invokeBuiltin(ins, p, noOutputting) {
     return popFnArgs(p).p;
   } else {
     var result = fnObj.get("fn").apply(null, [p].concat(argValues));
-    p = result.p;
-    p = popFnArgs(p).p;
+    p = popFnArgs(result.p).p;
     return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }));
   }
 };
