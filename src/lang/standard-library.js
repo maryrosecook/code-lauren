@@ -101,7 +101,7 @@ var createStandardLibrary = module.exports = function () {
       return { p: p, v: parseFloat(x) / 0.01745 };
     }),
 
-    "thing": langUtil.createBuiltinNormal(function(p) {
+    thing: langUtil.createBuiltinNormal(function(p) {
       return { p: p, v: im.Map() };
     }),
 
