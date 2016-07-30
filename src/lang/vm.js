@@ -9,10 +9,15 @@ var checkArgs = require("./check-args");
 var standardLibrary = require("./standard-library");
 var programState = require("./program-state");
 
+function StackValue(value, ast) {
+  this.v = value;
+  this.ast = ast;
+};
+
 function stepPush(ins, p) {
   // TODO: when have lists and objects in lang, will need to detect them and use immutablejs
 
-  return p.set("stack", p.get("stack").unshift({ v: ins[1], ast: ins.ast }));
+  return p.set("stack", p.get("stack").unshift(new StackValue(ins[1], ins.ast)));
 };
 
 function stepPushLambda(ins, p) {
@@ -24,7 +29,7 @@ function stepPushLambda(ins, p) {
                       programState.currentCallFrame(p)
                         .get("scope")); // an id into the p.scopes object
 
-  return p.set("stack", p.get("stack").unshift({ v: lambda, ast: ins.ast }));
+  return p.set("stack", p.get("stack").unshift(new StackValue(lambda, ins.ast)));
 };
 
 function stepPop(ins, p) {
@@ -43,7 +48,7 @@ function stepReturn(ins, p) {
 
 var ARG_START = ["ARG_START"];
 function stepArgStart(ins, p) {
-  return p.set("stack", p.get("stack").push({ v: ARG_START }));
+  return p.set("stack", p.get("stack").push(new StackValue(ARG_START)));
 };
 
 function stepGetEnv(ins, p) {
@@ -55,7 +60,7 @@ function stepGetEnv(ins, p) {
     throw new langUtil.RuntimeError("Never heard of " + ins[1], ins.ast);
   } else {
     var value = scope.getScopedBinding(scopes, currentScope, key);
-    return p.set("stack", p.get("stack").push({ v: value, ast: ins.ast }));
+    return p.set("stack", p.get("stack").push(new StackValue(value, ins.ast)));
   }
 };
 
@@ -114,7 +119,7 @@ function invokeBuiltin(ins, p, noOutputting) {
   } else {
     var result = runFnObj(fnObj, p, argContainers);
     p = popFnArgs(result.p).p;
-    return p.set("stack", p.get("stack").unshift({ v: result.v, ast: ins.ast }));
+    return p.set("stack", p.get("stack").unshift(new StackValue(result.v, ins.ast)));
   }
 };
 
