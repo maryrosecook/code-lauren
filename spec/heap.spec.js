@@ -14,4 +14,19 @@ describe("heap", function() {
                        heapAndPointer.pointer))
       .toBe(objToStore)
   });
+
+  it("should be able to add value and then swap in new value", function() {
+    var objToStore = im.Map();
+    var heapAndPointer = heapLib.add(heapLib.create(), objToStore);
+    var immutableStoredObj = heapLib
+        .get(heapAndPointer.heap, heapAndPointer.pointer)
+        .set("key", "value");
+
+    var heap = heapLib.update(heapAndPointer.heap,
+                              heapAndPointer.pointer,
+                              immutableStoredObj);
+
+    expect(heapLib.get(heap, heapAndPointer.pointer).toObject())
+      .toEqual({ key: "value" })
+  });
 });

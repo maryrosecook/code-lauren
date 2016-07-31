@@ -13,6 +13,10 @@ function get(heap, pointer) {
   return heap.get(pointer.id);
 };
 
+function update(heap, pointer, value) {
+  return heap.set(pointer.id, value);
+};
+
 function Pointer(id) {
   this.id = id;
 };
@@ -20,5 +24,6 @@ function Pointer(id) {
 module.exports = {
   create: create,
   add: add,
-  get: get
+  get: get,
+  update: update
 };
