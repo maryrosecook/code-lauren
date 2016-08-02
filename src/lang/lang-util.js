@@ -92,6 +92,10 @@ var langUtil = module.exports = {
     return langUtil.isInvokable(o) && o.get("type") === BUILTIN_MUTATING;
   },
 
+  isPointer: function(o) {
+    return _.isObject(o) && "id" in o;
+  },
+
   NO_OUTPUTTING: "no_outputting",
 
   RuntimeError: RuntimeError,

@@ -80,6 +80,12 @@ function thing(message) {
   });
 };
 
+function pointer(message) {
+  return createSpec(message, function(arg) {
+    return !langUtil.isPointer(arg);
+  });
+};
+
 function num(message) {
   return createSpec(message, function(arg) {
     return !_.isNumber(arg);
@@ -148,6 +154,7 @@ checkBuiltinArgs.range = range;
 checkBuiltinArgs.numOrBoolean = numOrBoolean;
 checkBuiltinArgs.numOrBooleanOrString = numOrBooleanOrString;
 checkBuiltinArgs.thing = thing;
+checkBuiltinArgs.pointer = pointer;
 checkBuiltinArgs.anyType = anyType;
 checkBuiltinArgs.checkLambdaArgs = checkLambdaArgs;
 checkBuiltinArgs.checkBuiltinArgs = checkBuiltinArgs;

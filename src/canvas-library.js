@@ -3,6 +3,8 @@ var im = require("immutable");
 
 var util = require("./util");
 var langUtil = require("./lang/lang-util");
+var heapLib = require("./lang/heap");
+var programState = require("./lang/program-state");
 var chk = require("./lang/check-args");
 var env = require("./env");
 
@@ -129,11 +131,15 @@ var user = im.Map({
     return { p: p, v: undefined };
   }),
 
-  draw: langUtil.createBuiltinOutputting(function(p, drawable) {
+  draw: langUtil.createBuiltinOutputting(function(p, drawablePointer) {
     chk(arguments,
+        chk.pointer("a shape or some words to draw"));
+
+    chk([p, programState.getFromHeap(p, drawablePointer)],
         chk.anyType(["rectangle", "circle", "words"], "a shape or some words to draw"));
 
     addOperation(makeOperation(function () {
+      var drawable = programState.getFromHeap(p, drawablePointer);
       drawFns[drawable.get("type")](drawable);
     }, "draw"));
 
@@ -148,14 +154,22 @@ var user = im.Map({
     return { p: p, v: color };
   }),
 
-  "are-overlapping": langUtil.createBuiltinNormal(function(p, s1, s2) {
+  "are-overlapping": langUtil.createBuiltinNormal(function(p, shapePointer1, shapePointer2) {
     chk(arguments,
+        chk.pointer("a shape"),
+        chk.pointer("another shape"));
+
+    chk([p,
+         programState.getFromHeap(p, shapePointer1),
+         programState.getFromHeap(p, shapePointer2)],
         chk.anyType(["rectangle", "circle"], "a shape"),
         chk.anyType(["rectangle", "circle"], "another shape"));
 
-    var collisionTestFn = overlappingFns[s1.get("type") + " " + s2.get("type")];
+    var shape1 = programState.getFromHeap(p, shapePointer1);
+    var shape2 = programState.getFromHeap(p, shapePointer2);
+    var collisionTestFn = overlappingFns[shape1.get("type") + " " + shape2.get("type")];
     if (collisionTestFn !== undefined) {
-      return { p: p, v: collisionTestFn(s1, s2) };
+      return { p: p, v: collisionTestFn(shape1, shape2) };
     } else {
       throw new Error("Could not find collision test function.");
     };
@@ -171,7 +185,11 @@ var user = im.Map({
     var rectangle = im.Map({x: x, y: y, width: width, height: height,
                             filled: true, color: "black", type: "rectangle"});
 
-    return { p: p, v: rectangle };
+    var heapAndPointer = heapLib.add(p.get("heap"), rectangle);
+    return {
+      p: p.set("heap", heapAndPointer.heap),
+      v: heapAndPointer.pointer
+    };
   }),
 
   "circle": langUtil.createBuiltinNormal(function(p, x, y, width) {
@@ -182,7 +200,12 @@ var user = im.Map({
 
     var circle = im.Map({x: x, y: y, width: width,
                          filled: true, color: "black", type: "circle"});
-    return { p: p, v: circle };
+    var heapAndPointer = heapLib.add(p.get("heap"), circle);
+
+    return {
+      p: p.set("heap", heapAndPointer.heap),
+      v: heapAndPointer.pointer
+    };
   }),
 
   "set-composite-operation": langUtil.createBuiltinNormal(function(p, operation) {
@@ -200,7 +223,13 @@ var user = im.Map({
         chk.numOrBooleanOrString("some words or a number"));
 
     var words = im.Map({x: x, y: y, words: words, color: "black", type: "words" });
-    return { p: p, v: words };
+
+    var heapAndPointer = heapLib.add(p.get("heap"), words);
+
+    return {
+      p: p.set("heap", heapAndPointer.heap),
+      v: heapAndPointer.pointer
+    };
   }),
 
   distance: langUtil.createBuiltinNormal(function(p, s1, s2) {

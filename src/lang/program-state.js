@@ -64,6 +64,10 @@ function currentScopeId(p) {
   return currentCallFrame(p).get("scope");
 };
 
+function getFromHeap(p, pointer) {
+  return heapLib.get(p.get("heap"), pointer);
+};
+
 module.exports = {
   init: init,
   currentCallFrame: currentCallFrame,
@@ -71,5 +75,6 @@ module.exports = {
   isComplete: isComplete,
   isCrashed: isCrashed,
   mergeTopLevelBindings: mergeTopLevelBindings,
-  pushCallFrame: pushCallFrame
+  pushCallFrame: pushCallFrame,
+  getFromHeap: getFromHeap
 };

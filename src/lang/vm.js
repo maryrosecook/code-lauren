@@ -243,9 +243,17 @@ function initProgramStateAndComplete(code, bc) {
 };
 
 function maybePrintError(e) {
-  if (typeof(window) === "undefined" || window.location.href.indexOf("localhost:") !== -1) {
+  if (areTesting || areOnLocalhost()) {
     console.log(e.stack);
   }
+};
+
+function areTesting() {
+  return typeof window === "undefined";
+};
+
+function areOnLocalhost() {
+  return window.location.href.indexOf("localhost:") !== -1;
 };
 
 function popFnArgs(p) {

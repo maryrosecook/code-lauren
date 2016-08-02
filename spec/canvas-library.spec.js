@@ -7,6 +7,7 @@ var standardLibrary = require("../src/lang/standard-library");
 var canvasLibrary = require("../src/canvas-library");
 var env = require("../src/env");
 var programState = require("../src/lang/program-state");
+var heapLib = require("../src/lang/heap");
 
 var canvasLib = canvasLibrary({});
 
@@ -66,11 +67,17 @@ describe("canvas library", function() {
     });
 
     it("should make a rectangle", function() {
-      var r = vm.complete(setupProgram('rectangle(1 2 3 4)')).get("stack").get(-1).v;
-      expect(r.get("x")).toEqual(1);
-      expect(r.get("y")).toEqual(2);
-      expect(r.get("width")).toEqual(3);
-      expect(r.get("height")).toEqual(4);
+      var ps = vm.complete(setupProgram('rectangle(1 2 3 4)'));
+      var rectanglePointer = ps
+          .get("stack")
+          .get(-1)
+          .v;
+
+      var rectangle = heapLib.get(ps.get("heap"), rectanglePointer);
+      expect(rectangle.get("x")).toEqual(1);
+      expect(rectangle.get("y")).toEqual(2);
+      expect(rectangle.get("width")).toEqual(3);
+      expect(rectangle.get("height")).toEqual(4);
     });
   });
 
@@ -87,10 +94,16 @@ describe("canvas library", function() {
     });
 
     it("should make a circle", function() {
-      var r = vm.complete(setupProgram('circle(1 2 3)')).get("stack").get(-1).v;
-      expect(r.get("x")).toEqual(1);
-      expect(r.get("y")).toEqual(2);
-      expect(r.get("width")).toEqual(3);
+      var ps = vm.complete(setupProgram('circle(1 2 3)'));
+      var circlePointer = ps
+          .get("stack")
+          .get(-1)
+          .v;
+
+      var circle = heapLib.get(ps.get("heap"), circlePointer);
+      expect(circle.get("x")).toEqual(1);
+      expect(circle.get("y")).toEqual(2);
+      expect(circle.get("width")).toEqual(3);
     });
   });
 
@@ -107,10 +120,16 @@ describe("canvas library", function() {
     });
 
     it("should make a words", function() {
-      var r = vm.complete(setupProgram('words(1 2 "hi")')).get("stack").get(-1).v;
-      expect(r.get("x")).toEqual(1);
-      expect(r.get("y")).toEqual(2);
-      expect(r.get("words")).toEqual("hi");
+      var ps = vm.complete(setupProgram('words(1 2 "hi")'));
+      var wordsPointer = ps
+          .get("stack")
+          .get(-1)
+          .v;
+
+      var words = heapLib.get(ps.get("heap"), wordsPointer);
+      expect(words.get("x")).toEqual(1);
+      expect(words.get("y")).toEqual(2);
+      expect(words.get("words")).toEqual("hi");
     });
   });
 

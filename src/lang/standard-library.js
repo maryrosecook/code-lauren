@@ -3,12 +3,21 @@ var im = require("immutable");
 
 var langUtil = require("./lang-util");
 var programState = require("./program-state");
+var heapLib = require("./heap");
 var util = require("../util");
 var chk = require("./check-args");
 var scope = require("./scope");
 
 function maybeUnwrapImmutableValue(item) {
   return item !== undefined && item.toJS ? item.toJS() : item;
+};
+
+function maybeUnwrapPointer(p, item) {
+  if (langUtil.isPointer(item)) {
+    return heapLib.get(p.get("heap"), item);
+  } else {
+    return item
+  }
 };
 
 var createStandardLibrary = module.exports = function () {
@@ -102,7 +111,12 @@ var createStandardLibrary = module.exports = function () {
     }),
 
     thing: langUtil.createBuiltinNormal(function(p) {
-      return { p: p, v: im.Map() };
+      var thing = im.Map();
+      var heapAndPointer = heapLib.add(p.get("heap"), thing);
+      return {
+        p: p.set("heap", heapAndPointer.heap),
+        v: heapAndPointer.pointer
+      };
     }),
 
     "less-than": langUtil.createBuiltinNormal(function(p, a, b) {
@@ -153,24 +167,33 @@ var createStandardLibrary = module.exports = function () {
       return { p: p, v: Math.round(Math.random() * (b - a)) + a };
     }),
 
-    set: langUtil.createBuiltinMutating(function(p, obj, key, value) {
+    set: langUtil.createBuiltinMutating(function(p, objPointer, key, value) {
       chk(arguments,
-          chk.thing("a thing to set some information on"),
+          chk.pointer("a thing to set some information on"),
           chk.string("the name of the information to set"),
           chk.numOrBooleanOrString("the information to set"));
 
-      var varName = p.get("currentInstruction").ast.c[1].c;
-      var value = obj.set(key, value);
-      p = p.set("scopes", scope.setGlobalBinding(p.get("scopes"),
-                                                 programState.currentScopeId(p),
-                                                 varName,
-                                                 value));
+      chk([p, programState.getFromHeap(p, objPointer)],
+          chk.thing("a thing to set some information on"));
 
-      return { v: value, p: p };
+      var obj = heapLib.get(p.get("heap"), objPointer);
+      var varName = p.get("currentInstruction").ast.c[1].c;
+      var newObj = obj.set(key, value);
+      p = p.set("heap", heapLib.update(p.get("heap"), objPointer, newObj));
+
+      return { v: newObj, p: p };
     }),
 
-    get: langUtil.createBuiltinNormal(function(p, obj, key) {
-      return { p: p, v: obj.get(key) };
+    get: langUtil.createBuiltinNormal(function(p, objPointer, key) {
+      chk(arguments,
+          chk.pointer("a thing to get some information from"),
+          chk.string("the name of the information to get"));
+
+      chk([p, programState.getFromHeap(p, objPointer)],
+          chk.thing("a thing to get some information from"));
+
+      var value = heapLib.get(p.get("heap"), objPointer).get(key);
+      return { p: p, v: value };
     }),
 
     print: langUtil.createBuiltinOutputting(
@@ -178,9 +201,12 @@ var createStandardLibrary = module.exports = function () {
         chk(arguments,
             chk.defined("something to print"));
 
-        console.log(maybeUnwrapImmutableValue(itemToPrint));
+        console.log(maybeUnwrapImmutableValue(maybeUnwrapPointer(p, itemToPrint)));
         return { p: p, v: itemToPrint + "\n" };
       }),
+
+    // JUST GOT BASIC IDEA OF HEAP WORKING - DEMO WORKS IN GUI
+    // NOW LOTS OF TESTS TO FIX
 
     counted: langUtil.createBuiltinInternalState(im.Map(), function(p, target) {
       chk(arguments,

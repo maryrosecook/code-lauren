@@ -7,17 +7,23 @@ var c = require("../src/lang/compiler");
 var v = require("../src/lang/vm");
 var programState = require("../src/lang/program-state");
 var langUtil = require("../src/lang/lang-util");
+var heapLib = require("../src/lang/heap");
 var envModule = require("../src/env");
 
 function metaMock() {
   return { ast: { c: [{ c: undefined }]}};
 };
 
+function pointerToObject(ps, pointer) {
+  return heapLib.get(ps.get("heap"), pointer).toObject();
+};
+
 describe("library", function() {
   describe("thing", function() {
     it("should be able to make new empty dict", function() {
-      var lib = standardLibrary();
-      expect(lib.getIn(["thing", "fn"])().v.toObject()).toEqual({});
+      var code = 'thing()';
+      var ps = v(code, c(p(code)));
+      expect(pointerToObject(ps, ps.getIn(["stack", -1]).v)).toEqual({});
     });
   });
 
@@ -39,28 +45,42 @@ describe("library", function() {
     it("should be able to add a value to a thing by mutating the thing", function() {
       var code = 'thing: thing() \n set(thing "key" "value") \n thing';
       var ps = v(code, c(p(code)));
-      expect(ps.getIn(["stack", -1]).v.toObject()).toEqual({ key: "value" });
+      expect(pointerToObject(ps, ps.getIn(["stack", -1]).v)).toEqual({ key: "value" });
     });
 
     it("should be able to change a value on a thing by mutating the thing", function() {
       var code = 'thing: thing() \n set(thing "key" "a") \n set(thing "key" "b") \n thing';
       var ps = v(code, c(p(code)));
-      expect(ps.getIn(["stack", -1]).v.toObject()).toEqual({ key: "b" });
+      expect(pointerToObject(ps, ps.getIn(["stack", -1]).v)).toEqual({ key: "b" });
     });
 
-    it("should return newly set value", function() {
+    it("should return newly updated thing", function() {
       var code = 'a: thing() \n set(a "key" "value")';
       expect(v(code, c(p(code))).getIn(["stack", -1]).v.toObject()).toEqual({ key: "value" });
     });
 
     it("should mutate var passed into lambda for outer scope var passed in from", function() {
       var code = 'a: thing() \n { ?a-prime set(a-prime "key" "value") }(a) \n a';
-      expect(v(code, c(p(code))).getIn(["stack", -1]).v.toObject())
+      var ps = v(code, c(p(code)));
+      expect(ps.get("exception")).toBeUndefined();
+
+      var thingPointer = ps.getIn(["stack", -1]).v;
+      expect(pointerToObject(ps, thingPointer))
         .toEqual({ key: "value" });
     });
   });
 
   describe("get", function() {
+    it("should throw if missing args", function() {
+      var code = 'get()';
+      expect(v(code, c(p(code))).get("exception").message)
+        .toEqual("Needs a thing to get some information from");
+
+      var code = 'a: thing() \n get(a)';
+      expect(v(code, c(p(code))).get("exception").message)
+        .toEqual("Needs the name of the information to get");
+    });
+
     it("should be able to get a value from a dict", function() {
       var code = 'a: thing() \n set(a "key" "value") \n get(a "key")';
       var ps = v(code, c(p(code)));
