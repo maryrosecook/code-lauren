@@ -10,9 +10,7 @@
   "scripts": {
     "test": "node --harmony node_modules/jasmine-node/lib/jasmine-node/cli.js --color --autotest src/ spec/",
     "build-for-deploy": "rm -r build; webpack --config webpack-build-for-deploy.config.js -p --progress --colors",
-    "build-for-development": "rm -r build; webpack --config webpack-build-for-development.config.js --progress --colors --watch",
-    "start": "live-server build --port=4000 --no-browser --host=localhost",
-    "build-pages": "node scripts/build-pages.js"
+    "start": "node scripts/develop.js",
   },
   "dependencies": {
     "brfs": "^1.4.0",
@@ -41,6 +39,7 @@
     "jasmine-node": "1.14.5",
     "json-loader": "^0.5.2",
     "jsx-loader": "^0.13.2",
+    "rimraf": "^2.5.4",
     "style-loader": "^0.12.3",
     "uglify-js": "^2.4.19",
     "url-loader": "^0.5.6",

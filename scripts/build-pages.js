@@ -49,12 +49,16 @@ function buildPages() {
 
     fs.writeFileSync(path.join(PAGES_PATH, "/all-pages.js"),
                      "module.exports = " + JSON.stringify(pages));
-    console.log("Rebuilt");
+    console.log("-----------------------");
+    console.log("Rebuilt pages");
+    console.log("-----------------------");
   } catch (e) {
     if (e instanceof SpecificError) {
       console.log("Rebuild failed:", e.message);
     } else {
-      console.log(e.stack)
+      console.log("-----------------------");
+      console.log("Page build error");
+      // console.log(e.stack)
     }
   }
 };
@@ -278,9 +282,13 @@ function makeLinksOnClick(md) {
 
 buildPages();
 
-// rebuild pages when something in on change
-fs.watch(__dirname + "/../pages", function (event, filename) {
-  if (event == "change" && filename.match(/\.md$/)) {
-    buildPages();
-  }
-});
+function rebuildPagesOnChange() {
+  // rebuild pages when something in on change
+  fs.watch(__dirname + "/../pages", function (event, filename) {
+    if (event == "change" && filename.match(/\.md$/)) {
+      buildPages();
+    }
+  });
+};
+
+module.exports = rebuildPagesOnChange;

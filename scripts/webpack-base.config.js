@@ -1,12 +1,16 @@
 var path = require("path");
 var ManifestPlugin = require('webpack-manifest-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ProgressPlugin = require('webpack/lib/ProgressPlugin');
+var lessVerboseWebpackProgressPlugin = require("./less-verbose-webpack-progress-plugin");
 
 module.exports = {
   entry: "./src/index.js",
   output: {
-    path: path.join(__dirname, "build")
+    path: path.join(__dirname, "../build")
   },
+
+  watch: true,
 
   module: {
     loaders: [
@@ -37,6 +41,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "./src/index-template.html",
       inject: true
-    })
+    }),
+    lessVerboseWebpackProgressPlugin()
   ]
 };
