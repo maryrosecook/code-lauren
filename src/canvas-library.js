@@ -175,7 +175,7 @@ var user = im.Map({
     };
   }),
 
-  "rectangle": langUtil.createBuiltinNormal(function(p, x, y, width, height) {
+  rectangle: langUtil.createBuiltinNormal(function(p, x, y, width, height) {
     chk(arguments,
         chk.num("the x coordinate of the center of the rectangle"),
         chk.num("the y coordinate of the center of the rectangle"),
@@ -192,7 +192,7 @@ var user = im.Map({
     };
   }),
 
-  "circle": langUtil.createBuiltinNormal(function(p, x, y, width) {
+  circle: langUtil.createBuiltinNormal(function(p, x, y, width) {
     chk(arguments,
         chk.num("the x coordinate of the center of the circle"),
         chk.num("the y coordinate of the center of the circle"),
@@ -216,7 +216,7 @@ var user = im.Map({
     return { p: p, v: undefined };
   }),
 
-  "words": langUtil.createBuiltinNormal(function(p, x, y, words) {
+  words: langUtil.createBuiltinNormal(function(p, x, y, words) {
     chk(arguments,
         chk.num("the x coordinate of the center of the words"),
         chk.num("the y coordinate of the center of the words"),
