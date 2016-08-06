@@ -5,7 +5,7 @@ var scope = require("./scope");
 var heapLib = require("./heap");
 
 var BUILTIN_SCOPE_ID = 0;
-var GLOBAL_SCOPE_ID = 1;
+var USER_TOP_LEVEL_SCOPE_ID = 1;
 
 function currentCallFrame(p) {
   return p.get("callStack").last();
@@ -36,18 +36,18 @@ function init(code, bc, builtinBindings) {
     heap: heapLib.create()
   });
 
-  p = scope.addScope(p, builtinBindings); // builtin scope
-  p = scope.addScope(p, im.Map(), BUILTIN_SCOPE_ID); // global scope - mouse, keyboard etc
-  p = pushCallFrame(p, bc, bcPointer, GLOBAL_SCOPE_ID); // user top level scope
+  p = scope.addScope(p, builtinBindings, undefined, false); // builtin scope, mouse, keyboard et
+  p = scope.addScope(p, im.Map(), BUILTIN_SCOPE_ID, true); // user top level scope
+  p = pushCallFrame(p, bc, bcPointer, USER_TOP_LEVEL_SCOPE_ID);
   return p;
 };
 
 function mergeTopLevelBindings(p, bindings) {
   for (var name in bindings) {
     p = p.set("scopes", scope.setBindingAtId(p.get("scopes"),
-                                                GLOBAL_SCOPE_ID,
-                                                name,
-                                                bindings[name]));
+                                             BUILTIN_SCOPE_ID,
+                                             name,
+                                             bindings[name]));
   }
 
   return p;

@@ -68,10 +68,19 @@ function stepSetEnv(ins, p) {
   var currentScopeId = programState.currentCallFrame(p).get("scope");
   var variableName = ins[1];
   var variableValue = p.get("stack").peek().v;
+
+  try {
+    var scopes = scope.setGlobalBinding(p.get("scopes"),
+                                        currentScopeId,
+                                        variableName,
+                                        variableValue);
+  } catch (e) {
+    throw new langUtil.RuntimeError(e.message, ins.ast);
+  }
+
   return p
     .set("stack", p.get("stack").shift())
-    .set("scopes",
-         scope.setGlobalBinding(p.get("scopes"), currentScopeId, variableName, variableValue));
+    .set("scopes", scopes);
 };
 
 function stepInvoke(ins, p, noOutputting) {
@@ -98,7 +107,8 @@ function invokeLambda(ins, p) {
   checkArgs.checkLambdaArgs(fnStackItem, argContainers, ins.ast);
   p = scope.addScope(p,
                      mapParamsToArgs(fnObj.get("parameters"), argValues),
-                     fnObj.get("closureScope"));
+                     fnObj.get("closureScope"),
+                     true);
 
   if (canTailCallOptimise(p.get("callStack"), fnObj)) { // tco not tested!
     return tailCallOptimise(p, p.get("callStack"), fnObj);

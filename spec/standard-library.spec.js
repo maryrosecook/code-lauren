@@ -43,13 +43,13 @@ describe("library", function() {
     });
 
     it("should be able to add a value to a thing by mutating the thing", function() {
-      var code = 'thing: thing() \n set(thing "key" "value") \n thing';
+      var code = 'obj: thing() \n set(obj "key" "value") \n obj';
       var ps = v(code, c(p(code)));
       expect(pointerToObject(ps, ps.getIn(["stack", -1]).v)).toEqual({ key: "value" });
     });
 
     it("should be able to change a value on a thing by mutating the thing", function() {
-      var code = 'thing: thing() \n set(thing "key" "a") \n set(thing "key" "b") \n thing';
+      var code = 'obj: thing() \n set(obj "key" "a") \n set(obj "key" "b") \n obj';
       var ps = v(code, c(p(code)));
       expect(pointerToObject(ps, ps.getIn(["stack", -1]).v)).toEqual({ key: "b" });
     });

@@ -31,21 +31,36 @@ function setGlobalBinding(scopes, originalScopeId, k, v) {
   var scopeId = originalScopeId;
   while (scopeId !== undefined) {
     if (scopes.getIn([scopeId, "bindings", k]) !== undefined) {
-      return scopes.setIn([scopeId, "bindings", k], v);
+      return setValueInScope(scopes, scopeId, k, v);
     } else if (scopes.getIn([scopeId, "parent"]) !== undefined) {
       scopeId = scopes.getIn([scopeId, "parent"]);
     } else {
-      return scopes.setIn([originalScopeId, "bindings", k], v);
+      return setValueInScope(scopes, originalScopeId, k, v);
     }
   }
+};
+
+function setValueInScope(scopes, scopeId, k, v) {
+  if (!isScopeMutable(scopes, scopeId)) {
+    throw new Error("Can't set the name `" + k + "`." +
+                    "It's already being used by the system for something else. " +
+                    "You can use a different name.");
+  }
+
+  return scopes.setIn([scopeId, "bindings", k], v);
+};
+
+function isScopeMutable(scopes, scopeId) {
+  return scopes.getIn([scopeId, "isMutable"]) === true;
 };
 
 function setBindingAtId(scopes, scopeId, k, v) {
   return scopes.setIn([scopeId, "bindings", k], v);
 };
 
-function addScope(p, bindings, parent) {
-  return p.set("scopes", p.get("scopes").push(im.Map({ bindings: bindings, parent: parent })));
+function addScope(p, bindings, parent, isMutable) {
+  var scope = im.Map({ bindings: bindings, parent: parent, isMutable: isMutable })
+  return p.set("scopes", p.get("scopes").push(scope));
 };
 
 function lastScopeId(p) {

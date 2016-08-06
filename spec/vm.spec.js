@@ -1,3 +1,5 @@
+var im = require("immutable");
+
 var p = require("../src/lang/parser");
 var c = require("../src/lang/compiler");
 var v = require("../src/lang/vm");
@@ -5,6 +7,10 @@ var programState = require("../src/lang/program-state");
 var standardLibrary = require("../src/lang/standard-library");
 
 var util = require("../src/util");
+
+function popStack(ps) {
+  return ps.getIn(["stack", -1]).v;
+};
 
 describe("vm", function() {
   describe("top level", function() {
@@ -139,7 +145,27 @@ describe("vm", function() {
                                                        ["return"]]);
       expect(binding.get("parameters")).toBeDefined();
     });
+
+    describe("protecting builtin functions", function() {
+      describe("builtin functions", function() {
+        it("should throw if try to reassign builtin function", function() {
+          var code = 'add: 1';
+          var ps = v(code, c(p(code)));
+          var addBindingValue = ps.getIn(["scopes", 0, "bindings", "add"]);
+          expect(ps.get("exception")).toBeDefined();
+        });
+
+        it("should not reassign if try to reassign builtin function", function() {
+          var code = 'add: 1';
+          var ps = v(code, c(p(code)));
+          var addBindingValue = ps.getIn(["scopes", 0, "bindings", "add"]);
+          expect(addBindingValue instanceof im.Map).toBeTruthy();
+          expect(addBindingValue.get("type")).toEqual("builtin_normal");
+        });
+      });
+    });
   });
+
 
   describe("forever", function() {
     it("should run for a long time", function() {
