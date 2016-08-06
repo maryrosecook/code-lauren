@@ -44,10 +44,11 @@ function init(code, bc, builtinBindings) {
 
 function mergeTopLevelBindings(p, bindings) {
   for (var name in bindings) {
-    p = p.set("scopes", scope.setBindingAtId(p.get("scopes"),
-                                             BUILTIN_SCOPE_ID,
-                                             name,
-                                             bindings[name]));
+    p = p.set("scopes", scope.setBindingInScope(p.get("scopes"),
+                                                BUILTIN_SCOPE_ID,
+                                                name,
+                                                bindings[name],
+                                                scope.OVERRIDE_IMMUTABILITY));
   }
 
   return p;

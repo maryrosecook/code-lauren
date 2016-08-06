@@ -1,6 +1,8 @@
 var im = require("immutable");
 var util = require("../util");
 
+var OVERRIDE_IMMUTABILITY = true;
+
 function getScopedBinding(scopes, scopeId, k) {
   while (scopeId !== undefined) {
     var scope = scopes.get(scopeId);
@@ -31,30 +33,27 @@ function setGlobalBinding(scopes, originalScopeId, k, v) {
   var scopeId = originalScopeId;
   while (scopeId !== undefined) {
     if (scopes.getIn([scopeId, "bindings", k]) !== undefined) {
-      return setValueInScope(scopes, scopeId, k, v);
+      return setBindingInScope(scopes, scopeId, k, v);
     } else if (scopes.getIn([scopeId, "parent"]) !== undefined) {
       scopeId = scopes.getIn([scopeId, "parent"]);
     } else {
-      return setValueInScope(scopes, originalScopeId, k, v);
+      return setBindingInScope(scopes, originalScopeId, k, v);
     }
   }
-};
-
-function setValueInScope(scopes, scopeId, k, v) {
-  if (!isScopeMutable(scopes, scopeId)) {
-    throw new Error("Can't set the name `" + k + "`." +
-                    "It's already being used by the system for something else. " +
-                    "You can use a different name.");
-  }
-
-  return scopes.setIn([scopeId, "bindings", k], v);
 };
 
 function isScopeMutable(scopes, scopeId) {
   return scopes.getIn([scopeId, "isMutable"]) === true;
 };
 
-function setBindingAtId(scopes, scopeId, k, v) {
+function setBindingInScope(scopes, scopeId, k, v, overrideImmutability) {
+  overrideImmutability = overrideImmutability === true ? true : false;
+  if (!isScopeMutable(scopes, scopeId) && !overrideImmutability) {
+    throw new Error("You can't use the name `" + k + "`. " +
+                    "It's already being used by the system for something else. " +
+                    "You can use a different name.");
+  }
+
   return scopes.setIn([scopeId, "bindings", k], v);
 };
 
@@ -72,6 +71,7 @@ module.exports = {
   hasScopedBinding: hasScopedBinding,
   setGlobalBinding: setGlobalBinding,
   lastScopeId: lastScopeId,
-  setBindingAtId: setBindingAtId,
-  addScope: addScope
+  setBindingInScope: setBindingInScope,
+  addScope: addScope,
+  OVERRIDE_IMMUTABILITY: OVERRIDE_IMMUTABILITY
 };
