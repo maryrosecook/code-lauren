@@ -1,10 +1,9 @@
-var mousePosition = { x: 0, y: 0 };
-var mouseDown = false;
-var screen;
-var setup = module.exports = function(window, inScreen) {
-  if (screen !== undefined) { throw new Error("Already started"); }
+var im = require("immutable");
 
-  screen = inScreen;
+var setup = module.exports = function(window, screen) {
+  var mousePosition = { x: 0, y: 0 };
+  var mouseDown = false;
+  var screen;
 
   var env = require("./env");
 
