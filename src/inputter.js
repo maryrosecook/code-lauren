@@ -28,12 +28,12 @@ var setup = module.exports = function(window, screen) {
 
   return {
     getMouseBindings: function() {
-      return {
+      return im.Map({
         "mouse-x": mousePosition.x,
         "mouse-y": mousePosition.y,
         "mouse-button-is-down": mouseDown,
         "mouse-button-is-up": !mouseDown
-      };
+      });
     }
   };
 };
