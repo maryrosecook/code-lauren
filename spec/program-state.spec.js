@@ -16,12 +16,12 @@ function createMockScreen() {
   return {};
 };
 
-describe("mergeTopLevelBindings", function() {
+describe("createTopLevelBindings", function() {
   it("should be able to merge inputter data (mouse etc)", function() {
     var code = "whatever";
     var ps = programState.init(code, compile(parse(code)), im.Map());
 
     var inputter = inputterSetup(createMockWindow(), createMockScreen());
-    programState.mergeTopLevelBindings(ps, inputter.getMouseBindings());
+    programState.createTopLevelBindings(ps, inputter.getMouseBindings());
   });
 });

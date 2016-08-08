@@ -37,14 +37,14 @@ function init(code, bc, builtinBindings) {
   });
 
   p = scope.addScope(p, im.Map(), undefined, false); // builtin scope, mouse, keyboard et
-  p = mergeTopLevelBindings(p, builtinBindings);
+  p = createTopLevelBindings(p, builtinBindings);
 
   p = scope.addScope(p, im.Map(), BUILTIN_SCOPE_ID, true); // user top level scope
   p = pushCallFrame(p, bc, bcPointer, USER_TOP_LEVEL_SCOPE_ID);
   return p;
 };
 
-function mergeTopLevelBindings(p, bindings) {
+function createTopLevelBindings(p, bindings) {
   bindings.keySeq().forEach(function(name) {
     var valueToBind = bindings.get(name);
     p = p.set("scopes", scope.setBindingInScope(p.get("scopes"),
@@ -78,7 +78,7 @@ module.exports = {
   currentScopeId: currentScopeId,
   isComplete: isComplete,
   isCrashed: isCrashed,
-  mergeTopLevelBindings: mergeTopLevelBindings,
+  createTopLevelBindings: createTopLevelBindings,
   pushCallFrame: pushCallFrame,
   getFromHeap: getFromHeap
 };

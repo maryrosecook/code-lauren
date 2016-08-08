@@ -70,7 +70,7 @@ function initProgramState(code, annotator, canvasLib, inputter) {
     var ps = programState
         .init(code, compile(ast), programBindings)
         .set("canvasLib", canvasLib.program);
-    ps = programState.mergeTopLevelBindings(ps, inputter.getMouseBindings());
+    ps = programState.createTopLevelBindings(ps, inputter.getMouseBindings());
     return ps;
   }
 };
@@ -218,7 +218,7 @@ var ProgramPlayer = React.createClass({
     }
 
     if (!this.state.paused) {
-      this.state.ps = programState.mergeTopLevelBindings(this.state.ps,
+      this.state.ps = programState.createTopLevelBindings(this.state.ps,
                                                          this.props.inputter.getMouseBindings());
     }
 
