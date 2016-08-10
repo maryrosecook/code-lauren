@@ -3,6 +3,7 @@ var im = require("immutable");
 
 var scope = require("./scope");
 var heapLib = require("./heap");
+var langUtil = require("./lang-util");
 
 var BUILTIN_SCOPE_ID = 0;
 var USER_TOP_LEVEL_SCOPE_ID = 1;
@@ -45,16 +46,23 @@ function init(code, bc, builtinBindings) {
 };
 
 function createTopLevelBindings(p, bindings) {
-  bindings.keySeq().forEach(function(name) {
-    var valueToBind = bindings.get(name);
-    p = p.set("scopes", scope.setBindingInScope(p.get("scopes"),
-                                                BUILTIN_SCOPE_ID,
-                                                name,
-                                                valueToBind,
-                                                scope.OVERRIDE_IMMUTABILITY));
-  });
+  return bindings.keySeq().reduce(function(p, name) {
+    var actualValue = bindings.get(name);
+    var valueToStore;
+    if (langUtil.isThing(actualValue)) {
+      var heapAndPointer = heapLib.add(p.get("heap"), actualValue);
+      p = p.set("heap", heapAndPointer.heap);
+      valueToStore = heapAndPointer.pointer;
+    } else {
+      valueToStore = actualValue;
+    }
 
-  return p;
+    return p.set("scopes", scope.setBindingInScope(p.get("scopes"),
+                                                   BUILTIN_SCOPE_ID,
+                                                   name,
+                                                   valueToStore,
+                                                   scope.OVERRIDE_IMMUTABILITY));
+  }, p);
 };
 
 function pushCallFrame(p, bc, bcPointer, scopeId, tail) {
@@ -72,6 +80,10 @@ function getFromHeap(p, pointer) {
   return heapLib.get(p.get("heap"), pointer);
 };
 
+function peekStack(p) {
+  return p.getIn(["stack", -1]).v;
+};
+
 module.exports = {
   init: init,
   currentCallFrame: currentCallFrame,
@@ -80,5 +92,6 @@ module.exports = {
   isCrashed: isCrashed,
   createTopLevelBindings: createTopLevelBindings,
   pushCallFrame: pushCallFrame,
-  getFromHeap: getFromHeap
+  getFromHeap: getFromHeap,
+  peekStack: peekStack
 };

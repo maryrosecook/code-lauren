@@ -96,6 +96,10 @@ var langUtil = module.exports = {
     return _.isObject(o) && "id" in o;
   },
 
+  isThing: function(o) {
+    return o instanceof im.Map && !langUtil.isInvokable(o);
+  },
+
   NO_OUTPUTTING: "no_outputting",
 
   RuntimeError: RuntimeError,
