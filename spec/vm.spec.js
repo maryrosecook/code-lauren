@@ -8,10 +8,6 @@ var standardLibrary = require("../src/lang/standard-library");
 
 var util = require("../src/util");
 
-function popStack(ps) {
-  return ps.getIn(["stack", -1]).v;
-};
-
 describe("vm", function() {
   describe("top level", function() {
     it("should return undefined from an empty program", function() {
