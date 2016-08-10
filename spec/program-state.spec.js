@@ -3,6 +3,7 @@ var sinon = require("sinon");
 
 var parse = require("../src/lang/parser");
 var compile = require("../src/lang/compiler");
+var run = require("../src/lang/vm").complete;
 var programState = require("../src/lang/program-state");
 
 var inputterSetup = require("../src/inputter");
@@ -19,10 +20,12 @@ function createMockScreen() {
 
 describe("createTopLevelBindings", function() {
   it("should be able to merge inputter data (mouse etc)", function() {
-    var code = "whatever";
-    var ps = programState.init(code, compile(parse(code)), im.Map());
-
+    var code = "mouse-button-is-down";
     var inputter = inputterSetup(createMockWindow(), createMockScreen());
-    programState.createTopLevelBindings(ps, inputter.getMouseBindings());
+
+    var ps = programState.init(code, compile(parse(code)), im.Map());
+    ps = programState.createTopLevelBindings(ps, inputter.getMouseBindings());
+
+    expect(programState.peekStack(run(ps))).toEqual(false);
   });
 });
