@@ -1,4 +1,5 @@
 var im = require("immutable");
+var sinon = require("sinon");
 
 var parse = require("../src/lang/parser");
 var compile = require("../src/lang/compiler");
@@ -8,7 +9,7 @@ var inputterSetup = require("../src/inputter");
 
 function createMockWindow() {
   return {
-    addEventListener: function() {}
+    addEventListener: sinon.stub()
   }
 };
 
