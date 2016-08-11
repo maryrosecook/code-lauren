@@ -136,11 +136,11 @@ var user = im.Map({
         chk.pointer("a shape or some words to draw"));
 
     chk([p, programState.getFromHeap(p, drawablePointer)],
-        chk.anyType(["rectangle", "circle", "words"], "a shape or some words to draw"));
+        chk.anyValueAtKey("_drawableType", ["rectangle", "circle", "words"], "a shape or some words to draw"));
 
     addOperation(makeOperation(function () {
       var drawable = programState.getFromHeap(p, drawablePointer);
-      drawFns[drawable.get("type")](drawable);
+      drawFns[drawable.get("_drawableType")](drawable);
     }, "draw"));
 
     return { p: p, v: undefined };
@@ -162,12 +162,12 @@ var user = im.Map({
     chk([p,
          programState.getFromHeap(p, shapePointer1),
          programState.getFromHeap(p, shapePointer2)],
-        chk.anyType(["rectangle", "circle"], "a shape"),
-        chk.anyType(["rectangle", "circle"], "another shape"));
+        chk.anyValueAtKey("_spatialType", ["rectangle", "circle"], "a shape"),
+        chk.anyValueAtKey("_spatialType", ["rectangle", "circle"], "another shape"));
 
     var shape1 = programState.getFromHeap(p, shapePointer1);
     var shape2 = programState.getFromHeap(p, shapePointer2);
-    var collisionTestFn = overlappingFns[shape1.get("type") + " " + shape2.get("type")];
+    var collisionTestFn = overlappingFns[shape1.get("_spatialType") + " " + shape2.get("_spatialType")];
     if (collisionTestFn !== undefined) {
       return { p: p, v: collisionTestFn(shape1, shape2) };
     } else {
@@ -183,7 +183,7 @@ var user = im.Map({
         chk.num("the height"));
 
     var rectangle = im.Map({x: x, y: y, width: width, height: height,
-                            filled: true, color: "black", type: "rectangle"});
+                            filled: true, color: "black", _drawableType: "rectangle", _spatialType: "rectangle" });
 
     var heapAndPointer = heapLib.add(p.get("heap"), rectangle);
     return {
@@ -199,7 +199,7 @@ var user = im.Map({
         chk.num("the width"));
 
     var circle = im.Map({x: x, y: y, width: width,
-                         filled: true, color: "black", type: "circle"});
+                         filled: true, color: "black", _drawableType: "circle", _spatialType: "circle" });
     var heapAndPointer = heapLib.add(p.get("heap"), circle);
 
     return {
@@ -222,7 +222,7 @@ var user = im.Map({
         chk.num("the y coordinate of the center of the words"),
         chk.numOrBooleanOrString("some words or a number"));
 
-    var words = im.Map({x: x, y: y, words: words, color: "black", type: "words" });
+    var words = im.Map({x: x, y: y, words: words, color: "black", _drawableType: "words" });
 
     var heapAndPointer = heapLib.add(p.get("heap"), words);
 
@@ -234,8 +234,8 @@ var user = im.Map({
 
   distance: langUtil.createBuiltinNormal(function(p, s1, s2) {
     chk(arguments,
-        chk.anyType(["rectangle", "circle"], "a shape"),
-        chk.anyType(["rectangle", "circle"], "another shape"));
+        chk.anyValueAtKey("_spatialType", ["rectangle", "circle"], "a shape"),
+        chk.anyValueAtKey("_spatialType", ["rectangle", "circle"], "another shape"));
 
     return { p: p, v: shapeDistance(s1, s2) };
   })

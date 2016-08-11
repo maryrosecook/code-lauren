@@ -132,10 +132,10 @@ function set(legalValues, message) {
   });
 };
 
-function anyType(types, message) {
+function anyValueAtKey(key, possibleValues, message) {
   return createSpec(message, function(arg) {
-    for (var i = 0; i < types.length; i++) {
-      if (arg.get("type") === types[i]) {
+    for (var i = 0; i < possibleValues.length; i++) {
+      if (arg.get(key) === possibleValues[i]) {
         return false;
       }
     }
@@ -155,7 +155,7 @@ checkBuiltinArgs.numOrBoolean = numOrBoolean;
 checkBuiltinArgs.numOrBooleanOrString = numOrBooleanOrString;
 checkBuiltinArgs.thing = thing;
 checkBuiltinArgs.pointer = pointer;
-checkBuiltinArgs.anyType = anyType;
+checkBuiltinArgs.anyValueAtKey = anyValueAtKey;
 checkBuiltinArgs.checkLambdaArgs = checkLambdaArgs;
 checkBuiltinArgs.checkBuiltinArgs = checkBuiltinArgs;
 module.exports = checkBuiltinArgs;
