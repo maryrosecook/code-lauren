@@ -29,6 +29,9 @@ function createMouse(mousePosition, mouseDown) {
   return im.Map({
     x: mousePosition.x,
     y: mousePosition.y,
+    _spatialType: "rectangle",
+    width: 1,
+    height: 1,
     "button-is-down": mouseDown,
     "button-is-up": !mouseDown
   });
