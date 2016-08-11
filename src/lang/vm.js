@@ -15,8 +15,6 @@ function StackValue(value, ast) {
 };
 
 function stepPush(ins, p) {
-  // TODO: when have lists and objects in lang, will need to detect them and use immutablejs
-
   return p.set("stack", p.get("stack").unshift(new StackValue(ins[1], ins.ast)));
 };
 
