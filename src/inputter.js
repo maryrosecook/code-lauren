@@ -3,7 +3,6 @@ var im = require("immutable");
 var setup = module.exports = function(window, screen) {
   var mousePosition = { x: 0, y: 0 };
   var mouseDown = false;
-  var screen;
 
   var env = require("./env");
 
