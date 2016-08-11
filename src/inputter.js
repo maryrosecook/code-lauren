@@ -30,8 +30,8 @@ var setup = module.exports = function(window, screen) {
     getMouseBindings: function() {
       return im.Map({
         mouse: im.Map({
-          "x": mousePosition.x,
-          "y": mousePosition.y,
+          x: mousePosition.x,
+          y: mousePosition.y,
           "button-is-down": mouseDown,
           "button-is-up": !mouseDown
         })
