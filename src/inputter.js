@@ -4,15 +4,8 @@ var setup = module.exports = function(window, screen) {
   var mousePosition = { x: 0, y: 0 };
   var mouseDown = false;
 
-  var env = require("./env");
-
   window.addEventListener('mousemove', function(e) {
-    var absoluteMousePosition = getAbsoluteMousePosition(e);
-    var elementPosition = getElementPosition(screen.canvas);
-    mousePosition = {
-      x: absoluteMousePosition.x - elementPosition.x,
-      y: env.yInvert(absoluteMousePosition.y - elementPosition.y)
-    };
+    mousePosition = userMousePosition(getAbsoluteMousePosition(e), screen.canvas);
   }, false);
 
   window.addEventListener('mousedown', function(e) {
@@ -48,6 +41,15 @@ function getElementPosition(element) {
   return {
     x: rect.left + (window.pageXOffset || body.scrollLeft) - (body.clientLeft || 0),
     y: rect.top + (window.pageYOffset || body.scrollTop) - (body.clientTop || 0)
+  };
+};
+
+function userMousePosition(absoluteMousePosition, canvas) {
+  var env = require("./env");
+  var elementPosition = getElementPosition(canvas);
+  return {
+    x: absoluteMousePosition.x - elementPosition.x,
+    y: env.yInvert(absoluteMousePosition.y - elementPosition.y)
   };
 };
 
