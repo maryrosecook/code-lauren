@@ -28,16 +28,18 @@ var setup = module.exports = function(window, screen) {
 
   return {
     getMouseBindings: function() {
-      return im.Map({
-        mouse: im.Map({
-          x: mousePosition.x,
-          y: mousePosition.y,
-          "button-is-down": mouseDown,
-          "button-is-up": !mouseDown
-        })
-      });
+      return im.Map({ mouse: createMouse(mousePosition, mouseDown) });
     }
   };
+};
+
+function createMouse(mousePosition, mouseDown) {
+  return im.Map({
+    x: mousePosition.x,
+    y: mousePosition.y,
+    "button-is-down": mouseDown,
+    "button-is-up": !mouseDown
+  });
 };
 
 function getElementPosition(element) {
