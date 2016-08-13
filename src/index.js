@@ -29,13 +29,11 @@ var Sidebar = require("./sidebar.jsx");
 
 var createEditor = require("./editor");
 var sourceSaver = require("./source-saver");
-var createAnnotator = require("./annotator");
 
 window.addEventListener("load", function() {
   var editor = createEditor();
 
-  React.render(React.createElement(Topbar,
-                                   { editor: editor, annotator: createAnnotator(editor) }),
+  React.render(React.createElement(Topbar, { editor: editor }),
                $("#topbar")[0]);
 
   // export globally

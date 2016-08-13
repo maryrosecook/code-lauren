@@ -4,6 +4,7 @@ var ProgramPlayer = require("./program-player.jsx");
 var Search = require("./search.jsx");
 var env = require("./env");
 var sourceSaver = require("./source-saver");
+var createAnnotator = require("./annotator");
 
 var screen = $("#screen")[0].getContext("2d");
 var canvasLib = env.setupCanvasLib(screen);
@@ -20,7 +21,7 @@ var Topbar = React.createClass({
         <h1><a href="#" onClick={load("home")}>CODE LAUREN</a></h1>
 
         <ProgramPlayer editor={this.props.editor}
-                       annotator={this.props.annotator}
+                       annotator={createAnnotator(this.props.editor)}
                        canvasLib={canvasLib}
                        inputter={inputter} />
 
