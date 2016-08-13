@@ -5,6 +5,10 @@ function create() {
 };
 
 function add(heap, value) {
+  if (!isImmutable(value)) {
+    throw new Error("Cannot add immutable value to heap");
+  }
+
   var newHeap = heap.push(value);
   return { heap: newHeap, pointer: new Pointer(newHeap.size - 1) };
 };
@@ -19,6 +23,10 @@ function update(heap, pointer, value) {
 
 function Pointer(id) {
   this.id = id;
+};
+
+function isImmutable(possiblyImmutableObject) {
+  return possiblyImmutableObject instanceof im.Map;
 };
 
 module.exports = {
