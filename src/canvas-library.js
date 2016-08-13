@@ -232,12 +232,64 @@ var user = im.Map({
     };
   }),
 
-  distance: langUtil.createBuiltinNormal(function(p, s1, s2) {
+  "vector-towards": langUtil.createBuiltinNormal(function(p, shapePointer1, shapePointer2) {
     chk(arguments,
+        chk.pointer("a shape"),
+        chk.pointer("another shape"));
+
+    var shape1 = programState.getFromHeap(p, shapePointer1);
+    var shape2 = programState.getFromHeap(p, shapePointer2);
+
+    chk([p,
+         shape1,
+         shape2],
         chk.anyValueAtKey("_spatialType", ["rectangle", "circle"], "a shape"),
         chk.anyValueAtKey("_spatialType", ["rectangle", "circle"], "another shape"));
 
-    return { p: p, v: shapeDistance(s1, s2) };
+    var position1 = {
+      x: parseFloat(shape1.get("x")),
+      y: parseFloat(env.yInvert(shape1.get("y")))
+    };
+
+    var position2 = {
+      x: parseFloat(shape2.get("x")),
+      y: parseFloat(env.yInvert(shape2.get("y")))
+    };
+
+    var vector = vectorBetween(position1, position2);
+    var heapAndPointer = heapLib.add(p.get("heap"), im.Map(vector));
+
+    return {
+      p: p.set("heap", heapAndPointer.heap),
+      v: heapAndPointer.pointer
+    };
+  }),
+
+  distance: langUtil.createBuiltinNormal(function(p, shapePointer1, shapePointer2) {
+    chk(arguments,
+        chk.pointer("a shape"),
+        chk.pointer("another shape"));
+
+    var shape1 = programState.getFromHeap(p, shapePointer1);
+    var shape2 = programState.getFromHeap(p, shapePointer2);
+
+    chk([p,
+         shape1,
+         shape2],
+        chk.anyValueAtKey("_spatialType", ["rectangle", "circle"], "a shape"),
+        chk.anyValueAtKey("_spatialType", ["rectangle", "circle"], "another shape"));
+
+    var position1 = {
+      x: parseFloat(shape1.get("x")),
+      y: parseFloat(env.yInvert(shape1.get("y")))
+    };
+
+    var position2 = {
+      x: parseFloat(shape2.get("x")),
+      y: parseFloat(env.yInvert(shape2.get("y")))
+    };
+
+    return { p: p, v: distance(position1, position2) };
   })
 });
 
@@ -313,7 +365,17 @@ var overlappingFns = {
   },
 
   "circle circle": function(s1, s2) {
-    return shapeDistance(s1, s2) <= s1.get("width") / 2 + s2.get("width") / 2;
+    var position1 = {
+      x: parseFloat(s1.get("x")),
+      y: parseFloat(env.yInvert(s1.get("y")))
+    };
+
+    var position2 = {
+      x: parseFloat(s2.get("x")),
+      y: parseFloat(env.yInvert(s2.get("y")))
+    };
+
+    return distance(position1, position2) <= s1.get("width") / 2 + s2.get("width") / 2;
   },
 
   // only works for unrotated rectangles
@@ -347,7 +409,10 @@ var overlappingFns = {
       closestY = cY;
     }
 
-    return distance(cX, cY, closestX, closestY) < cWidth / 2;
+    var position1 = { x: cX, y: cY };
+    var position2 = { x: closestX, y: closestY };
+
+    return distance(position1, position2) < cWidth / 2;
   },
 
   "circle rectangle": function(c, r) {
@@ -355,19 +420,33 @@ var overlappingFns = {
   }
 };
 
-function distance(x1, y1, x2, y2) {
-  var x = Math.abs(x1 - x2);
-  var y = Math.abs(y1 - y2);
+function distance(position1, position2) {
+  var x = Math.abs(position1.x - position2.x);
+  var y = Math.abs(position1.y - position2.y);
 
   return Math.sqrt((x * x) + (y * y));
 };
 
-function shapeDistance(s1, s2) {
-  var x1 = parseFloat(s1.get("x"));
-  var y1 = parseFloat(env.yInvert(s1.get("y")));
-  var x2 = parseFloat(s2.get("x"));
-  var y2 = parseFloat(env.yInvert(s2.get("y")));
-  return distance(x1, y1, x2, y2);
+function vectorBetween(position1, position2) {
+  return unitVector({
+    x: position2.x - position1.x,
+    y: position2.y - position1.y
+  });
+};
+
+function unitVector(position) {
+  if (magnitude(position) === 0) {
+    return { x: 0, y: 0 };
+  } else {
+    return {
+      x: position.x / magnitude(position),
+      y: position.y / magnitude(position)
+    };
+  }
+};
+
+function magnitude(position) {
+  return Math.sqrt(position.x * position.x + position.y * position.y);
 };
 
 var COMPOSITE_OPERATIONS = [

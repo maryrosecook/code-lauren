@@ -133,6 +133,27 @@ describe("canvas library", function() {
     });
   });
 
+  describe("vector-towards", function() {
+    it("should report missing args", function() {
+      expect(vm.complete(setupProgram('vector-towards()'))
+             .get("exception").message)
+        .toEqual("Needs a shape");
+
+      expect(vm.complete(setupProgram('vector-towards(rectangle(1 1 1 1))'))
+             .get("exception").message)
+        .toEqual("Needs another shape");
+    });
+
+    it("should report the vector between two shapes", function() {
+      var ps = vm.complete(setupProgram('vector-towards(circle(1 1 1) circle(10 10 1))'));
+      var vectorPointer = programState.peekStack(ps);
+
+      var vector = heapLib.get(ps.get("heap"), vectorPointer);
+      expect(vector.get("x")).toEqual(0.7071067811865476);
+      expect(vector.get("y")).toEqual(-0.7071067811865476);
+    });
+  });
+
   describe("are-overlapping", function() {
     it("should report missing args", function() {
       expect(vm.complete(setupProgram('are-overlapping()'))
