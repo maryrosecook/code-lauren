@@ -4,7 +4,7 @@
 }
 
 body {
-  font-family: "Gill Sans W02 Light";
+  font-family: "Gill Sans WGL W01 Light";
   overflow: hidden;
   font-kerning: normal;
   font-weight: normal;
@@ -79,13 +79,13 @@ video {
 }
 
 .search .title {
-  font-family: "Gill Sans W02 Book";
+  font-family: "Gill Sans W01 Book";
 }
 
 .search input {
   height: 22px;
   border: 1px solid black;
-  font-family: "Gill Sans W02 Light";
+  font-family: "Gill Sans WGL W01 Light";
   font-size: 16px;
   padding-left: 5px;
   vertical-align: top;
@@ -134,7 +134,7 @@ video {
 }
 
 .search .result .excerpt .match {
-  font-family: "Gill Sans W02 Book";
+  font-family: "Gill Sans W01 Book";
   font-weight: bold;
 }
 
@@ -183,7 +183,7 @@ video {
 }
 
 .topbar {
-  font-family: "Gill Sans W02 Light";
+  font-family: "Gill Sans WGL W01 Light";
   font-size: 16px;
   position: fixed;
   top: 0;
@@ -215,7 +215,7 @@ video {
 }
 
 h1 {
-  font-family: "Gill Sans W02 Light";
+  font-family: "Gill Sans WGL W01 Light";
   font-size: 27px;
   margin: -2px 0 0 0;
   color: white;
@@ -224,7 +224,7 @@ h1 {
 }
 
 #sidebar h2 {
-  font-family: "Gill Sans W02 Book";
+  font-family: "Gill Sans W01 Book";
   font-size: 21px;
 
   /* to give nice space at top of content. When content loaded,
@@ -241,7 +241,7 @@ h1 {
   margin-top: 0;
   margin-bottom: 0.55em;
   font-weight: normal;
-  font-family: "Gill Sans W02 Book";
+  font-family: "Gill Sans W01 Book";
 }
 
 #sidebar h4 {
@@ -249,7 +249,7 @@ h1 {
   margin-top: 0;
   margin-bottom: 0.55em;
   font-weight: normal;
-  font-family: "Gill Sans W02 Book";
+  font-family: "Gill Sans W01 Book";
 }
 
 #sidebar p {
@@ -517,7 +517,7 @@ td code {
 
 @media handheld, only screen and (max-width: 767px) {
   body {
-    font-family: "Gill Sans W02 Light";
+    font-family: "Gill Sans WGL W01 Light";
     font-size: 18px;
     overflow: scroll;
   }
@@ -535,7 +535,7 @@ td code {
   }
 
   h2 {
-    font-family: "Gill Sans W02 Light";
+    font-family: "Gill Sans WGL W01 Light";
     font-size: 22px;
     margin-bottom: 10px;
   }
