@@ -1,7 +1,13 @@
 ## Game programming for beginners
 
-Get started by changing one of the numbers in the code on the left.  Did the rectangle move? Or did it change size?
+A prototype game programming environment for beginners.  I'm not really working on this anymore.  But for the curious, here's a brief overview of the API:
 
-Try changing the other numbers.  What does each number do?
-
-### <div class="next">[Start making your first game →](#make-your-first-game)</div>
+* [Basic syntax](#basic-syntax)
+* [Create and draw shapes and text](#create-and-draw-shapes-and-text)
+* [Create an animation](#create-an-animation)
+* [Perform mathematical operations](#perform-mathematical-operations)
+* [Compare things](#compare-things)
+* [Create and change objects](#create-and-change-objects)
+* [Data types](#data-types)
+* [Print to the JavaScript console](#print-to-the-javascript-console)
+* [Step forwards and backwards through a program](#step-forwards-and-backwards-through-a-program)
