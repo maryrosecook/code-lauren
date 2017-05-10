@@ -144,7 +144,7 @@ video {
   right: 0;
   width: 450px;
   max-width: 450px;
-  height: calc(70% - 32px);
+  height: calc(100% - 32px);
   background-color: white;
   z-index: 2;
   overflow: hidden;
