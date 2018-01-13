@@ -2,7 +2,7 @@
 
 A prototype game programming environment for beginners.  I'm not really working on this anymore.  But for the curious, here's a brief overview of the API:
 
-* [Basic syntax](#basic-syntax)
+* [Assign variables](#assign-variables)
 * [Call and define functions](#call-and-define-functions)
 * [Create and draw shapes and text](#create-and-draw-shapes-and-text)
 * [Create an animation](#create-an-animation)
