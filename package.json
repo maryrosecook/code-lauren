@@ -27,6 +27,7 @@
     "summarize-markdown": "^0.3.0",
     "transform-loader": "^0.2.1",
     "underscore": "^1.8.2",
+    "url-parse": "^1.2.0",
     "video.js": "^4.12.15",
     "webpack-manifest-plugin": "^0.5.0"
   },
